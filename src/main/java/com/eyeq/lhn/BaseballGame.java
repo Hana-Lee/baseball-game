@@ -1,5 +1,8 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.model.Ball;
+import com.eyeq.lhn.model.Strike;
+
 /**
  * @author Hana Lee
  * @since 2015-11-11 20-47
@@ -58,7 +61,7 @@ public class BaseballGame {
 	}
 
 	private GuessResult createSolvedResult() {
-		return new GuessResult(true, 3, 0);
+		return new GuessResult(true, new Strike(3), new Ball(0));
 	}
 
 	private GuessResult createNonSolvedResult(String guessNumbers) {
@@ -72,6 +75,6 @@ public class BaseballGame {
 				balls++;
 			}
 		}
-		return new GuessResult(false, strikes, balls);
+		return new GuessResult(false, new Strike(strikes), new Ball(balls));
 	}
 }

@@ -1,5 +1,7 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.model.Ball;
+import com.eyeq.lhn.model.Strike;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +20,6 @@ public class BaseballGameTest {
 	@Before
 	public void setUp() throws Exception {
 		game = new BaseballGame();
-
 	}
 
 	@Test
@@ -77,10 +78,10 @@ public class BaseballGameTest {
 		}
 	}
 
-	private void assertGuessResult(String guessNumbers, boolean solved, int strikes, int balls) {
+	private void assertGuessResult(String guessNumbers, boolean solved, int expectedStrikes, int expectedBalls) {
 		GuessResult guessResult = game.guess(guessNumbers);
 		assertThat(guessResult.isSolved(), equalTo(solved));
-		assertThat(guessResult.getStrikes(), equalTo(strikes));
-		assertThat(guessResult.getBalls(), equalTo(balls));
+		assertThat(guessResult.getStrike(), equalTo(new Strike(expectedStrikes).getCount()));
+		assertThat(guessResult.getBall(), equalTo(new Ball(expectedBalls).getCount()));
 	}
 }
