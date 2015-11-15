@@ -39,6 +39,9 @@ public class BaseballGame {
 
 	private void init() {
 		this.loadedScores = loadScores();
+		if (loadedScores == null) {
+			loadedScores = new ArrayList<>();
+		}
 	}
 
 	public void setSetting(GameSetting setting) {
@@ -82,9 +85,8 @@ public class BaseballGame {
 			}
 		}
 
-		if (guessNumbers.charAt(0) == guessNumbers.charAt(1)
-				|| guessNumbers.charAt(0) == guessNumbers.charAt(2)
-				|| guessNumbers.charAt(1) == guessNumbers.charAt(2)) {
+		if (guessNumbers.charAt(0) == guessNumbers.charAt(1) || guessNumbers.charAt(0) == guessNumbers.charAt(2) ||
+				guessNumbers.charAt(1) == guessNumbers.charAt(2)) {
 			throw new IllegalArgumentException("중복 된 입력 값이 있습니다 : " + guessNumbers);
 		}
 	}
@@ -112,9 +114,6 @@ public class BaseballGame {
 	}
 
 	public void saveScore(Score score) {
-		if (loadedScores == null) {
-			loadedScores = new ArrayList<>();
-		}
 		loadedScores.add(score);
 		scoreService.save(loadedScores, scoreFileName);
 	}
@@ -125,6 +124,8 @@ public class BaseballGame {
 
 	public void deleteScore() {
 		scoreService.delete(scoreFileName);
+
+		init();
 	}
 
 	public Score score(GuessResult result) {
@@ -135,6 +136,16 @@ public class BaseballGame {
 		if (guessCount == setting.getUserInputCountLimit() && !result.isSolved()) {
 			score = 0;
 		}
-		return new Score(1L, "이하나", score, true, "1234", true);
+
+		return new Score(generateScoreId(), "이하나", score, true, "1234", true);
+	}
+
+	private long generateScoreId() {
+		if (loadedScores.isEmpty()) {
+			return 1L;
+		} else {
+			Score previousScore = loadedScores.get(loadedScores.size() - 1);
+			return previousScore.getId() + 1L;
+		}
 	}
 }

@@ -131,6 +131,24 @@ public class BaseballGameTest {
 		assertEquals("스코어의 생성필드느 1234 이여야만 합니다", "1234", score.getCreated());
 	}
 
+	// 게임 점수 ID 증가 테스트
+	@Test
+	public void 게임점수ID값증가테스트() {
+		game.deleteScore();
+
+		generateGameNumber("123");
+		GuessResult result = game.guess("123");
+		Score score = game.score(result);
+		game.saveScore(score);
+		assertEquals("첫번째 score 의 ID 값은 1L 이여야 합니다", 1L, score.getId());
+
+		generateGameNumber("456");
+		result = game.guess("456");
+		score = game.score(result);
+		game.saveScore(score);
+		assertEquals("두번째 score 의 ID 값은 2L 이여야 합니다", 2L, score.getId());
+	}
+
 	// 게임 점수 계산 테스트
 	@Test
 	public void 게임점수계산테스트() {
