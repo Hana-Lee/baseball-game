@@ -1,13 +1,14 @@
-package com.eyeq.lhn;
+package com.eyeq.lhn.model;
 
-import com.eyeq.lhn.model.Ball;
-import com.eyeq.lhn.model.Strike;
+import java.io.Serializable;
 
 /**
  * @author Hana Lee
  * @since 2015-11-11 22-03
  */
-public class GuessResult {
+public class GuessResult implements Serializable {
+
+	private static final long serialVersionUID = 882749425118511462L;
 
 	private boolean solved;
 	private Strike strike;

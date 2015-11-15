@@ -1,9 +1,16 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.exception.GameNotEndException;
 import com.eyeq.lhn.exception.UserInputOverLimitException;
 import com.eyeq.lhn.model.Ball;
+import com.eyeq.lhn.model.GuessResult;
+import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.model.Strike;
+import com.eyeq.lhn.service.ScoreService;
 import com.eyeq.lhn.setting.GameSetting;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Hana Lee
@@ -15,9 +22,23 @@ public class BaseballGame {
 	private GameNumberGenerator gameNumberGenerator;
 	private int guessCount = 0;
 	private GameSetting setting;
+	private ScoreService scoreService;
+	private List<Score> loadedScores;
+	private String scoreFileName;
+	private int startScore = 1000;
 
-	public static void main(String[] args) {
+//	public static void main(String[] args) {
+//	}
 
+	public BaseballGame(ScoreService scoreService, String scoreFileName) {
+		this.scoreService = scoreService;
+		this.scoreFileName = scoreFileName;
+
+		init();
+	}
+
+	private void init() {
+		this.loadedScores = loadScores();
 	}
 
 	public void setSetting(GameSetting setting) {
@@ -90,7 +111,27 @@ public class BaseballGame {
 		return new GuessResult(false, new Strike(strikes), new Ball(balls));
 	}
 
-	public void saveResult(GuessResult result) {
+	public void saveScore(Score score) {
+		if (loadedScores == null) {
+			loadedScores = new ArrayList<>();
+		}
+		loadedScores.add(score);
+		scoreService.save(loadedScores, scoreFileName);
+	}
 
+	public List<Score> loadScores() {
+		return scoreService.load(scoreFileName);
+	}
+
+	public void deleteScore() {
+		scoreService.delete(scoreFileName);
+	}
+
+	public Score score(GuessResult result) {
+		if (!result.isSolved()) {
+			throw new GameNotEndException();
+		}
+		int score = startScore - ((guessCount - 1) * 10);
+		return new Score(1L, "이하나", score, true, "1234", true);
 	}
 }
