@@ -1,7 +1,6 @@
 # 야구 게임
 자바를 공부하며 만들어 보는 야구 게임
-TravisCI
-
+![Travis CI](https://travis-ci.org/eyeqmc-study/baseball-game.svg?branch=master)
 ## 야구게임 설계
 
 ### 규칙
