@@ -1,7 +1,9 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.exception.UserInputOverLimitException;
 import com.eyeq.lhn.model.Ball;
 import com.eyeq.lhn.model.Strike;
+import com.eyeq.lhn.setting.GameSetting;
 
 /**
  * @author Hana Lee
@@ -11,9 +13,15 @@ public class BaseballGame {
 
 	private String generatedNumber;
 	private GameNumberGenerator gameNumberGenerator;
+	private int guessCount = 0;
+	private GameSetting setting;
 
 	public static void main(String[] args) {
 
+	}
+
+	public void setSetting(GameSetting setting) {
+		this.setting = setting;
 	}
 
 	public void setGameNumberGenerator(GameNumberGenerator gameNumberGenerator) {
@@ -25,6 +33,10 @@ public class BaseballGame {
 	}
 
 	public GuessResult guess(String guessNumbers) {
+		guessCount++;
+		if (guessCount > setting.getUserInputCountLimit()) {
+			throw new UserInputOverLimitException();
+		}
 		assertGuessNumbersValid(guessNumbers);
 
 		if (solved(guessNumbers)) {
@@ -76,5 +88,9 @@ public class BaseballGame {
 			}
 		}
 		return new GuessResult(false, new Strike(strikes), new Ball(balls));
+	}
+
+	public void saveResult(GuessResult result) {
+
 	}
 }
