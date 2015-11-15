@@ -126,7 +126,7 @@ public class BaseballGameTest {
 		assertEquals("스코어의 ID 는 1L 이여야만 합니다", 1L, score.getId());
 		assertEquals("스코어의 결과필드는 true 이여야만 합니다", true, score.isSolved());
 		assertEquals("스코어의 이름필드는 이하나 이여야만 합니다", "이하나", score.getName());
-		assertEquals("스코어의 점수필드는 100 이여야만 합니다", 100, score.getScore());
+		assertEquals("스코어의 점수필드는 1000 이여야만 합니다", 1000, score.getScore());
 		assertEquals("스코어의 활성화필드는 true 이여야만 합니다", true, score.isEnabled());
 		assertEquals("스코어의 생성필드느 1234 이여야만 합니다", "1234", score.getCreated());
 	}
@@ -192,7 +192,18 @@ public class BaseballGameTest {
 			fail();
 		}
 		assertEquals(score3, score4);
-		System.out.println(score1);
+	}
+
+	// 숫자 맞추기를 실패 했을때 0점 테스트
+	@Test
+	public void 숫자맞추기실패테스트() {
+		generateGameNumber("123");
+		GuessResult result = null;
+		for (int i = 1; i <= 10; i++) {
+			result = game.guess("234");
+		}
+		Score score = game.score(result);
+		assertEquals("숫자를 못맞췄을때는 점수가 0점이여야 한다", 0, score.getScore());
 	}
 
 	private void generateGameNumber(String generatedNumber) {

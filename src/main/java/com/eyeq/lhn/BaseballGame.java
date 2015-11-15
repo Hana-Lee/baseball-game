@@ -128,10 +128,13 @@ public class BaseballGame {
 	}
 
 	public Score score(GuessResult result) {
-		if (!result.isSolved()) {
+		if (!result.isSolved() && guessCount < setting.getUserInputCountLimit()) {
 			throw new GameNotEndException();
 		}
 		int score = startScore - ((guessCount - 1) * 10);
+		if (guessCount == setting.getUserInputCountLimit() && !result.isSolved()) {
+			score = 0;
+		}
 		return new Score(1L, "이하나", score, true, "1234", true);
 	}
 }
