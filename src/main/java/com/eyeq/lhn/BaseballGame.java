@@ -1,5 +1,6 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.controller.GameNumberGenerator;
 import com.eyeq.lhn.exception.GameNotEndException;
 import com.eyeq.lhn.exception.UserInputOverLimitException;
 import com.eyeq.lhn.model.Ball;

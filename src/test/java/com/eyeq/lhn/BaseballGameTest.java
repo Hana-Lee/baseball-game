@@ -1,5 +1,7 @@
 package com.eyeq.lhn;
 
+import com.eyeq.lhn.controller.GameNumberGenerator;
+import com.eyeq.lhn.controller.GameNumberRandomGenerator;
 import com.eyeq.lhn.exception.GameNotEndException;
 import com.eyeq.lhn.exception.UserInputOverLimitException;
 import com.eyeq.lhn.model.Ball;
@@ -18,7 +20,10 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Hana Lee
@@ -222,6 +227,43 @@ public class BaseballGameTest {
 		}
 		Score score = game.score(result);
 		assertEquals("숫자를 못맞췄을때는 점수가 0점이여야 한다", 0, score.getScore());
+	}
+
+	// 랜덤 하게 생성된 숫자가 3자리수인지 확인하는 테스트
+	@Test
+	public void 랜덤생성된숫자의자리수확인테스트() {
+		GameSetting setting = new GameSetting();
+		int generateNumberCount = 10;
+		setting.setGenerateNumberCount(generateNumberCount);
+
+		GameNumberGenerator generator = new GameNumberRandomGenerator(setting);
+		String generatedNumber = generator.generate();
+
+		assertEquals("랜덤숫자는 " + generatedNumber + "자리여야 합니다", generateNumberCount, generatedNumber.length());
+	}
+
+	// 랜덤하게 생성된 숫자에 중복된 숫자가 생성되는지 확인 테스트
+	@Test
+	public void 랜덤생성숫자중복테스트() {
+		GameSetting setting = new GameSetting();
+		setting.setGenerateNumberCount(3);
+
+		GameNumberGenerator generator = new GameNumberRandomGenerator(setting);
+
+		for (int i = 0; i < 1000; i++) {
+			String generatedNumber = generator.generate();
+
+			assertFalse("랜덤 생성된 숫자에는 중복된 숫자가 있을 수 없습니다 : " + generatedNumber, 중복숫자체크(generatedNumber));
+		}
+	}
+
+	private boolean 중복숫자체크(String number) {
+		if (number.charAt(0) == number.charAt(1) || number.charAt(0) == number.charAt(2) ||
+				number.charAt(1) == number.charAt(2)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private void generateGameNumber(String generatedNumber) {

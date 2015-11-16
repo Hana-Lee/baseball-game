@@ -7,6 +7,7 @@ package com.eyeq.lhn.setting;
 public class GameSetting {
 
 	private int userInputCountLimit;
+	private int generateNumberCount;
 
 	public void setUserInputCountLimit(int userInputCountLimit) {
 		this.userInputCountLimit = userInputCountLimit;
@@ -14,5 +15,13 @@ public class GameSetting {
 
 	public int getUserInputCountLimit() {
 		return userInputCountLimit;
+	}
+
+	public void setGenerateNumberCount(int generateNumberCount) {
+		this.generateNumberCount = generateNumberCount;
+	}
+
+	public int getGenerateNumberCount() {
+		return generateNumberCount;
 	}
 }

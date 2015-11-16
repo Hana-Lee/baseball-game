@@ -1,4 +1,4 @@
-package com.eyeq.lhn;
+package com.eyeq.lhn.controller;
 
 /**
  * @author Hana Lee
