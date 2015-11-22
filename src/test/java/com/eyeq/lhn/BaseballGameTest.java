@@ -129,10 +129,9 @@ public class BaseballGameTest {
 		assertNotNull("스코어는 Null 일수 없습니다", score);
 		assertEquals("스코어의 ID 는 1L 이여야만 합니다", 1L, score.getId());
 		assertEquals("스코어의 결과필드는 true 이여야만 합니다", true, score.isSolved());
-		assertEquals("스코어의 이름필드는 이하나 이여야만 합니다", "이하나", score.getName());
+		assertEquals("스코어의 이름필드는 No Name 이여야만 합니다", "No Name", score.getName());
 		assertEquals("스코어의 점수필드는 1000 이여야만 합니다", 1000, score.getScore());
 		assertEquals("스코어의 활성화필드는 true 이여야만 합니다", true, score.isEnabled());
-		assertEquals("스코어의 생성필드느 1234 이여야만 합니다", "1234", score.getCreated());
 	}
 
 	// 게임 점수 ID 증가 테스트
