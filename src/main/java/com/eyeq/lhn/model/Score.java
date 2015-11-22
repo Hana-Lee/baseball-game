@@ -18,6 +18,7 @@ public class Score implements Serializable {
 	private static final long serialVersionUID = -9101473675515636509L;
 
 	private long id;
+	@Setter
 	private String name;
 	private int score;
 	private boolean solved;
