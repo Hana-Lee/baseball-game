@@ -34,6 +34,7 @@ public class BaseballGame {
 	private String scoreFileName;
 	private int startScore = 1000;
 	private ViewRenderer viewRenderer;
+	private boolean gameTerminated = false;
 
 	public static void main(String[] args) {
 		BaseballGame baseballGame = new BaseballGame(new ScoreServiceImpl(), "test_score.txt", new ConsoleViewRenderer
@@ -47,8 +48,7 @@ public class BaseballGame {
 		baseballGame.start();
 	}
 
-	public BaseballGame(ScoreService scoreService, String scoreFileName,
-	                    ViewRenderer viewRenderer) {
+	public BaseballGame(ScoreService scoreService, String scoreFileName, ViewRenderer viewRenderer) {
 		this.scoreService = scoreService;
 		this.scoreFileName = scoreFileName;
 		this.viewRenderer = viewRenderer;
@@ -64,29 +64,43 @@ public class BaseballGame {
 	}
 
 	public void start() {
-		viewRenderer.renderTitle();
-		viewRenderer.renderWelcome();
-		viewRenderer.renderMenu(MenuFactory.create());
-		Scanner s = new Scanner(System.in);
-		if (s.hasNext()) {
-			String userInput = s.next();
-			if (userInput.equals("1")) {
-				generateNumber();
-				System.out.println("생성된 숫자:"+generatedNumber);
-				viewRenderer.renderGameCount(guessCount);
-				viewRenderer.renderInputNumberMessage(setting);
-				Scanner inputNumber = new Scanner(System.in);
-				if (inputNumber.hasNext()) {
-					GuessResult result = guess(inputNumber.next());
-					if (isGameEnd(result)) {
-						viewRenderer.renderGameEnd(result, guessCount);
-						viewRenderer.renderScore(score(result));
+		while (!isGameTerminated()) {
+			viewRenderer.renderTitle();
+			viewRenderer.renderWelcome();
+			viewRenderer.renderMenu(MenuFactory.create());
+			Scanner s = new Scanner(System.in);
+			if (s.hasNext()) {
+				String userInput = s.next();
+				if (userInput.equals("1")) {
+					generateNumber();
+
+					GuessResult result = null;
+					while (!isGameEnd(result)) {
+						System.out.println("생성된 숫자:" + generatedNumber);
+						viewRenderer.renderGameCount(guessCount);
+						viewRenderer.renderInputNumberMessage(setting);
+						Scanner inputNumber = new Scanner(System.in);
+						if (inputNumber.hasNext()) {
+							result = guess(inputNumber.next());
+							viewRenderer.renderGuessResult(result);
+						}
 					}
+					viewRenderer.renderGameEnd(result, guessCount);
+					Score score = score(result);
+					viewRenderer.renderScore(score);
+					viewRenderer.renderInputNameMessage();
+					Scanner inputName = new Scanner(System.in);
+					if (inputName.hasNext()) {
+						score.setName(inputName.next());
+					}
+					saveScore(score);
+				} else if (userInput.equals("2")) {
+					viewRenderer.renderAllScores(loadedScores);
+				} else if (userInput.equals("3")) {
+
+				} else if (userInput.equals("4")) {
+					gameTerminated = true;
 				}
-			} else if (userInput.equals("2")) {
-
-			} else if (userInput.equals("3")) {
-
 			}
 		}
 	}
@@ -184,7 +198,7 @@ public class BaseballGame {
 			score = 0;
 		}
 
-		return new Score(generateScoreId(), "이하나", score, true, "1234", true);
+		return new Score(generateScoreId(), "No Name", score, true, String.valueOf(System.currentTimeMillis()), true);
 	}
 
 	private long generateScoreId() {
@@ -197,6 +211,10 @@ public class BaseballGame {
 	}
 
 	public boolean isGameEnd(GuessResult result) {
-		return result.isSolved() || guessCount == 10;
+		return result != null && (result.isSolved() || guessCount == 10);
+	}
+
+	public boolean isGameTerminated() {
+		return gameTerminated;
 	}
 }
