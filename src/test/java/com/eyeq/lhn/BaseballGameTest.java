@@ -20,10 +20,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Hana Lee
@@ -34,6 +31,7 @@ public class BaseballGameTest {
 	private BaseballGame game;
 	private ScoreService scoreService;
 	private final String scoreFileName = "test_score.data";
+	private final int userInputCountLimit = 10;
 
 	@Before
 	public void setUp() throws Exception {
@@ -41,7 +39,7 @@ public class BaseballGameTest {
 		game = new BaseballGame(scoreService, scoreFileName);
 
 		GameSetting setting = new GameSetting();
-		setting.setUserInputCountLimit(10);
+		setting.setUserInputCountLimit(userInputCountLimit);
 		game.setSetting(setting);
 	}
 
@@ -222,14 +220,14 @@ public class BaseballGameTest {
 	public void 숫자맞추기실패테스트() {
 		generateGameNumber("123");
 		GuessResult result = null;
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= userInputCountLimit; i++) {
 			result = game.guess("234");
 		}
 		Score score = game.score(result);
 		assertEquals("숫자를 못맞췄을때는 점수가 0점이여야 한다", 0, score.getScore());
 	}
 
-	// 랜덤 하게 생성된 숫자가 3자리수인지 확인하는 테스트
+	// 랜덤 하게 생성된 숫자가 설정된 자리수인지 확인하는 테스트
 	@Test
 	public void 랜덤생성된숫자의자리수확인테스트() {
 		GameSetting setting = new GameSetting();
@@ -255,6 +253,30 @@ public class BaseballGameTest {
 
 			assertFalse("랜덤 생성된 숫자에는 중복된 숫자가 있을 수 없습니다 : " + generatedNumber, 중복숫자체크(generatedNumber));
 		}
+	}
+
+	// 게임 종료 여부 확인 테스트
+	@Test
+	public void testGameEndWithMatchingNumber() {
+		generateGameNumber("123");
+		GuessResult result = game.guess("123");
+		boolean isGameEnd = game.isGameEnd(result);
+		assertTrue("게임 종료값은 true 여야 합니다", isGameEnd);
+	}
+
+	// 게임 횟수만큼 입력했을때 게임이 끝나는지 확인 테스트
+	@Test
+	public void testGameEndWhenUserInputLimitTime() {
+		generateGameNumber("123");
+		GuessResult result = null;
+		for (int i = 1; i <= userInputCountLimit; i++) {
+			result = game.guess("456");
+			if (i < userInputCountLimit) {
+				assertFalse("게임중에는 게임 종료 값이 false 여야 합니다", game.isGameEnd(result));
+			}
+		}
+		boolean isGameEnd = game.isGameEnd(result);
+		assertTrue("게임 종료 값은 true 여야 합니다", isGameEnd);
 	}
 
 	private boolean 중복숫자체크(String number) {

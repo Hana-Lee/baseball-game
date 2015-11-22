@@ -149,4 +149,8 @@ public class BaseballGame {
 			return previousScore.getId() + 1L;
 		}
 	}
+
+	public boolean isGameEnd(GuessResult result) {
+		return result.isSolved() || guessCount == 10;
+	}
 }

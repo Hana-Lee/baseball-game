@@ -19,7 +19,7 @@ public class GameNumberRandomGenerator implements GameNumberGenerator {
 
 	@Override
 	public String generate() {
-		Set<String> randomNumbers = new LinkedHashSet<>(3);
+		Set<String> randomNumbers = new LinkedHashSet<>();
 
 		while (randomNumbers.size() < gameSetting.getGenerateNumberCount()) {
 			int rNumber = (int) (Math.random() * 10);
