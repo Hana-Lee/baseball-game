@@ -11,6 +11,7 @@ import com.eyeq.lhn.model.Strike;
 import com.eyeq.lhn.service.ScoreService;
 import com.eyeq.lhn.service.ScoreServiceImpl;
 import com.eyeq.lhn.setting.GameSetting;
+import com.eyeq.lhn.view.ConsoleViewRenderer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,7 +37,7 @@ public class BaseballGameTest {
 	@Before
 	public void setUp() throws Exception {
 		scoreService = new ScoreServiceImpl();
-		game = new BaseballGame(scoreService, scoreFileName);
+		game = new BaseballGame(scoreService, scoreFileName, new ConsoleViewRenderer());
 
 		GameSetting setting = new GameSetting();
 		setting.setUserInputCountLimit(userInputCountLimit);

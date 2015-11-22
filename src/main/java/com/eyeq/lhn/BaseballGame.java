@@ -1,17 +1,23 @@
 package com.eyeq.lhn;
 
 import com.eyeq.lhn.controller.GameNumberGenerator;
+import com.eyeq.lhn.controller.GameNumberRandomGenerator;
 import com.eyeq.lhn.exception.GameNotEndException;
 import com.eyeq.lhn.exception.UserInputOverLimitException;
+import com.eyeq.lhn.factory.MenuFactory;
 import com.eyeq.lhn.model.Ball;
 import com.eyeq.lhn.model.GuessResult;
 import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.model.Strike;
 import com.eyeq.lhn.service.ScoreService;
+import com.eyeq.lhn.service.ScoreServiceImpl;
 import com.eyeq.lhn.setting.GameSetting;
+import com.eyeq.lhn.view.ConsoleViewRenderer;
+import com.eyeq.lhn.view.ViewRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author Hana Lee
@@ -27,13 +33,25 @@ public class BaseballGame {
 	private List<Score> loadedScores;
 	private String scoreFileName;
 	private int startScore = 1000;
+	private ViewRenderer viewRenderer;
 
-//	public static void main(String[] args) {
-//	}
+	public static void main(String[] args) {
+		BaseballGame baseballGame = new BaseballGame(new ScoreServiceImpl(), "test_score.txt", new ConsoleViewRenderer
+				());
+		GameSetting setting = new GameSetting();
+		setting.setGenerateNumberCount(3);
+		setting.setUserInputCountLimit(10);
+		baseballGame.setGameNumberGenerator(new GameNumberRandomGenerator(setting));
+		baseballGame.setSetting(setting);
 
-	public BaseballGame(ScoreService scoreService, String scoreFileName) {
+		baseballGame.start();
+	}
+
+	public BaseballGame(ScoreService scoreService, String scoreFileName,
+	                    ViewRenderer viewRenderer) {
 		this.scoreService = scoreService;
 		this.scoreFileName = scoreFileName;
+		this.viewRenderer = viewRenderer;
 
 		init();
 	}
@@ -42,6 +60,34 @@ public class BaseballGame {
 		this.loadedScores = loadScores();
 		if (loadedScores == null) {
 			loadedScores = new ArrayList<>();
+		}
+	}
+
+	public void start() {
+		viewRenderer.renderTitle();
+		viewRenderer.renderWelcome();
+		viewRenderer.renderMenu(MenuFactory.create());
+		Scanner s = new Scanner(System.in);
+		if (s.hasNext()) {
+			String userInput = s.next();
+			if (userInput.equals("1")) {
+				generateNumber();
+				System.out.println("생성된 숫자:"+generatedNumber);
+				viewRenderer.renderGameCount(guessCount);
+				viewRenderer.renderInputNumberMessage(setting);
+				Scanner inputNumber = new Scanner(System.in);
+				if (inputNumber.hasNext()) {
+					GuessResult result = guess(inputNumber.next());
+					if (isGameEnd(result)) {
+						viewRenderer.renderGameEnd(result, guessCount);
+						viewRenderer.renderScore(score(result));
+					}
+				}
+			} else if (userInput.equals("2")) {
+
+			} else if (userInput.equals("3")) {
+
+			}
 		}
 	}
 
