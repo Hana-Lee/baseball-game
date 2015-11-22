@@ -16,9 +16,10 @@ public class MenuFactory {
 	public static List<Menu> create() {
 		if (menus == null) {
 			menus = new ArrayList<>();
-			menus.add(new Menu(1, "시작", "게임을 시작합니다."));
-			menus.add(new Menu(2, "점수", "게임 점수 리스트를 봅니다"));
-			menus.add(new Menu(3, "설정", "게임의 규칙을 설정 합니다."));
+			menus.add(new Menu(1, "시작", "게임 시작"));
+			menus.add(new Menu(2, "점수", "게임 점수 리스트"));
+			menus.add(new Menu(3, "설정", "게임 규칙 설정"));
+			menus.add(new Menu(4, "종료", "게임 종료"));
 		}
 		return menus;
 	}
