@@ -19,7 +19,6 @@ import java.util.List;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
@@ -193,7 +192,8 @@ public class BaseballGameTest {
 		game.deleteScore();
 
 		List<Score> results = game.loadScores();
-		assertNull("결과 파일은 null 이어야 합니다", results);
+		assertNotNull("점수 리스트는 null 일 수 없습니다", results);
+		assertTrue("점수 리스트는 empty 여야 합니다", results.isEmpty());
 	}
 
 	// score 클래스의 identity 와 equality 테스트
