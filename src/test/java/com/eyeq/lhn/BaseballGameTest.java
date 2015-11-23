@@ -8,8 +8,8 @@ import com.eyeq.lhn.model.Ball;
 import com.eyeq.lhn.model.GuessResult;
 import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.model.Strike;
+import com.eyeq.lhn.service.MemorySaveScoreService;
 import com.eyeq.lhn.service.ScoreService;
-import com.eyeq.lhn.service.ScoreServiceImpl;
 import com.eyeq.lhn.setting.GameSetting;
 import com.eyeq.lhn.view.ConsoleViewRenderer;
 import org.junit.Before;
@@ -31,13 +31,12 @@ public class BaseballGameTest {
 
 	private BaseballGame game;
 	private ScoreService scoreService;
-	private final String scoreFileName = "test_score.data";
 	private final int userInputCountLimit = 10;
 
 	@Before
 	public void setUp() throws Exception {
-		scoreService = new ScoreServiceImpl();
-		game = new BaseballGame(scoreService, scoreFileName, new ConsoleViewRenderer());
+		scoreService = new MemorySaveScoreService();
+		game = new BaseballGame(scoreService, new ConsoleViewRenderer());
 
 		GameSetting setting = new GameSetting();
 		setting.setUserInputCountLimit(userInputCountLimit);

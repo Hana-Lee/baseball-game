@@ -9,8 +9,8 @@ import com.eyeq.lhn.model.Ball;
 import com.eyeq.lhn.model.GuessResult;
 import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.model.Strike;
+import com.eyeq.lhn.service.MemorySaveScoreService;
 import com.eyeq.lhn.service.ScoreService;
-import com.eyeq.lhn.service.ScoreServiceImpl;
 import com.eyeq.lhn.setting.GameSetting;
 import com.eyeq.lhn.view.ConsoleViewRenderer;
 import com.eyeq.lhn.view.ViewRenderer;
@@ -31,14 +31,12 @@ public class BaseballGame {
 	private GameSetting setting;
 	private ScoreService scoreService;
 	private List<Score> loadedScores;
-	private String scoreFileName;
 	private int startScore = 1000;
 	private ViewRenderer viewRenderer;
 	private boolean gameTerminated = false;
 
 	public static void main(String[] args) {
-		BaseballGame baseballGame = new BaseballGame(new ScoreServiceImpl(), "test_score.txt", new ConsoleViewRenderer
-				());
+		BaseballGame baseballGame = new BaseballGame(new MemorySaveScoreService(), new ConsoleViewRenderer());
 		GameSetting setting = new GameSetting();
 		setting.setGenerateNumberCount(3);
 		setting.setUserInputCountLimit(10);
@@ -48,9 +46,8 @@ public class BaseballGame {
 		baseballGame.start();
 	}
 
-	public BaseballGame(ScoreService scoreService, String scoreFileName, ViewRenderer viewRenderer) {
+	public BaseballGame(ScoreService scoreService, ViewRenderer viewRenderer) {
 		this.scoreService = scoreService;
-		this.scoreFileName = scoreFileName;
 		this.viewRenderer = viewRenderer;
 
 		init();
@@ -176,15 +173,15 @@ public class BaseballGame {
 
 	public void saveScore(Score score) {
 		loadedScores.add(score);
-		scoreService.save(loadedScores, scoreFileName);
+		scoreService.save(loadedScores);
 	}
 
 	public List<Score> loadScores() {
-		return scoreService.load(scoreFileName);
+		return scoreService.load();
 	}
 
 	public void deleteScore() {
-		scoreService.delete(scoreFileName);
+		scoreService.delete();
 
 		init();
 	}

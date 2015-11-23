@@ -9,9 +9,9 @@ import java.util.List;
  * @since 2015-11-15 20:16
  */
 public interface ScoreService {
-	void save(List<Score> results, String saveFileName);
+	void save(List<Score> results);
 
-	List<Score> load(String savedFileName);
+	List<Score> load();
 
-	void delete(String savedFileName);
+	void delete();
 }

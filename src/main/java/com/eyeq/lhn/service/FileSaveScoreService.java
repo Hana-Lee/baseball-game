@@ -9,10 +9,16 @@ import java.util.List;
  * @author Hana Lee
  * @since 2015-11-15 20:17
  */
-public class ScoreServiceImpl implements ScoreService {
+public class FileSaveScoreService implements ScoreService {
+
+	private String fileName;
+
+	public FileSaveScoreService(String fileName) {
+		this.fileName = fileName;
+	}
 
 	@Override
-	public void save(List<Score> results, String saveFileName) {
+	public void save(List<Score> results) {
 		File saveDirectory = new File(getDefaultSaveDirectory() + File.separator + "BaseBallGame");
 
 		boolean makeDirectoryResult = saveDirectory.exists() || saveDirectory.mkdir();
@@ -20,8 +26,7 @@ public class ScoreServiceImpl implements ScoreService {
 		if (makeDirectoryResult) {
 			ObjectOutputStream objectOutputStream = null;
 			try {
-				objectOutputStream = new ObjectOutputStream(new FileOutputStream(new File(saveDirectory,
-						saveFileName)));
+				objectOutputStream = new ObjectOutputStream(new FileOutputStream(new File(saveDirectory, fileName)));
 				objectOutputStream.writeObject(results);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -53,9 +58,9 @@ public class ScoreServiceImpl implements ScoreService {
 	}
 
 	@Override
-	public List<Score> load(String savedFileName) {
+	public List<Score> load() {
 		File resultFile = new File(getDefaultSaveDirectory() + File.separator + "BaseBallGame" + File.separator +
-				savedFileName);
+				fileName);
 		if (!resultFile.exists()) {
 			return null;
 		}
@@ -79,9 +84,9 @@ public class ScoreServiceImpl implements ScoreService {
 	}
 
 	@Override
-	public void delete(String savedFileName) {
+	public void delete() {
 		File scoreFile = new File(getDefaultSaveDirectory() + File.separator + "BaseBallGame" + File.separator +
-				savedFileName);
+				fileName);
 		if (scoreFile.exists() && scoreFile.canWrite()) {
 			scoreFile.delete();
 		}
