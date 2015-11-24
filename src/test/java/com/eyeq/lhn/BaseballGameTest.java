@@ -17,8 +17,6 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
