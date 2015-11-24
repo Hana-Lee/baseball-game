@@ -95,7 +95,7 @@ public class BaseballGame {
 				} else if (userInput.equals("2")) {
 					viewRenderer.renderAllScores(loadedScores);
 				} else if (userInput.equals("3")) {
-
+					viewRenderer.renderSettingMenu(setting);
 				} else if (userInput.equals("4")) {
 					gameTerminated = true;
 				}
