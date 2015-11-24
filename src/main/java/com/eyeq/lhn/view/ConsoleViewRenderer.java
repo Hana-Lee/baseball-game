@@ -6,6 +6,7 @@ import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.setting.GameSetting;
 
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author Hana Lee
@@ -37,7 +38,19 @@ public class ConsoleViewRenderer implements ViewRenderer {
 	public void renderSettingMenu(GameSetting setting) {
 		System.out.println("=== 게임 설정 ====");
 		System.out.println("사용자 입력 제한 횟수 (" + setting.getUserInputCountLimit() + "회) : ");
+		// TODO 입력 방법 리팩토링 할 것
+		Scanner input = new Scanner(System.in);
+		if (input.hasNext()) {
+			String inputValue = input.next();
+			setting.setUserInputCountLimit(Integer.parseInt(inputValue));
+		}
+
 		System.out.println("랜덤 숫자 생성 갯수 (" + setting.getGenerateNumberCount() + "개) : ");
+		input = new Scanner(System.in);
+		if (input.hasNext()) {
+			String inputValue = input.next();
+			setting.setGenerateNumberCount(Integer.parseInt(inputValue));
+		}
 	}
 
 	@Override
