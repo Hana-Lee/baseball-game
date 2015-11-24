@@ -62,6 +62,7 @@ public class BaseballGame {
 
 	public void start() {
 		while (!isGameTerminated()) {
+			resetStatus();
 			viewRenderer.renderTitle();
 			viewRenderer.renderWelcome();
 			viewRenderer.renderMenu(MenuFactory.create());
@@ -100,6 +101,12 @@ public class BaseballGame {
 				}
 			}
 		}
+	}
+
+	private void resetStatus() {
+		this.guessCount = 0;
+		this.generatedNumber = "";
+		this.startScore = 1000;
 	}
 
 	public void setSetting(GameSetting setting) {
