@@ -67,8 +67,8 @@ public class BaseballGame {
 			viewRenderer.renderWelcome();
 			viewRenderer.renderMenu(MenuFactory.create());
 			Scanner s = new Scanner(System.in);
-			if (s.hasNext()) {
-				String userInput = s.next();
+			if (s.hasNextLine()) {
+				String userInput = s.nextLine();
 				if (userInput.equals("1")) {
 					generateNumber();
 
@@ -78,8 +78,8 @@ public class BaseballGame {
 						viewRenderer.renderGameCount(guessCount);
 						viewRenderer.renderInputNumberMessage(setting);
 						Scanner inputNumber = new Scanner(System.in);
-						if (inputNumber.hasNext()) {
-							result = guess(inputNumber.next());
+						if (inputNumber.hasNextLine()) {
+							result = guess(inputNumber.nextLine());
 							viewRenderer.renderGuessResult(result);
 						}
 					}
@@ -122,11 +122,12 @@ public class BaseballGame {
 	}
 
 	public GuessResult guess(String guessNumbers) {
+		assertGuessNumbersValid(guessNumbers);
+
 		guessCount++;
 		if (guessCount > setting.getUserInputCountLimit()) {
 			throw new UserInputOverLimitException();
 		}
-		assertGuessNumbersValid(guessNumbers);
 
 		if (solved(guessNumbers)) {
 			return createSolvedResult();

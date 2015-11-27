@@ -53,6 +53,10 @@ public class BaseballGameTest {
 		assertIllegalArgumentException("141");
 		assertIllegalArgumentException("411");
 		assertIllegalArgumentException("444");
+
+		assertIllegalArgumentException("1 2 3");
+		assertIllegalArgumentException("1 23");
+		assertIllegalArgumentException("12 3");
 	}
 
 	// 일부숫자의 값이 맞았을때 게임 룰에 따라 결과값이 제대로 나오는지 확인 하는 테스트
