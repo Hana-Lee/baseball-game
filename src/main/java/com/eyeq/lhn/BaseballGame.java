@@ -34,6 +34,7 @@ public class BaseballGame {
 	private int startScore = 1000;
 	private ViewRenderer viewRenderer;
 	private boolean gameTerminated = false;
+	private int wrongInputCount = 0;
 
 	public static void main(String[] args) {
 		BaseballGame baseballGame = new BaseballGame(new MemorySaveScoreService(), new ConsoleViewRenderer());
@@ -80,10 +81,15 @@ public class BaseballGame {
 							viewRenderer.renderInputNumberMessage(setting);
 							Scanner inputNumber = new Scanner(System.in);
 							if (inputNumber.hasNextLine()) {
-								result = guess(inputNumber.nextLine());
-								viewRenderer.renderGuessResult(result);
+								try {
+									result = guess(inputNumber.nextLine());
+									viewRenderer.renderGuessResult(result);
+								} catch (IllegalArgumentException e) {
+									wrongInputCount++;
+								}
 							}
 						}
+
 						viewRenderer.renderGameEnd(result, guessCount);
 						Score score = score(result);
 						viewRenderer.renderScore(score);
@@ -114,6 +120,7 @@ public class BaseballGame {
 		this.guessCount = 0;
 		this.generatedNumber = "";
 		this.startScore = 1000;
+		this.wrongInputCount = 0;
 	}
 
 	public void setSetting(GameSetting setting) {
@@ -149,7 +156,7 @@ public class BaseballGame {
 		}
 
 		if (guessNumbers.length() < 3) {
-			throw new IllegalArgumentException("입력 값이 3보자 작습니다 : " + guessNumbers);
+			throw new IllegalArgumentException("입력 값이 3보다 작습니다 : " + guessNumbers);
 		}
 
 		for (char ch : guessNumbers.toCharArray()) {
@@ -202,12 +209,17 @@ public class BaseballGame {
 	}
 
 	public Score score(GuessResult result) {
-		if (!result.isSolved() && guessCount < setting.getUserInputCountLimit()) {
-			throw new GameNotEndException();
-		}
-		int score = startScore - ((guessCount - 1) * 10);
-		if (guessCount == setting.getUserInputCountLimit() && !result.isSolved()) {
+		int score;
+		if (result == null) {
 			score = 0;
+		} else {
+			if (!result.isSolved() && guessCount < setting.getUserInputCountLimit()) {
+				throw new GameNotEndException();
+			}
+			score = startScore - ((guessCount - 1) * 10);
+			if (guessCount == setting.getUserInputCountLimit() && !result.isSolved()) {
+				score = 0;
+			}
 		}
 
 		return new Score(generateScoreId(), "No Name", score, true, String.valueOf(System.currentTimeMillis()), true);
@@ -223,7 +235,7 @@ public class BaseballGame {
 	}
 
 	public boolean isGameEnd(GuessResult result) {
-		return result != null && (result.isSolved() || guessCount == 10);
+		return wrongInputCount > 5 || (result != null && result.isSolved()) || guessCount == 10;
 	}
 
 	public boolean isGameTerminated() {
