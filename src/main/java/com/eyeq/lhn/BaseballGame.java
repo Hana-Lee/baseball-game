@@ -1,7 +1,6 @@
 package com.eyeq.lhn;
 
 import com.eyeq.lhn.controller.GameNumberGenerator;
-import com.eyeq.lhn.controller.GameNumberRandomGenerator;
 import com.eyeq.lhn.exception.GameNotEndException;
 import com.eyeq.lhn.exception.UserInputOverLimitException;
 import com.eyeq.lhn.factory.MenuFactory;
@@ -9,10 +8,8 @@ import com.eyeq.lhn.model.Ball;
 import com.eyeq.lhn.model.GuessResult;
 import com.eyeq.lhn.model.Score;
 import com.eyeq.lhn.model.Strike;
-import com.eyeq.lhn.service.MemorySaveScoreService;
 import com.eyeq.lhn.service.ScoreService;
 import com.eyeq.lhn.setting.GameSetting;
-import com.eyeq.lhn.view.ConsoleViewRenderer;
 import com.eyeq.lhn.view.ViewRenderer;
 
 import java.util.ArrayList;
@@ -35,17 +32,6 @@ public class BaseballGame {
 	private ViewRenderer viewRenderer;
 	private boolean gameTerminated = false;
 	private int wrongInputCount = 0;
-
-	public static void main(String[] args) {
-		BaseballGame baseballGame = new BaseballGame(new MemorySaveScoreService(), new ConsoleViewRenderer());
-		GameSetting setting = new GameSetting();
-		setting.setGenerateNumberCount(3);
-		setting.setUserInputCountLimit(10);
-		baseballGame.setGameNumberGenerator(new GameNumberRandomGenerator(setting));
-		baseballGame.setSetting(setting);
-
-		baseballGame.start();
-	}
 
 	public BaseballGame(ScoreService scoreService, ViewRenderer viewRenderer) {
 		this.scoreService = scoreService;
