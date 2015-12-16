@@ -14,14 +14,10 @@ public class ServerBackground {
 
 	private ServerSocket serverSocket;
 	private Socket socket;
-//	private DataOutputStream dataOutputStream;
-
 
 	public static void main(String[] args) throws IOException {
 		ServerBackground serverBackground = new ServerBackground();
 		serverBackground.setting();
-
-
 	}
 
 	private void setting() throws IOException {
@@ -30,7 +26,7 @@ public class ServerBackground {
 		while (true) {
 			System.out.println("서버 대기중...");
 			socket = serverSocket.accept();
-//			dataOutputStream = new DataOutputStream(socket.getOutputStream());
+
 			System.out.println(socket.getInetAddress() + " 에서 접속.");
 
 			ServerReceiver serverReceiver = new ServerReceiver(socket);
@@ -65,8 +61,4 @@ public class ServerBackground {
 			}
 		}
 	}
-
-//	private void sendMessage(String msg) throws IOException {
-//		dataOutputStream.writeUTF(msg);
-//	}
 }
