@@ -23,15 +23,21 @@ public class ServerBackground {
 	private void setting() throws IOException {
 		serverSocket = new ServerSocket(8888);
 
-		while (true) {
+//		while (true) {
 			System.out.println("서버 대기중...");
 			socket = serverSocket.accept();
 
 			System.out.println(socket.getInetAddress() + " 에서 접속.");
 
-			ServerReceiver serverReceiver = new ServerReceiver(socket);
-			serverReceiver.start();
-		}
+			DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+			String clientMsg = dataInputStream.readUTF();
+			System.out.println("Client Msg : " + clientMsg);
+
+			DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+			dataOutputStream.writeUTF("서버 입니다");
+//			ServerReceiver serverReceiver = new ServerReceiver(socket);
+//			serverReceiver.start();
+//		}
 	}
 
 	private class ServerReceiver extends Thread {
