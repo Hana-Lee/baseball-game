@@ -36,56 +36,56 @@ public class App {
 			Scanner s = new Scanner(System.in);
 			if (s.hasNextLine()) {
 				switch (s.nextInt()) {
-				case 1:
-					client.sendSocketData("start");
-					
-					System.out.print("숫자를 입력해주세요 :  ");
-					Scanner s2 = new Scanner(System.in);
-					if (s2.hasNextLine()) {
-						inputNum = s2.nextLine();
-						client.sendSocketData(inputNum);
-					}
-					
-					System.out.println(client.getServerMessage());
+					case 1:
+						client.sendSocketData("start");
 
-					break;
-				case 2:
-					boolean exit = false;
-					while (!exit) {
-						System.out.println("==== 메뉴를 선택해주세요 =======");
-						System.out.println("1. 잘못된 값 연속 입력 횟수 제한 값 수정");
-						System.out.println("2. 수 입력 횟수 제한 값 수정");
-						System.out.println("0. 메인메뉴");
-						Scanner settingInput = new Scanner(System.in);
-						if (settingInput.hasNextInt()) {
-							switch (settingInput.nextInt()) {
-							case 1:
-								System.out.print("값을 입력해주세요. : ");
-								Scanner inputSettingNum = new Scanner(System.in);
-								if (inputSettingNum.hasNextInt()) {
-									//setting.setLimitInputWrongNum(inputSettingNum.nextInt());
-								}
-								break;
-							case 2:
-								System.out.print("값을 입력해주세요. : ");
-								Scanner inputSettingNum2 = new Scanner(System.in);
-								if (inputSettingNum2.hasNextInt()) {
-									//setting.setNumberOfInputNum(inputSettingNum2.nextInt());
-								}
-								break;
-							case 0:
-								// settingInput.close();
-								exit = true;
-							}
+						System.out.print("숫자를 입력해주세요 :  ");
+						Scanner s2 = new Scanner(System.in);
+						if (s2.hasNextLine()) {
+							inputNum = s2.nextLine();
+							client.sendSocketData(inputNum);
 						}
 
-					}
-					break;
-				case 0:
-					System.out.println("안녕히가세요");
-					gameTerminated = true;
-					client.closeConnection();
-					break;
+						System.out.println(client.getServerMessage());
+
+						break;
+					case 2:
+						boolean exit = false;
+						while (!exit) {
+							System.out.println("==== 메뉴를 선택해주세요 =======");
+							System.out.println("1. 잘못된 값 연속 입력 횟수 제한 값 수정");
+							System.out.println("2. 수 입력 횟수 제한 값 수정");
+							System.out.println("0. 메인메뉴");
+							Scanner settingInput = new Scanner(System.in);
+							if (settingInput.hasNextInt()) {
+								switch (settingInput.nextInt()) {
+									case 1:
+										System.out.print("값을 입력해주세요. : ");
+										Scanner inputSettingNum = new Scanner(System.in);
+										if (inputSettingNum.hasNextInt()) {
+											//setting.setLimitInputWrongNum(inputSettingNum.nextInt());
+										}
+										break;
+									case 2:
+										System.out.print("값을 입력해주세요. : ");
+										Scanner inputSettingNum2 = new Scanner(System.in);
+										if (inputSettingNum2.hasNextInt()) {
+											//setting.setNumberOfInputNum(inputSettingNum2.nextInt());
+										}
+										break;
+									case 0:
+										// settingInput.close();
+										exit = true;
+								}
+							}
+
+						}
+						break;
+					case 0:
+						System.out.println("안녕히가세요");
+						gameTerminated = true;
+						client.closeConnection();
+						break;
 
 				}
 

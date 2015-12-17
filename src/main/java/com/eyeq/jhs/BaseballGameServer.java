@@ -6,8 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class BaseballGameServer {
-	ServerSocket server = null;
-	Socket client = null;
+	private ServerSocket server = null;
+	private Socket client = null;
 
 	public static void main(String[] args) {
 		BaseballGameServer server = new BaseballGameServer();
