@@ -1,20 +1,19 @@
 package com.eyeq.jhs;
 
-import com.eyeq.jhs.model.Setting;
-import com.eyeq.jhs.strategy.GenerationNumberStrategy;
-import com.eyeq.jhs.strategy.RandomNumberGenerator;
-
 import java.util.Scanner;
 
 public class App {
 
 	public static void main(String[] args) {
-		Setting setting = new Setting();
-		BaseballGameEngine bbGame = new BaseballGameEngine(setting);
-		GenerationNumberStrategy strtg = new RandomNumberGenerator();
-		bbGame.setStrategy(strtg);
+//		Setting setting = new Setting();
+//		BaseballGameEngine bbGame = new BaseballGameEngine(setting);
+//		GenerationNumberStrategy strtg = new RandomNumberGenerator();
+//		bbGame.setStrategy(strtg);
+//
+//		bbGame.startGame();
 
-		bbGame.startGame();
+		App app = new App();
+		app.startGame();
 	}
 
 	public void startGame() {
@@ -29,7 +28,7 @@ public class App {
 		while (!gameTerminated) {
 			System.out.println("====== 게임 메뉴 ======");
 			System.out.println("1. 시작");
-			System.out.println("2. Settings");
+			System.out.println("2. 설정");
 			System.out.println("0. 종료");
 			System.out.println("=====================");
 			System.out.print("메뉴를 선택해 주세요 : ");
@@ -43,11 +42,10 @@ public class App {
 						Scanner s2 = new Scanner(System.in);
 						if (s2.hasNextLine()) {
 							inputNum = s2.nextLine();
-							client.sendSocketData(inputNum);
+							client.sendSocketData("user_guess_num," + inputNum);
 						}
 
 						System.out.println(client.getServerMessage());
-
 						break;
 					case 2:
 						boolean exit = false;

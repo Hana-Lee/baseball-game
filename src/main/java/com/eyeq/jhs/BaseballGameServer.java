@@ -1,6 +1,5 @@
 package com.eyeq.jhs;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -21,17 +20,9 @@ public class BaseballGameServer {
 				System.out.println("Server: Waiting for request.");
 				client = server.accept();
 				System.out.println("Server: accepted.");
-				DataInputStream stream = new DataInputStream(client.getInputStream());
 
-				String receivedData = stream.readUTF();
-
-				System.out.println("Received data: " + receivedData);
-
-				stream.close();
-				// 데이터 처리 끝난 후 소켓종료
-				client.close();
-
-				System.out.println("-------------------------");
+				final Receiver receiver = new Receiver(client);
+				receiver.start();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -46,5 +37,4 @@ public class BaseballGameServer {
 			}
 		}
 	}
-
 }

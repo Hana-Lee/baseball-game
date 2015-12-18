@@ -36,7 +36,7 @@ public class BaseballGameClient {
 
 	public void sendSocketData(String data) {
 
-		System.out.println("Client: Sent data");
+		System.out.println("Client: Sent data : " + data);
 
 		try {
 			stream.writeUTF(data);
