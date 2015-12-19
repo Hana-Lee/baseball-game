@@ -20,6 +20,11 @@ public class BaseballGameEngine {
 		this.setting = setting;
 	}
 
+	public BaseballGameEngine(GenerationNumberStrategy strategy, Setting setting) {
+		this.strategy = strategy;
+		this.setting = setting;
+	}
+
 	public void startGame() {
 		Boolean gameTerminated = false;
 		String inputNum = "";

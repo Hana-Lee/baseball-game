@@ -69,4 +69,23 @@ public class BaseballGameClient {
 		return null;
 	}
 
+	class Receiver extends Thread {
+
+		private DataInputStream dataInputStream;
+
+		public Receiver(DataInputStream dataInputStream) {
+			this.dataInputStream = dataInputStream;
+		}
+
+		@Override
+		public void run() {
+			while (dataInputStream != null) {
+				try {
+					System.out.println("Server msg : " + dataInputStream.readUTF());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }

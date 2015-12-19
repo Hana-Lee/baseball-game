@@ -18,7 +18,7 @@ public class App {
 
 	public void startGame() {
 		Boolean gameTerminated = false;
-		String inputNum = "";
+		String inputNum;
 		// BaseballGameServer server = new BaseballGameServer();
 		BaseballGameClient client = new BaseballGameClient();
 
@@ -36,16 +36,24 @@ public class App {
 			if (s.hasNextLine()) {
 				switch (s.nextInt()) {
 					case 1:
-						client.sendSocketData("start");
+						client.sendSocketData("START");
+						boolean isGameOver = false;
+						while (!isGameOver) {
+							System.out.print("숫자를 입력해주세요 :  ");
+							Scanner s2 = new Scanner(System.in);
+							if (s2.hasNextLine()) {
+								inputNum = s2.nextLine();
+								client.sendSocketData("GUESS_NUM," + inputNum);
 
-						System.out.print("숫자를 입력해주세요 :  ");
-						Scanner s2 = new Scanner(System.in);
-						if (s2.hasNextLine()) {
-							inputNum = s2.nextLine();
-							client.sendSocketData("user_guess_num," + inputNum);
+								String serverMsg = client.getServerMessage();
+								System.out.println("Server Msg : " + serverMsg);
+								if (serverMsg.contains("resolved")) {
+									System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
+									System.out.println("점수는 : " + serverMsg.split(",")[4].split(":")[1] + "점 입니다");
+									isGameOver = true;
+								}
+							}
 						}
-
-						System.out.println(client.getServerMessage());
 						break;
 					case 2:
 						boolean exit = false;
