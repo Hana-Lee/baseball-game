@@ -1,26 +1,22 @@
 package com.eyeq.jhs;
 
+import com.eyeq.jhs.model.Result;
+import com.eyeq.jhs.model.Score;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.util.Scanner;
 
 public class App {
 
 	public static void main(String[] args) {
-//		Setting setting = new Setting();
-//		BaseballGameEngine bbGame = new BaseballGameEngine(setting);
-//		GenerationNumberStrategy strtg = new RandomNumberGenerator();
-//		bbGame.setStrategy(strtg);
-//
-//		bbGame.startGame();
-
 		App app = new App();
 		app.startGame();
 	}
 
 	public void startGame() {
 		Boolean gameTerminated = false;
-		String inputNum;
-		// BaseballGameServer server = new BaseballGameServer();
-		BaseballGameClient client = new BaseballGameClient();
+		final BaseballGameClient client = new BaseballGameClient();
 
 		client.connect();
 
@@ -38,19 +34,29 @@ public class App {
 					case 1:
 						client.sendSocketData("START");
 						boolean isGameOver = false;
+						int guessCount = 1;
 						while (!isGameOver) {
 							System.out.print("숫자를 입력해주세요 :  ");
 							Scanner s2 = new Scanner(System.in);
 							if (s2.hasNextLine()) {
-								inputNum = s2.nextLine();
+								String inputNum = s2.nextLine();
 								client.sendSocketData("GUESS_NUM," + inputNum);
 
 								String serverMsg = client.getServerMessage();
-								System.out.println("Server Msg : " + serverMsg);
-								if (serverMsg.contains("resolved")) {
-									System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
-									System.out.println("점수는 : " + serverMsg.split(",")[4].split(":")[1] + "점 입니다");
-									isGameOver = true;
+								ObjectMapper objectMapper = new ObjectMapper();
+								try {
+									Result result = objectMapper.readValue(serverMsg, Result.class);
+									System.out.println("Result : " + result);
+
+									if (result.getSolve().isSolved()) {
+										System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
+										System.out.println("점수는 : " + Score.calculateScore(guessCount, result) + "점 입니다");
+										isGameOver = true;
+									} else {
+										guessCount++;
+									}
+								} catch (IOException e) {
+									e.printStackTrace();
 								}
 							}
 						}
@@ -92,12 +98,8 @@ public class App {
 						gameTerminated = true;
 						client.closeConnection();
 						break;
-
 				}
-
 			}
-
 		}
-
 	}
 }

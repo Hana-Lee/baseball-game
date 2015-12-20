@@ -19,8 +19,6 @@ public class RandomNumberGenerator implements GenerationNumberStrategy {
 			}
 		}
 
-
 		return "" + firstNum + secondNum + thirdNum;
 	}
-
 }

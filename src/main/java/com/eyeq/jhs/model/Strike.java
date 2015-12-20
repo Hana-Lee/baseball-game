@@ -1,13 +1,17 @@
 package com.eyeq.jhs.model;
 
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
+@Getter
 public class Strike {
-	private int strike;
 
-	public Strike(int num) {
-		this.strike = num;
-	}
-
-	public int getCount() {
-		return strike;
-	}
+	private int count;
 }

@@ -1,8 +1,8 @@
 package com.eyeq.jhs;
 
 import com.eyeq.jhs.model.Result;
-import com.eyeq.jhs.model.Score;
 import com.eyeq.jhs.type.MessageType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -56,26 +56,31 @@ class Receiver extends Thread {
 							gameEngine.guess(value);
 							Result result = gameEngine.checkNumber(value);
 
-							StringBuffer sb = new StringBuffer();
-							sb.append(MessageType.RESULT.getValue());
-							sb.append(",");
-							sb.append(MessageType.BALL.getValue());
-							sb.append(":");
-							sb.append(result.getBallsCount());
-							sb.append(",");
-							sb.append(MessageType.STRIKE.getValue());
-							sb.append(":");
-							sb.append(result.getStrikeCount());
+							ObjectMapper objectMapper = new ObjectMapper();
+							String jsonResult = objectMapper.writeValueAsString(result);
 
-							if (result.isSolved()) {
-								sb.append(",");
-								sb.append(MessageType.RESOLVED.getValue());
-								sb.append(",");
-								sb.append(MessageType.SCORE.getValue());
-								sb.append(":");
-								sb.append(Score.calculateScore(gameEngine.getNthGame(), result));
-							}
-							dataOutputStream.writeUTF(sb.toString());
+							dataOutputStream.writeUTF(jsonResult);
+
+//							StringBuffer sb = new StringBuffer();
+//							sb.append(MessageType.RESULT.getValue());
+//							sb.append(",");
+//							sb.append(MessageType.BALL.getValue());
+//							sb.append(":");
+//							sb.append(result.getBallCount());
+//							sb.append(",");
+//							sb.append(MessageType.STRIKE.getValue());
+//							sb.append(":");
+//							sb.append(result.getStrikeCount());
+//
+//							if (result.getSolve()) {
+//								sb.append(",");
+//								sb.append(MessageType.RESOLVED.getValue());
+//								sb.append(",");
+//								sb.append(MessageType.SCORE.getValue());
+//								sb.append(":");
+//								sb.append(Score.calculateScore(gameEngine.getNthGame(), result));
+//							}
+//							dataOutputStream.writeUTF(sb.toString());
 						} catch (IllegalArgumentException e) {
 
 						}

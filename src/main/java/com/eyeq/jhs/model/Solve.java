@@ -6,14 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@NoArgsConstructor
+/**
+ * @author Hana Lee
+ * @since 2015-12-20 16:01
+ */
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 @Getter
-public class Result {
+public class Solve {
 
-	private Solve solve;
-	private Strike strike;
-	private Ball ball;
+	private boolean solved;
 }

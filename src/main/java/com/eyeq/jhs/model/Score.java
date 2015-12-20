@@ -2,13 +2,12 @@ package com.eyeq.jhs.model;
 
 public class Score {
 	public Score() {
-
 	}
 
 	public static int calculateScore(int nthGame, Result result) {
 		int totalScore = 0;
 
-		if (result != null && result.isSolved()) {
+		if (result != null && result.getSolve().isSolved()) {
 			if (nthGame <= 10) {
 				totalScore = 1000 - (100 * (nthGame - 1));
 			}
