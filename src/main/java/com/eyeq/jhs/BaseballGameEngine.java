@@ -2,7 +2,6 @@ package com.eyeq.jhs;
 
 import com.eyeq.jhs.model.Ball;
 import com.eyeq.jhs.model.Result;
-import com.eyeq.jhs.model.Setting;
 import com.eyeq.jhs.model.Solve;
 import com.eyeq.jhs.model.Strike;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
@@ -11,16 +10,10 @@ public class BaseballGameEngine {
 
 	private String generateNum;
 	private int nthGame = 0;
-	private int wrongNumber = 0;
-
 	private GenerationNumberStrategy strategy;
-	private boolean isGameOver;
 
-	private Setting setting;
-
-	public BaseballGameEngine(GenerationNumberStrategy strategy, Setting setting) {
+	public BaseballGameEngine(GenerationNumberStrategy strategy) {
 		this.strategy = strategy;
-		this.setting = setting;
 	}
 
 	public void guess(String inputNumber) {
@@ -57,8 +50,7 @@ public class BaseballGameEngine {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				Boolean result = generateNum.substring(i, i + 1).equals(inputNum.substring(j, j + 1));
-				if (result == true) {
+				if (generateNum.substring(i, i + 1).equals(inputNum.substring(j, j + 1))) {
 					if (i == j) {
 						strike++;
 						break;
@@ -119,7 +111,5 @@ public class BaseballGameEngine {
 
 	public void resetStatus() {
 		nthGame = 0;
-		wrongNumber = 0;
-		isGameOver = false;
 	}
 }

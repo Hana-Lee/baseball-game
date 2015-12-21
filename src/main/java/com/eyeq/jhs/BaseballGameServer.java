@@ -1,6 +1,5 @@
 package com.eyeq.jhs;
 
-import com.eyeq.jhs.model.Setting;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
 import com.eyeq.jhs.strategy.RandomNumberGenerator;
 
@@ -25,9 +24,8 @@ public class BaseballGameServer {
 				client = server.accept();
 				System.out.println("Server: accepted.");
 
-				final Setting setting = new Setting();
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final Receiver receiver = new Receiver(new BaseballGameEngine(strategy, setting), client);
+				final Receiver receiver = new Receiver(new BaseballGameEngine(strategy), client);
 				receiver.start();
 			}
 		} catch (IOException e) {
