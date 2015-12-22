@@ -1,7 +1,6 @@
 package com.eyeq.jhs;
 
 import com.eyeq.jhs.model.Result;
-import com.eyeq.jhs.model.Score;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -50,7 +49,8 @@ public class App {
 
 									if (result.getSolve().isSolved()) {
 										System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
-										System.out.println("점수는 : " + Score.calculateScore(guessCount, result) + "점 입니다");
+										client.sendSocketData("GET_SCORE");
+										System.out.println("점수는 : " + client.getServerMessage() + "점 입니다.");
 										isGameOver = true;
 									} else {
 										guessCount++;

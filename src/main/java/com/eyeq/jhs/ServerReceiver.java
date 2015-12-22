@@ -13,13 +13,13 @@ import java.net.Socket;
  * @author Hana Lee
  * @since 2015-12-18 21:02
  */
-class Receiver extends Thread {
+class ServerReceiver extends Thread {
 
 	private BaseballGameEngine gameEngine;
 	private DataInputStream dataInputStream;
 	private DataOutputStream dataOutputStream;
 
-	public Receiver(BaseballGameEngine baseballGameEngine, Socket socket) {
+	public ServerReceiver(BaseballGameEngine baseballGameEngine, Socket socket) {
 		this.gameEngine = baseballGameEngine;
 		try {
 			this.dataInputStream = new DataInputStream(socket.getInputStream());
@@ -65,6 +65,8 @@ class Receiver extends Thread {
 						}
 						break;
 					case GET_SCORE:
+						// 실제 점수 계산하는 로직을 넣을것.
+						dataOutputStream.writeUTF("900");
 						break;
 					default:
 						break;

@@ -21,10 +21,13 @@ public class BaseballGameClient {
 	public void connect() {
 		System.out.println("Client: Connecting");
 		try {
-			socket = new Socket("127.0.0.1", 9999);
+			socket = new Socket("127.0.0.1", 9090);
 			System.out.println("Client: connect Status = " + socket.isConnected());
 			stream = new DataOutputStream(socket.getOutputStream());
 			inStream = new DataInputStream(socket.getInputStream());
+
+//			final Receiver receiver = new Receiver(socket);
+//			receiver.start();
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -32,6 +35,10 @@ public class BaseballGameClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public Socket getSocket() {
+		return socket;
 	}
 
 	public void sendSocketData(String data) {
@@ -73,15 +80,19 @@ public class BaseballGameClient {
 
 		private DataInputStream dataInputStream;
 
-		public Receiver(DataInputStream dataInputStream) {
-			this.dataInputStream = dataInputStream;
+		public Receiver(Socket socket) {
+			try {
+				this.dataInputStream = new DataInputStream(socket.getInputStream());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
 		public void run() {
 			while (dataInputStream != null) {
 				try {
-					System.out.println("Server msg : " + dataInputStream.readUTF());
+					System.out.println("Server auto msg : " + dataInputStream.readUTF());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

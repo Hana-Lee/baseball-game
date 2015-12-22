@@ -18,14 +18,14 @@ public class BaseballGameServer {
 
 	public void startServer() {
 		try {
-			server = new ServerSocket(9999);
+			server = new ServerSocket(9090);
 			while (true) {
 				System.out.println("Server: Waiting for request.");
 				client = server.accept();
 				System.out.println("Server: accepted.");
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final Receiver receiver = new Receiver(new BaseballGameEngine(strategy), client);
+				final ServerReceiver receiver = new ServerReceiver(new BaseballGameEngine(strategy), client);
 				receiver.start();
 			}
 		} catch (IOException e) {
