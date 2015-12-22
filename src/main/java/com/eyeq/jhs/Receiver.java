@@ -60,30 +60,11 @@ class Receiver extends Thread {
 							String jsonResult = objectMapper.writeValueAsString(result);
 
 							dataOutputStream.writeUTF(jsonResult);
-
-//							StringBuffer sb = new StringBuffer();
-//							sb.append(MessageType.RESULT.getValue());
-//							sb.append(",");
-//							sb.append(MessageType.BALL.getValue());
-//							sb.append(":");
-//							sb.append(result.getBallCount());
-//							sb.append(",");
-//							sb.append(MessageType.STRIKE.getValue());
-//							sb.append(":");
-//							sb.append(result.getStrikeCount());
-//
-//							if (result.getSolve()) {
-//								sb.append(",");
-//								sb.append(MessageType.RESOLVED.getValue());
-//								sb.append(",");
-//								sb.append(MessageType.SCORE.getValue());
-//								sb.append(":");
-//								sb.append(Score.calculateScore(gameEngine.getNthGame(), result));
-//							}
-//							dataOutputStream.writeUTF(sb.toString());
 						} catch (IllegalArgumentException e) {
 
 						}
+						break;
+					case GET_SCORE:
 						break;
 					default:
 						break;
