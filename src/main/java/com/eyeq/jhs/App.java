@@ -47,7 +47,7 @@ public class App {
 									Result result = objectMapper.readValue(serverMsg, Result.class);
 									System.out.println("Result : " + result);
 
-									if (result.getSolve().isSolved()) {
+									if (result.getSolve().isValue()) {
 										System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
 										client.sendSocketData("GET_SCORE");
 										System.out.println("점수는 : " + client.getServerMessage() + "점 입니다.");
@@ -75,14 +75,14 @@ public class App {
 										System.out.print("값을 입력해주세요. : ");
 										Scanner inputSettingNum = new Scanner(System.in);
 										if (inputSettingNum.hasNextInt()) {
-											//setting.setLimitInputWrongNum(inputSettingNum.nextInt());
+											//setting.setLimitWrongInputCount(inputSettingNum.nextInt());
 										}
 										break;
 									case 2:
 										System.out.print("값을 입력해주세요. : ");
 										Scanner inputSettingNum2 = new Scanner(System.in);
 										if (inputSettingNum2.hasNextInt()) {
-											//setting.setNumberOfInputNum(inputSettingNum2.nextInt());
+											//setting.setLimitGuessInputCount(inputSettingNum2.nextInt());
 										}
 										break;
 									case 0:

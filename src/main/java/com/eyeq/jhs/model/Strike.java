@@ -13,5 +13,5 @@ import lombok.ToString;
 @Getter
 public class Strike {
 
-	private int count;
+	private int value;
 }

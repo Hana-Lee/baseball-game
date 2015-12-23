@@ -69,7 +69,7 @@ public class BaseballGameEngine {
 	private Result makeResult(Strike strike, Ball ball) {
 		boolean isSolved;
 
-		if (strike.getCount() == 3) {
+		if (strike.getValue() == 3) {
 			isSolved = true; // 판단하는 객체생성, BaseballGame객체에서 체크.
 		} else {
 			isSolved = false;
@@ -80,7 +80,7 @@ public class BaseballGameEngine {
 	public boolean endingGame(Result result) {
 		boolean ending;
 
-		if (result.getSolve().isSolved()) {
+		if (result.getSolve().isValue()) {
 			ending = true;
 		} else if (nthGame > 10) {
 			ending = true;
@@ -92,7 +92,7 @@ public class BaseballGameEngine {
 	}
 
 	public boolean isGameOver(Result result) {
-		if (result.getSolve().isSolved()) {
+		if (result.getSolve().isValue()) {
 			return true;
 		} else if (nthGame == 10) {
 			return true;

@@ -17,5 +17,5 @@ import lombok.ToString;
 @Getter
 public class Solve {
 
-	private boolean solved;
+	private boolean value;
 }

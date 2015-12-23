@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class Setting {
 	//잘못된 숫자 입력 횟수 제한
-	private int limitInputWrongNum = 5;
+	private int limitWrongInputCount = 5;
 
 	// 야구 게임 횟수
-	private int numberOfInputNum = 10;
+	private int limitGuessInputCount = 10;
 }
