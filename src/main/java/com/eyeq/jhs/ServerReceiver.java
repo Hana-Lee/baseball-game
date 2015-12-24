@@ -1,6 +1,9 @@
 package com.eyeq.jhs;
 
 import com.eyeq.jhs.model.Result;
+import com.eyeq.jhs.model.ResultDto;
+import com.eyeq.jhs.model.Score;
+import com.eyeq.jhs.model.ScoreCalculator;
 import com.eyeq.jhs.type.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -36,7 +39,7 @@ class ServerReceiver extends Thread {
 				final String clientMsg = dataInputStream.readUTF();
 				System.out.println("Msg : " + clientMsg);
 
-				String messageTypeStringValue = null;
+				String messageTypeStringValue;
 				String value = null;
 				MessageType messageType;
 				if (clientMsg.contains(",")) {
@@ -55,18 +58,17 @@ class ServerReceiver extends Thread {
 						try {
 							gameEngine.guess(value);
 							Result result = gameEngine.checkNumber(value);
+							Score score = ScoreCalculator.calculateScore(3, result);
+
+							ResultDto resultDto = new ResultDto(result, null, null, score, null);
 
 							ObjectMapper objectMapper = new ObjectMapper();
-							String jsonResult = objectMapper.writeValueAsString(result);
+							String jsonResult = objectMapper.writeValueAsString(resultDto);
 
 							dataOutputStream.writeUTF(jsonResult);
 						} catch (IllegalArgumentException e) {
 
 						}
-						break;
-					case GET_SCORE:
-						// 실제 점수 계산하는 로직을 넣을것.
-						dataOutputStream.writeUTF("900");
 						break;
 					default:
 						break;

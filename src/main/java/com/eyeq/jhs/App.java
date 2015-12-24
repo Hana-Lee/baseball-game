@@ -1,6 +1,6 @@
 package com.eyeq.jhs;
 
-import com.eyeq.jhs.model.Result;
+import com.eyeq.jhs.model.ResultDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -33,7 +33,6 @@ public class App {
 					case 1:
 						client.sendSocketData("START");
 						boolean isGameOver = false;
-						int guessCount = 1;
 						while (!isGameOver) {
 							System.out.print("숫자를 입력해주세요 :  ");
 							Scanner s2 = new Scanner(System.in);
@@ -44,16 +43,21 @@ public class App {
 								String serverMsg = client.getServerMessage();
 								ObjectMapper objectMapper = new ObjectMapper();
 								try {
-									Result result = objectMapper.readValue(serverMsg, Result.class);
-									System.out.println("Result : " + result);
+									ResultDto resultDto = objectMapper.readValue(serverMsg, ResultDto.class);
+									System.out.println("Result : " + resultDto);
 
-									if (result.getSolve().isValue()) {
-										System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
-										client.sendSocketData("GET_SCORE");
-										System.out.println("점수는 : " + client.getServerMessage() + "점 입니다.");
-										isGameOver = true;
+									if (resultDto.getErrorMessage() != null) {
+										System.out.println("서버 메세지 : " + resultDto.getErrorMessage().getType()
+												.getMessage());
 									} else {
-										guessCount++;
+										System.out.println(resultDto.getResult().getStrike().getValue() + "스트라이크, " +
+												resultDto.getResult().getBall().getValue() + "볼 입니다.");
+									}
+
+									if (resultDto.getResult().getSolve().isValue()) {
+										System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
+										System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
+										isGameOver = true;
 									}
 								} catch (IOException e) {
 									e.printStackTrace();

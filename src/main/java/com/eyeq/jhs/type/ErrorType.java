@@ -1,4 +1,4 @@
-package com.eyeq.jhs.model;
+package com.eyeq.jhs.type;
 
 import lombok.Getter;
 

@@ -4,7 +4,7 @@ public class ScoreCalculator {
 	public ScoreCalculator() {
 	}
 
-	public static int calculateScore(int nthGame, Result result) {
+	public static Score calculateScore(int nthGame, Result result) {
 		int totalScore = 0;
 
 		if (result != null && result.getSolve().isValue()) {
@@ -15,6 +15,6 @@ public class ScoreCalculator {
 
 		// setting 객체에서 총 점수 셋팅값 가져와서 점수계산 리팩토
 
-		return totalScore;
+		return new Score(totalScore);
 	}
 }

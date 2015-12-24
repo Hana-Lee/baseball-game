@@ -1,5 +1,6 @@
 package com.eyeq.jhs.model;
 
+import com.eyeq.jhs.type.ErrorType;
 import lombok.Data;
 
 /**
