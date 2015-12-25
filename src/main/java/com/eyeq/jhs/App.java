@@ -47,7 +47,7 @@ public class App {
 									System.out.println("Result : " + resultDto);
 
 									if (resultDto.getErrorMessage() != null) {
-										System.out.println("서버 메세지 : " + resultDto.getErrorMessage().getType()
+										System.out.println("오류 메세지 : " + resultDto.getErrorMessage().getType()
 												.getMessage());
 									} else {
 										System.out.println(resultDto.getResult().getStrike().getValue() + "스트라이크, " +
