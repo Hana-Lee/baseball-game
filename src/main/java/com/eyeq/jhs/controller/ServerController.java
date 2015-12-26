@@ -1,9 +1,11 @@
 package com.eyeq.jhs.controller;
 
+import com.eyeq.jhs.model.GameRoom;
 import com.eyeq.jhs.model.Result;
 import com.eyeq.jhs.model.ResultDto;
 import com.eyeq.jhs.model.Score;
 import com.eyeq.jhs.model.ScoreCalculator;
+import com.eyeq.jhs.model.User;
 import com.eyeq.jhs.type.MessageType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -11,6 +13,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Hana Lee
@@ -21,9 +25,11 @@ class ServerController extends Thread {
 	private GameController gameEngine;
 	private DataInputStream dataInputStream;
 	private DataOutputStream dataOutputStream;
+	private List<GameRoom> gameRoomList;
 
-	public ServerController(GameController gameController, Socket socket) {
+	public ServerController(GameController gameController, Socket socket, List<GameRoom> gameRoomList) {
 		this.gameEngine = gameController;
+		this.gameRoomList = gameRoomList;
 		try {
 			this.dataInputStream = new DataInputStream(socket.getInputStream());
 			this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -49,8 +55,21 @@ class ServerController extends Thread {
 					messageTypeStringValue = clientMsg;
 				}
 				messageType = MessageType.valueOf(messageTypeStringValue);
-
+				ObjectMapper objectMapper = new ObjectMapper();
+				String jsonResult;
 				switch (messageType) {
+					case CONNECTION:
+						jsonResult = objectMapper.writeValueAsString(gameRoomList);
+						dataOutputStream.writeUTF(jsonResult);
+						break;
+					case JOIN:
+						if (value != null) {
+							final long gameRoomId = Long.valueOf(value);
+							GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+									(Collectors.toList()).get(0);
+							gameRoom.getUsers().add(new User());
+						}
+						break;
 					case START:
 						gameEngine.generateNum();
 						break;
@@ -62,8 +81,7 @@ class ServerController extends Thread {
 
 							ResultDto resultDto = new ResultDto(result, null, null, score, null);
 
-							ObjectMapper objectMapper = new ObjectMapper();
-							String jsonResult = objectMapper.writeValueAsString(resultDto);
+							jsonResult = objectMapper.writeValueAsString(resultDto);
 
 							dataOutputStream.writeUTF(jsonResult);
 						} catch (IllegalArgumentException e) {

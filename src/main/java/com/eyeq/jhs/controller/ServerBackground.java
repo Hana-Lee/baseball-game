@@ -1,15 +1,25 @@
 package com.eyeq.jhs.controller;
 
+import com.eyeq.jhs.factory.GameRoomMaker;
+import com.eyeq.jhs.model.GameRoom;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
 import com.eyeq.jhs.strategy.RandomNumberGenerator;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class ServerBackground {
+
 	private ServerSocket server = null;
 	private Socket client = null;
+
+	private List<GameRoom> gameRoomList;
+
+	public ServerBackground() {
+		this.gameRoomList = GameRoomMaker.make();
+	}
 
 	public void startServer() {
 		try {
@@ -20,7 +30,7 @@ public class ServerBackground {
 				System.out.println("Server: accepted.");
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final ServerController receiver = new ServerController(new GameController(strategy), client);
+				final ServerController receiver = new ServerController(new GameController(strategy), client, gameRoomList);
 				receiver.start();
 			}
 		} catch (IOException e) {

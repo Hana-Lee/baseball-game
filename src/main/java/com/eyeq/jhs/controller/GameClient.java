@@ -16,6 +16,8 @@ public class GameClient {
 
 		System.out.println("====== 야구게임을 시작합니다🤗 ======");
 		while (!gameTerminated) {
+			client.sendSocketData("CONNECTION");
+			System.out.println("게임룸 리스트 : " + client.getServerMessage());
 			System.out.println("====== 게임 메뉴 ======");
 			System.out.println("1. 시작");
 			System.out.println("2. 설정");
@@ -26,6 +28,7 @@ public class GameClient {
 			if (s.hasNextLine()) {
 				switch (s.nextInt()) {
 					case 1:
+						client.sendSocketData("JOIN,1");
 						client.sendSocketData("START");
 						boolean isGameOver = false;
 						while (!isGameOver) {
