@@ -1,7 +1,5 @@
-package com.eyeq.jhs;
+package com.eyeq.jhs.controller;
 
-
-import com.eyeq.jhs.model.Result;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,14 +7,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class BaseballGameClient {
+public class ClientBackground {
 	private Socket socket;
 	private DataOutputStream stream;
 	private DataInputStream inStream;
-
-	public void sendSocketResult(Result result) {
-
-	}
 
 	public void connect() {
 		System.out.println("Client: Connecting");

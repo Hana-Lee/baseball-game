@@ -1,4 +1,4 @@
-package com.eyeq.jhs;
+package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
 import com.eyeq.jhs.strategy.RandomNumberGenerator;
@@ -7,14 +7,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class BaseballGameServer {
+public class ServerBackground {
 	private ServerSocket server = null;
 	private Socket client = null;
-
-	public static void main(String[] args) {
-		BaseballGameServer server = new BaseballGameServer();
-		server.startServer();
-	}
 
 	public void startServer() {
 		try {
@@ -25,7 +20,7 @@ public class BaseballGameServer {
 				System.out.println("Server: accepted.");
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final ServerReceiver receiver = new ServerReceiver(new BaseballGameEngine(strategy), client);
+				final ServerController receiver = new ServerController(new GameController(strategy), client);
 				receiver.start();
 			}
 		} catch (IOException e) {

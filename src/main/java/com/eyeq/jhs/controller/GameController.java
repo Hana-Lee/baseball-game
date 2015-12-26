@@ -1,4 +1,4 @@
-package com.eyeq.jhs;
+package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.model.Ball;
 import com.eyeq.jhs.model.Result;
@@ -6,13 +6,13 @@ import com.eyeq.jhs.model.Solve;
 import com.eyeq.jhs.model.Strike;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
 
-public class BaseballGameEngine {
+public class GameController {
 
 	private String generateNum;
 	private int nthGame = 0;
 	private GenerationNumberStrategy strategy;
 
-	public BaseballGameEngine(GenerationNumberStrategy strategy) {
+	public GameController(GenerationNumberStrategy strategy) {
 		this.strategy = strategy;
 	}
 

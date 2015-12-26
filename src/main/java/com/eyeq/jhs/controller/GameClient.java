@@ -1,4 +1,4 @@
-package com.eyeq.jhs;
+package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.model.ResultDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,16 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class App {
-
-	public static void main(String[] args) {
-		App app = new App();
-		app.startGame();
-	}
+public class GameClient {
 
 	public void startGame() {
 		Boolean gameTerminated = false;
-		final BaseballGameClient client = new BaseballGameClient();
+		final ClientBackground client = new ClientBackground();
 
 		client.connect();
 

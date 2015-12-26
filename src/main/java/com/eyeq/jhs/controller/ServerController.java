@@ -1,4 +1,4 @@
-package com.eyeq.jhs;
+package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.model.Result;
 import com.eyeq.jhs.model.ResultDto;
@@ -16,14 +16,14 @@ import java.net.Socket;
  * @author Hana Lee
  * @since 2015-12-18 21:02
  */
-class ServerReceiver extends Thread {
+class ServerController extends Thread {
 
-	private BaseballGameEngine gameEngine;
+	private GameController gameEngine;
 	private DataInputStream dataInputStream;
 	private DataOutputStream dataOutputStream;
 
-	public ServerReceiver(BaseballGameEngine baseballGameEngine, Socket socket) {
-		this.gameEngine = baseballGameEngine;
+	public ServerController(GameController gameController, Socket socket) {
+		this.gameEngine = gameController;
 		try {
 			this.dataInputStream = new DataInputStream(socket.getInputStream());
 			this.dataOutputStream = new DataOutputStream(socket.getOutputStream());

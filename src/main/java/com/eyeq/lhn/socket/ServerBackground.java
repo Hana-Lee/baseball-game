@@ -35,7 +35,7 @@ public class ServerBackground {
 
 		DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 		dataOutputStream.writeUTF("서버 입니다");
-//			ServerReceiver serverReceiver = new ServerReceiver(socket);
+//			ServerController serverReceiver = new ServerController(socket);
 //			serverReceiver.start();
 //		}
 	}
