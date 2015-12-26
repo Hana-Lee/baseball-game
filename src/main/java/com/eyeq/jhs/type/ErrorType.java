@@ -8,7 +8,7 @@ import lombok.Getter;
  */
 public enum ErrorType {
 
-	OVER_INPUT("한번에 입력 가능한 횟수를 초과 하였습니다."), ONLY_NUMBER("숫자만 입력 가능합니다.");
+	OVER_INPUT("한번에 입력 가능한 횟수를 초과 하였습니다."), ONLY_NUMBER("숫자만 입력 가능합니다."), DUPLICATE_USER_ID("중복 아이디 입니다");
 
 	@Getter
 	private String message;

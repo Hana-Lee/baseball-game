@@ -1,18 +1,18 @@
 package com.eyeq.jhs.model;
 
-import com.eyeq.jhs.type.ErrorType;
+import com.eyeq.jhs.type.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
  * @author Hana Lee
- * @since 2015-12-24 23-22
+ * @since 2015-12-27 05:12
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ErrorMessage {
+public class Role {
 
-	private ErrorType type;
+	private RoleType roleType = RoleType.DEPENDER;
 }

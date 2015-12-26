@@ -1,12 +1,16 @@
 package com.eyeq.jhs.controller;
 
+import com.eyeq.jhs.model.ErrorMessage;
 import com.eyeq.jhs.model.GameRoom;
 import com.eyeq.jhs.model.Result;
 import com.eyeq.jhs.model.ResultDto;
+import com.eyeq.jhs.model.Role;
 import com.eyeq.jhs.model.Score;
 import com.eyeq.jhs.model.ScoreCalculator;
 import com.eyeq.jhs.model.User;
+import com.eyeq.jhs.type.ErrorType;
 import com.eyeq.jhs.type.MessageType;
+import com.eyeq.jhs.type.RoleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataInputStream;
@@ -66,12 +70,24 @@ class ServerController extends Thread {
 						if (value != null) {
 							final String[] clientSendValues = value.split(":");
 							final long gameRoomId = Long.valueOf(clientSendValues[0]);
-							final User joinedUser = new User(clientSendValues[2]);
+							final String role = clientSendValues[4];
+							final String userId = clientSendValues[2];
+							final User joinedUser = new User(userId, new Role(RoleType.valueOf(role)));
+
 							GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 									(Collectors.toList()).get(0);
-							gameRoom.getUsers().add(joinedUser);
-						}
-						break;
+
+							final ErrorMessage errorMessage = new ErrorMessage();
+							String errorMessageJson;
+							if (gameRoom.getUsers().stream().filter(u -> u.getUserId().equals(userId)).count() > 0) {
+								errorMessage.setType(ErrorType.DUPLICATE_USER_ID);
+								errorMessageJson = objectMapper.writeValueAsString("[ " + userId + " ]는 " + errorMessage);
+							} else {
+								gameRoom.getUsers().add(joinedUser);
+								errorMessageJson = objectMapper.writeValueAsString(errorMessage);
+							}
+							dataOutputStream.writeUTF(errorMessageJson);
+						} break;
 					case GET_ROOM_LIST:
 						jsonResult = objectMapper.writeValueAsString(gameRoomList);
 						dataOutputStream.writeUTF(jsonResult);
