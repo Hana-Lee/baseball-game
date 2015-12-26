@@ -7,7 +7,8 @@ package com.eyeq.jhs.type;
 public enum MessageType {
 
 	START("start"), GUESS_NUM("guessNum"), RESULT("result"), BALL("ball"), STRIKE("strike"), GAMEOVER("gameover"),
-	SCORE("score"), RESOLVED("resolved"), GET_SCORE("getScore"), JOIN("join"), CONNECTION("connection");
+	SCORE("score"), RESOLVED("resolved"), GET_SCORE("getScore"), JOIN("join"), CONNECTION("connection"), GET_ROOM_LIST
+			("getRoomList");
 
 	private String value;
 

@@ -30,7 +30,8 @@ public class ServerBackground {
 				System.out.println("Server: accepted.");
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final ServerController receiver = new ServerController(new GameController(strategy), client, gameRoomList);
+				final ServerController receiver = new ServerController(new GameController(strategy), client,
+						gameRoomList);
 				receiver.start();
 			}
 		} catch (IOException e) {

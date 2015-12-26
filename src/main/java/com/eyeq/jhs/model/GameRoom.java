@@ -1,6 +1,7 @@
 package com.eyeq.jhs.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +11,7 @@ import java.util.Set;
  * @since 2015-12-23 22:38
  */
 @Data
+@NoArgsConstructor
 public class GameRoom {
 
 	private long id;

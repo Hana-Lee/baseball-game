@@ -48,7 +48,7 @@ public class FileSaveScoreService implements ScoreService {
 	}
 
 	private String getDefaultSaveDirectory() {
-		String os = System.getProperty("os.name").toUpperCase();
+		String os = System.getProperty("os.userId").toUpperCase();
 
 		if (os.contains("WIN")) {
 			return System.getenv("APPDATA");

@@ -64,11 +64,17 @@ class ServerController extends Thread {
 						break;
 					case JOIN:
 						if (value != null) {
-							final long gameRoomId = Long.valueOf(value);
+							final String[] clientSendValues = value.split(":");
+							final long gameRoomId = Long.valueOf(clientSendValues[0]);
+							final User joinedUser = new User(clientSendValues[2]);
 							GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 									(Collectors.toList()).get(0);
-							gameRoom.getUsers().add(new User());
+							gameRoom.getUsers().add(joinedUser);
 						}
+						break;
+					case GET_ROOM_LIST:
+						jsonResult = objectMapper.writeValueAsString(gameRoomList);
+						dataOutputStream.writeUTF(jsonResult);
 						break;
 					case START:
 						gameEngine.generateNum();
