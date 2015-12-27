@@ -88,6 +88,7 @@ public class GameClient {
 													(User::getUserId).collect(Collectors.joining(",")));
 											System.out.println();
 											System.out.println("----- 메뉴 -----");
+											System.out.println("1. 준비");
 											System.out.println("1. 시작");
 											System.out.println("2. 설정");
 											System.out.println("0. 나가기");

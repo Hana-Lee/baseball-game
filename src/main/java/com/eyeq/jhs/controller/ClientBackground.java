@@ -5,10 +5,10 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class ClientBackground {
 	private Socket socket;
+	private Socket backgroundSocket;
 	private DataOutputStream stream;
 	private DataInputStream inStream;
 
@@ -20,19 +20,25 @@ public class ClientBackground {
 			stream = new DataOutputStream(socket.getOutputStream());
 			inStream = new DataInputStream(socket.getInputStream());
 
-//			final Receiver receiver = new Receiver(socket);
-//			receiver.start();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			backgroundConnect();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public Socket getSocket() {
-		return socket;
+	private void backgroundConnect() {
+		System.out.println("Client: Background Connecting");
+		try {
+			backgroundSocket = new Socket("127.0.0.1", 9191);
+			System.out.println("Client: connect Status = " + backgroundSocket.isConnected());
+
+			final Receiver receiver = new Receiver(backgroundSocket);
+			receiver.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void sendSocketData(String data) {

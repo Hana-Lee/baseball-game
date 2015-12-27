@@ -8,7 +8,7 @@ public enum MessageType {
 
 	START("start"), GUESS_NUM("guessNum"), RESULT("result"), BALL("ball"), STRIKE("strike"), GAMEOVER("gameover"),
 	SCORE("score"), RESOLVED("resolved"), GET_SCORE("getScore"), JOIN("join"), CONNECTION("connection"), GET_ROOM_LIST
-			("getRoomList");
+			("getRoomList"), READY("ready");
 
 	private String value;
 
