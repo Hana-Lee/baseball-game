@@ -6,5 +6,5 @@ package com.eyeq.jhs.type;
  */
 public enum MessageType {
 
-	START, GUESS_NUM, JOIN, CONNECTION, GET_ROOM_LIST, READY
+	START, GUESS_NUM, JOIN, CONNECTION, GET_ROOM_LIST, CREATE_ROOM, READY
 }

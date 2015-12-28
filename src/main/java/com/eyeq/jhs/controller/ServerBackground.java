@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,11 +33,11 @@ public class ServerBackground {
 	private Socket client = null;
 	private Socket backgroundMessageClient = null;
 
-	private List<GameRoom> gameRoomList;
+	private List<GameRoom> gameRoomList = new ArrayList<>();
 	private List<DataOutputStream> backgroundMessageClients = new ArrayList<>();
 
 	public ServerBackground() {
-		this.gameRoomList = GameRoomMaker.make();
+		Collections.synchronizedList(gameRoomList);
 	}
 
 	public void startServer() {
@@ -54,8 +55,7 @@ public class ServerBackground {
 				backgroundMessageClients.add(new DataOutputStream(backgroundMessageClient.getOutputStream()));
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final ServerController receiver = new ServerController(new GameController(strategy), client,
-						gameRoomList);
+				final ServerController receiver = new ServerController(new GameController(strategy), client);
 				receiver.start();
 			}
 		} catch (IOException e) {
@@ -77,11 +77,9 @@ public class ServerBackground {
 		private GameController gameEngine;
 		private DataInputStream dataInputStream;
 		private DataOutputStream dataOutputStream;
-		private List<GameRoom> gameRoomList;
 
-		public ServerController(GameController gameController, Socket socket, List<GameRoom> gameRoomList) {
+		public ServerController(GameController gameController, Socket socket) {
 			this.gameEngine = gameController;
-			this.gameRoomList = gameRoomList;
 			try {
 				this.dataInputStream = new DataInputStream(socket.getInputStream());
 				this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -121,7 +119,13 @@ public class ServerBackground {
 					String jsonResult;
 					switch (messageType) {
 						case CONNECTION:
-							jsonResult = objectMapper.writeValueAsString(gameRoomList);
+//							jsonResult = objectMapper.writeValueAsString(gameRoomList);
+//							dataOutputStream.writeUTF(jsonResult);
+							break;
+						case CREATE_ROOM:
+							final GameRoom newGameRoom = GameRoomMaker.make(gameRoomList, value);
+							gameRoomList.add(newGameRoom);
+							jsonResult = objectMapper.writeValueAsString(newGameRoom);
 							dataOutputStream.writeUTF(jsonResult);
 							break;
 						case JOIN:

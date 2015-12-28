@@ -2,7 +2,6 @@ package com.eyeq.jhs.factory;
 
 import com.eyeq.jhs.model.GameRoom;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,14 +10,11 @@ import java.util.List;
  */
 public class GameRoomMaker {
 
-	public static List<GameRoom> make() {
-		final int LIMIT_USER_COUNT = 10;
+	public static GameRoom make(List<GameRoom> gameRoomList, String roomName) {
+		final int LIMIT_USER_COUNT = 5;
 
-		List<GameRoom> gameRooms = new ArrayList<>();
-		gameRooms.add(new GameRoom(1, "에메랄드", LIMIT_USER_COUNT));
-		gameRooms.add(new GameRoom(2, "다이아몬드", LIMIT_USER_COUNT));
-		gameRooms.add(new GameRoom(3, "사파이어", LIMIT_USER_COUNT));
-
-		return gameRooms;
+		final Long maxId = gameRoomList.isEmpty() ? 1L : gameRoomList.stream().map(GameRoom::getId).reduce(Long::max)
+				.get();
+		return new GameRoom(maxId + 1, roomName, LIMIT_USER_COUNT);
 	}
 }

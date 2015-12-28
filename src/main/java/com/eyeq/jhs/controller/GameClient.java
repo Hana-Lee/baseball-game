@@ -3,7 +3,9 @@ package com.eyeq.jhs.controller;
 import com.eyeq.jhs.model.ErrorMessage;
 import com.eyeq.jhs.model.GameRoom;
 import com.eyeq.jhs.model.ResultDto;
+import com.eyeq.jhs.model.Role;
 import com.eyeq.jhs.model.User;
+import com.eyeq.jhs.type.RoleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -56,8 +58,25 @@ public class GameClient {
 		}
 	}
 
-	private void joinGameRoom(long gameRoomNum, String userId, String userRole) throws IOException {
-		System.out.println("안녕하세요 " + userId + "님, " + gameRoomNum + "번 방에 입장하셨습니다");
+	private boolean joiningGameRoom(long gameRoomNum, User user) throws IOException {
+		client.sendSocketData("JOIN," + gameRoomNum + ":USER:" + user.getUserId() + ":ROLE:" +
+				user.getRole().getRoleType().name());
+		final String errorMessageJson = client.getServerMessage();
+		final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
+
+		boolean userIdValid;
+		if (errorMessage != null && errorMessage.getType() != null) {
+			userIdValid = false;
+			System.out.println(errorMessage.getType().getMessage());
+		} else {
+			userIdValid = true;
+		}
+
+		return userIdValid;
+	}
+
+	private void joinGameRoom(long gameRoomNum, User user) throws IOException {
+		System.out.println("안녕하세요 " + user.getUserId() + "님, " + gameRoomNum + "번 방에 입장하셨습니다");
 
 		boolean gameRoomLeft = false;
 		while (!gameRoomLeft) {
@@ -141,6 +160,7 @@ public class GameClient {
 		while (!gameTerminated) {
 			client.sendSocketData("CONNECTION");
 			System.out.println("*** 게임룸 리스트 ***");
+			client.sendSocketData("GET_ROOM_LIST");
 			final List<GameRoom> gameRoomList = getGameRoomList();
 			for (GameRoom gameRoom : gameRoomList) {
 				System.out.println(gameRoom.getId() + " : " + gameRoom.getName() + " (" + gameRoom.getUsers().size() +
@@ -160,44 +180,46 @@ public class GameClient {
 			if (s.hasNextLine()) {
 				switch (s.nextInt()) {
 					case 1:
+						System.out.println("게임룸 이름을 입력해주세요 : ");
+						Scanner gameRoomNameScanner = new Scanner(System.in);
+						if (gameRoomNameScanner.hasNextLine()) {
+							final String gameRoomName = gameRoomNameScanner.nextLine();
+							client.sendSocketData("CREATE_ROOM," + gameRoomName);
+							final String createdRoomJson = client.getServerMessage();
+							final GameRoom createdGameRoom = objectMapper.readValue(createdRoomJson, GameRoom.class);
+
+							boolean joinCompleted = false;
+							User userInfo = null;
+							while (!joinCompleted) {
+								userInfo = makeUserInfo();
+								if (userInfo != null) {
+									joinCompleted = joiningGameRoom(createdGameRoom.getId(), userInfo);
+								} else {
+									System.out.println("유저 정보가 없습니다. 다시 확인해주세요.");
+								}
+							}
+
+							joinGameRoom(createdGameRoom.getId(), userInfo);
+						}
+						break;
+					case 2:
 						System.out.println("게임룸 번호 선택 : ");
 						Scanner gameRoomNumScanner = new Scanner(System.in);
 						if (gameRoomNumScanner.hasNextLine()) {
 							final long gameRoomNum = Long.valueOf(gameRoomNumScanner.nextLine());
-							boolean userIdValid = false;
-							while (!userIdValid) {
-								System.out.println("유저 아이디를 입력해주세요 : ");
-								Scanner userNameScanner = new Scanner(System.in);
-								if (userNameScanner.hasNextLine()) {
-									final String userId = userNameScanner.nextLine();
-									System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
-									Scanner userRoleScanner = new Scanner(System.in);
-									String userRole = "ATTACKER";
-									if (userRoleScanner.hasNextLine()) {
-										final String userRoleSelect = userRoleScanner.nextLine();
-										if (userRoleSelect.equals("2")) {
-											userRole = "DEPENDER";
-										}
-									}
-
-									client.sendSocketData("JOIN," + gameRoomNum + ":USER:" + userId + ":ROLE:" +
-											userRole);
-									final String errorMessageJson = client.getServerMessage();
-									final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson,
-											ErrorMessage.class);
-
-									if (errorMessage != null && errorMessage.getType() != null) {
-										userIdValid = false;
-										System.out.println(errorMessage.getType().getMessage());
-									} else {
-										userIdValid = true;
-										joinGameRoom(gameRoomNum, userId, userRole);
-									}
+							boolean joinCompleted = false;
+							User userInfo = null;
+							while (!joinCompleted) {
+								userInfo = makeUserInfo();
+								if (userInfo != null) {
+									joinCompleted = joiningGameRoom(gameRoomNum, userInfo);
+								} else {
+									System.out.println("유저 정보가 없습니다. 다시 확인해주세요.");
 								}
 							}
+
+							joinGameRoom(gameRoomNum, userInfo);
 						}
-						break;
-					case 2:
 						break;
 					case 0:
 						System.out.println("안녕히가세요");
@@ -207,5 +229,26 @@ public class GameClient {
 				}
 			}
 		}
+	}
+
+	private User makeUserInfo() throws IOException {
+		System.out.println("유저 아이디를 입력해주세요 : ");
+		Scanner userNameScanner = new Scanner(System.in);
+		if (userNameScanner.hasNextLine()) {
+			final String userId = userNameScanner.nextLine();
+			System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
+			Scanner userRoleScanner = new Scanner(System.in);
+			String userRole = "ATTACKER";
+			if (userRoleScanner.hasNextLine()) {
+				final String userRoleSelect = userRoleScanner.nextLine();
+				if (userRoleSelect.equals("2")) {
+					userRole = "DEPENDER";
+				}
+			}
+
+			return new User(userId, new Role(RoleType.valueOf(userRole)));
+		}
+
+		return null;
 	}
 }

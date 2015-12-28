@@ -6,5 +6,5 @@ package com.eyeq.jhs.type;
  */
 public enum RoleType {
 
-	ATTACKER, DEPENDER;
+	ATTACKER, DEPENDER
 }
