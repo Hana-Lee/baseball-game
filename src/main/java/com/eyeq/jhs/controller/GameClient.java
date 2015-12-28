@@ -52,13 +52,13 @@ public class GameClient {
 								Scanner userNameScanner = new Scanner(System.in);
 								if (userNameScanner.hasNextLine()) {
 									final String userId = userNameScanner.nextLine();
-									System.out.println("역활을 선택해주세요 [ 1. 공격, 2. 수비 ] :");
+									System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
 									Scanner userRoleScanner = new Scanner(System.in);
-									String userRole = "DEPENDER";
+									String userRole = "ATTACKER";
 									if (userRoleScanner.hasNextLine()) {
 										final String userRoleSelect = userRoleScanner.nextLine();
-										if (userRoleSelect.equals("1")) {
-											userRole = "ATTACKER";
+										if (userRoleSelect.equals("2")) {
+											userRole = "DEPENDER";
 										}
 									}
 

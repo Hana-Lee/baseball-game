@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Role {
 
-	private RoleType roleType = RoleType.DEPENDER;
+	private RoleType roleType = RoleType.ATTACKER;
 }
