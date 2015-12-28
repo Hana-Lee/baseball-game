@@ -16,7 +16,7 @@ public class GameRoom {
 
 	private long id;
 	private String name;
-	private int limit;
+	private int limit = 5;
 	private Set<User> users = new HashSet<>();
 
 	public GameRoom(long id, String name, int limit) {
