@@ -7,7 +7,6 @@ import com.eyeq.jhs.model.Role;
 import com.eyeq.jhs.model.Setting;
 import com.eyeq.jhs.model.User;
 import com.eyeq.jhs.type.RoleType;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -19,6 +18,8 @@ public class GameClient {
 
 	private final ClientBackground client = new ClientBackground();
 	private ObjectMapper objectMapper = new ObjectMapper();
+
+	private User user;
 
 	public GameClient() {
 		client.connect();
@@ -56,24 +57,218 @@ public class GameClient {
 		}
 	}
 
-	private boolean joiningGameRoom(long gameRoomNum, User user) throws IOException {
+	private Setting fetchGameSetting(long gameRoomNum) throws IOException {
+		client.sendSocketData("GET_SETTING," + gameRoomNum);
+		final String settingJson = client.getServerMessage();
+		return objectMapper.readValue(settingJson, Setting.class);
+	}
+
+	private List<GameRoom> fetchGameRoomList() throws IOException {
+		client.sendSocketData("GET_ROOM_LIST");
+		return objectMapper.readValue(client.getServerMessage(), objectMapper.getTypeFactory().constructCollectionType
+				(List.class, GameRoom.class));
+	}
+
+	private void showingGameRoomMenu(long gameRoomId) throws IOException {
+		boolean menuLeft = false;
+		final Setting oSetting = fetchGameSetting(gameRoomId);
+		final Setting newSetting = new Setting(oSetting.getLimitWrongInputCount(), oSetting.getLimitGuessInputCount(),
+				oSetting.getGenerationNumberCount());
+		while (!menuLeft) {
+			String limitWrongInputCountMessage = String.valueOf(oSetting.getLimitWrongInputCount());
+			if (oSetting.getLimitWrongInputCount() != newSetting.getLimitWrongInputCount()) {
+				limitWrongInputCountMessage = oSetting.getLimitWrongInputCount() + " -> " + newSetting
+						.getLimitWrongInputCount();
+			}
+
+			String limitGuessInputCountMessage = String.valueOf(oSetting.getLimitGuessInputCount());
+			if (oSetting.getLimitGuessInputCount() != newSetting.getLimitGuessInputCount()) {
+				limitGuessInputCountMessage = oSetting.getLimitGuessInputCount() + " -> " + newSetting
+						.getLimitGuessInputCount();
+			}
+
+			String generationNumberCountMessage = String.valueOf(oSetting.getGenerationNumberCount());
+			if (oSetting.getGenerationNumberCount() != newSetting.getGenerationNumberCount()) {
+				generationNumberCountMessage = oSetting.getGenerationNumberCount() + " -> " + newSetting
+						.getGenerationNumberCount();
+			}
+			System.out.println("======= 메뉴를 선택해주세요 =======");
+			System.out.println("1. 입력 오류 횟수 설정 (" + limitWrongInputCountMessage + ")");
+			System.out.println("2. 공격 횟수 설정 (" + limitGuessInputCountMessage + ")");
+			System.out.println("3. 생성 숫자 자리수 설정 (" + generationNumberCountMessage + ")");
+			System.out.println("4. 저장(저장을 하지 않으면 이전 설정유지)");
+			System.out.println("0. 메뉴 나가기");
+			Scanner settingInput = new Scanner(System.in);
+			if (settingInput.hasNextInt()) {
+				switch (settingInput.nextInt()) {
+					case 1:
+						System.out.print("값을 입력해주세요. : ");
+						Scanner limitWrongNumSettingScanner = new Scanner(System.in);
+						if (limitWrongNumSettingScanner.hasNextInt()) {
+							newSetting.setLimitWrongInputCount(Integer.parseInt(limitWrongNumSettingScanner.nextLine
+									()));
+						}
+						break;
+					case 2:
+						System.out.print("값을 입력해주세요. : ");
+						Scanner limitGuessNumSettingScanner = new Scanner(System.in);
+						if (limitGuessNumSettingScanner.hasNextInt()) {
+							newSetting.setLimitGuessInputCount(Integer.parseInt(limitGuessNumSettingScanner.nextLine
+									()));
+						}
+						break;
+					case 3:
+						System.out.print("값을 입력해주세요. : ");
+						Scanner generationNumCountSettingScanner = new Scanner(System.in);
+						if (generationNumCountSettingScanner.hasNextInt()) {
+							newSetting.setGenerationNumberCount(Integer.parseInt(generationNumCountSettingScanner
+									.nextLine()));
+						}
+						break;
+					case 4:
+						client.sendSocketData("SET_SETTING," + gameRoomId + ":wrong:" + newSetting
+								.getLimitWrongInputCount() + ":guess:" + newSetting.getLimitGuessInputCount() +
+								":count:" + newSetting.getGenerationNumberCount());
+						if (!client.getServerMessage().isEmpty()) {
+							System.out.println("저장이 완료 되었습니다.");
+						} else {
+							System.out.println("저장에 실패 했습니다. 다시 시도 해주세요.");
+						}
+						break;
+					case 0:
+						menuLeft = true;
+				}
+			}
+
+		}
+	}
+
+	public void startGame() throws IOException {
+		Boolean gameTerminated = false;
+
+		System.out.println("====== 야구게임을 시작합니다 ======");
+		System.out.println();
+
+		login();
+
+		System.out.println();
+		while (!gameTerminated) {
+			System.out.println("*** 게임룸 리스트 ***");
+			final List<GameRoom> gameRoomList = fetchGameRoomList();
+			if (gameRoomList.isEmpty()) {
+				System.out.println("생성된 게임룸이 없습니다.");
+			} else {
+				for (GameRoom gameRoom : gameRoomList) {
+					final String roomName = gameRoom.getName();
+					final long roomId = gameRoom.getId();
+					final int userCountInRoom = gameRoom.getUsers().size();
+					final int limitCount = gameRoom.getLimit();
+					System.out.println(roomId + " : " + roomName + " (" + userCountInRoom + "/" + limitCount + ")");
+				}
+			}
+			System.out.println("******************");
+			System.out.println();
+			System.out.println("====== 게임 메뉴 ======");
+			System.out.println("1. 게임룸 생성");
+			if (gameRoomList.size() > 0) {
+				System.out.println("2. 게임룸 선택");
+			}
+			System.out.println("0. 종료");
+			System.out.println("=====================");
+			System.out.print("메뉴를 선택해 주세요 : ");
+			Scanner s = new Scanner(System.in);
+			if (s.hasNextLine()) {
+				switch (s.nextInt()) {
+					case 1:
+						System.out.println("게임룸 이름을 입력해주세요 : ");
+						Scanner gameRoomNameScanner = new Scanner(System.in);
+						if (gameRoomNameScanner.hasNextLine()) {
+							final String gameRoomName = gameRoomNameScanner.nextLine();
+							final GameRoom createdGameRoom = createGameRoom(gameRoomName);
+
+							user.setRole(selectUserRole());
+
+							if (joiningGameRoom(createdGameRoom.getId())) {
+								joinGameRoom(createdGameRoom.getId());
+							}
+						}
+						break;
+					case 2:
+						System.out.println("게임룸 번호 선택 : ");
+						Scanner gameRoomNumScanner = new Scanner(System.in);
+						if (gameRoomNumScanner.hasNextLine()) {
+							final long gameRoomNum = Long.valueOf(gameRoomNumScanner.nextLine());
+
+							user.setRole(selectUserRole());
+
+							if (joiningGameRoom(gameRoomNum)) {
+								joinGameRoom(gameRoomNum);
+							}
+						}
+						break;
+					case 0:
+						System.out.println("안녕히가세요");
+						gameTerminated = true;
+						client.closeConnection();
+						break;
+				}
+			}
+		}
+	}
+
+	private void login() throws IOException {
+		boolean loginCompleted = false;
+		while (!loginCompleted) {
+			System.out.println("유저 아이디를 입력해주세요 : ");
+			Scanner userNameScanner = new Scanner(System.in);
+			if (userNameScanner.hasNextLine()) {
+				final String userId = userNameScanner.nextLine();
+
+				client.sendSocketData("LOGIN," + userId);
+				final String errorMessageJson = client.getServerMessage();
+				final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
+				if (errorMessage.getType() != null) {
+					System.out.println(errorMessage.getType().getMessage());
+				} else {
+					this.user = new User(userId, null);
+					loginCompleted = true;
+				}
+			}
+		}
+	}
+
+	private Role selectUserRole() {
+		System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
+		Scanner userRoleScanner = new Scanner(System.in);
+		String userRole = "ATTACKER";
+		if (userRoleScanner.hasNextLine()) {
+			final String userRoleSelect = userRoleScanner.nextLine();
+			if (userRoleSelect.equals("2")) {
+				userRole = "DEPENDER";
+			}
+		}
+
+		return new Role(RoleType.valueOf(userRole));
+	}
+
+	private boolean joiningGameRoom(long gameRoomNum) throws IOException {
 		client.sendSocketData("JOIN," + gameRoomNum + ":USER:" + user.getId() + ":ROLE:" +
 				user.getRole().getRoleType().name());
 		final String errorMessageJson = client.getServerMessage();
 		final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
 
-		boolean userIdValid;
+		boolean joinCompleted;
 		if (errorMessage != null && errorMessage.getType() != null) {
-			userIdValid = false;
+			joinCompleted = false;
 			System.out.println(errorMessage.getType().getMessage());
 		} else {
-			userIdValid = true;
+			joinCompleted = true;
 		}
 
-		return userIdValid;
+		return joinCompleted;
 	}
 
-	private void joinGameRoom(long gameRoomNum, User user) throws IOException {
+	private void joinGameRoom(long gameRoomNum) throws IOException {
 		System.out.println("안녕하세요 " + user.getId() + "님, " + gameRoomNum + "번 방에 입장하셨습니다");
 
 		boolean gameRoomLeft = false;
@@ -83,8 +278,11 @@ public class GameClient {
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomNum).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining(", " +
-					""));
+			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining
+					("," +
+					" " +
+					"" + ""));
+			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
 			System.out.println("접속 유저 : " + userList);
 			final Setting setting = fetchGameSetting(gameRoomNum);
 			System.out.println("** 현재 설정 **");
@@ -127,177 +325,9 @@ public class GameClient {
 		}
 	}
 
-	private Setting fetchGameSetting(long gameRoomNum) throws IOException {
-		client.sendSocketData("GET_SETTING," + gameRoomNum);
-		final String settingJson = client.getServerMessage();
-		return objectMapper.readValue(settingJson, Setting.class);
-	}
-
-	private List<GameRoom> fetchGameRoomList() throws IOException {
-		client.sendSocketData("GET_ROOM_LIST");
-		return objectMapper.readValue(client.getServerMessage(), objectMapper.getTypeFactory().constructCollectionType
-				(List.class, GameRoom.class));
-	}
-
-	private void showingGameRoomMenu(long gameRoomId) throws JsonProcessingException {
-		boolean menuLeft = false;
-		final Setting setting = new Setting();
-		while (!menuLeft) {
-			System.out.println("==== 메뉴를 선택해주세요 =======");
-			System.out.println("1. 입력 오류 횟수 설정");
-			System.out.println("2. 공격 횟수 설정");
-			System.out.println("3. 생성 숫자 자리수 설정");
-			System.out.println("4. 저장(저장을 하지 않으면 이전 설정유지)");
-			System.out.println("0. 메뉴 나가기");
-			Scanner settingInput = new Scanner(System.in);
-			if (settingInput.hasNextInt()) {
-				switch (settingInput.nextInt()) {
-					case 1:
-						System.out.print("값을 입력해주세요. : ");
-						Scanner limitWrongNumSettingScanner = new Scanner(System.in);
-						if (limitWrongNumSettingScanner.hasNextInt()) {
-							setting.setLimitWrongInputCount(Integer.parseInt(limitWrongNumSettingScanner.nextLine()));
-						}
-						break;
-					case 2:
-						System.out.print("값을 입력해주세요. : ");
-						Scanner limitGuessNumSettingScanner = new Scanner(System.in);
-						if (limitGuessNumSettingScanner.hasNextInt()) {
-							setting.setLimitGuessInputCount(Integer.parseInt(limitGuessNumSettingScanner.nextLine()));
-						}
-						break;
-					case 3:
-						System.out.print("값을 입력해주세요. : ");
-						Scanner generationNumCountSettingScanner = new Scanner(System.in);
-						if (generationNumCountSettingScanner.hasNextInt()) {
-							setting.setGenerationNumberCount(Integer.parseInt(generationNumCountSettingScanner
-									.nextLine()));
-						}
-						break;
-					case 4:
-						client.sendSocketData("SET_SETTING," + gameRoomId + ":wrong:" + setting
-								.getLimitWrongInputCount() + ":guess:" + setting.getLimitGuessInputCount() + ":count:"
-								+ setting.getGenerationNumberCount());
-						if (!client.getServerMessage().isEmpty()) {
-							System.out.println("저장이 완료 되었습니다.");
-						} else {
-							System.out.println("저장에 실패 했습니다. 다시 시도 해주세요.");
-						}
-						break;
-					case 0:
-						menuLeft = true;
-				}
-			}
-
-		}
-	}
-
-	public void startGame() throws IOException {
-		Boolean gameTerminated = false;
-
-		System.out.println("====== 야구게임을 시작합니다 ======");
-		while (!gameTerminated) {
-			client.sendSocketData("CONNECTION");
-			System.out.println("*** 게임룸 리스트 ***");
-			final List<GameRoom> gameRoomList = fetchGameRoomList();
-			if (gameRoomList.isEmpty()) {
-				System.out.println("생성된 게임룸이 없습니다.");
-			} else {
-				for (GameRoom gameRoom : gameRoomList) {
-					final String roomName = gameRoom.getName();
-					final long roomId = gameRoom.getId();
-					final int userCountInRoom = gameRoom.getUsers().size();
-					final int limitCount = gameRoom.getLimit();
-					System.out.println(roomId + " : " + roomName + " (" + userCountInRoom + "/" + limitCount + ")");
-				}
-			}
-			System.out.println("******************");
-			System.out.println();
-			System.out.println("====== 게임 메뉴 ======");
-			System.out.println("1. 게임룸 생성");
-			if (gameRoomList.size() > 0) {
-				System.out.println("2. 게임룸 선택");
-			}
-			System.out.println("0. 종료");
-			System.out.println("=====================");
-			System.out.print("메뉴를 선택해 주세요 : ");
-			Scanner s = new Scanner(System.in);
-			if (s.hasNextLine()) {
-				switch (s.nextInt()) {
-					case 1:
-						System.out.println("게임룸 이름을 입력해주세요 : ");
-						Scanner gameRoomNameScanner = new Scanner(System.in);
-						if (gameRoomNameScanner.hasNextLine()) {
-							final String gameRoomName = gameRoomNameScanner.nextLine();
-							final GameRoom createdGameRoom = createGameRoom(gameRoomName);
-
-							boolean joinCompleted = false;
-							User userInfo = null;
-							while (!joinCompleted) {
-								userInfo = makeUserInfo();
-								if (userInfo != null) {
-									joinCompleted = joiningGameRoom(createdGameRoom.getId(), userInfo);
-								} else {
-									System.out.println("유저 정보가 없습니다. 다시 확인해주세요.");
-								}
-							}
-
-							joinGameRoom(createdGameRoom.getId(), userInfo);
-						}
-						break;
-					case 2:
-						System.out.println("게임룸 번호 선택 : ");
-						Scanner gameRoomNumScanner = new Scanner(System.in);
-						if (gameRoomNumScanner.hasNextLine()) {
-							final long gameRoomNum = Long.valueOf(gameRoomNumScanner.nextLine());
-							boolean joinCompleted = false;
-							User userInfo = null;
-							while (!joinCompleted) {
-								userInfo = makeUserInfo();
-								if (userInfo != null) {
-									joinCompleted = joiningGameRoom(gameRoomNum, userInfo);
-								} else {
-									System.out.println("유저 정보가 없습니다. 다시 확인해주세요.");
-								}
-							}
-
-							joinGameRoom(gameRoomNum, userInfo);
-						}
-						break;
-					case 0:
-						System.out.println("안녕히가세요");
-						gameTerminated = true;
-						client.closeConnection();
-						break;
-				}
-			}
-		}
-	}
-
 	private GameRoom createGameRoom(String gameRoomName) throws IOException {
-		client.sendSocketData("CREATE_ROOM," + gameRoomName);
+		client.sendSocketData("CREATE_ROOM," + gameRoomName + ":USER_ID:" + user.getId());
 		final String createdRoomJson = client.getServerMessage();
 		return objectMapper.readValue(createdRoomJson, GameRoom.class);
-	}
-
-	private User makeUserInfo() throws IOException {
-		System.out.println("유저 아이디를 입력해주세요 : ");
-		Scanner userNameScanner = new Scanner(System.in);
-		if (userNameScanner.hasNextLine()) {
-			final String userId = userNameScanner.nextLine();
-			System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
-			Scanner userRoleScanner = new Scanner(System.in);
-			String userRole = "ATTACKER";
-			if (userRoleScanner.hasNextLine()) {
-				final String userRoleSelect = userRoleScanner.nextLine();
-				if (userRoleSelect.equals("2")) {
-					userRole = "DEPENDER";
-				}
-			}
-
-			return new User(userId, new Role(RoleType.valueOf(userRole)));
-		}
-
-		return null;
 	}
 }

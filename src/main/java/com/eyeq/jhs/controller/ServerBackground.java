@@ -23,39 +23,42 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ServerBackground {
 
 	private ServerSocket server = null;
-	private ServerSocket backgroundMessageServer = null;
-	private Socket client = null;
-	private Socket backgroundMessageClient = null;
+	private ServerSocket bgMessageServer = null;
 
 	private List<GameRoom> gameRoomList = new ArrayList<>();
-	private List<DataOutputStream> backgroundMessageClients = new ArrayList<>();
+	private Map<User, DataOutputStream> clients = new HashMap<>();
+	private Map<User, DataOutputStream> bgMessageClients = new HashMap<>();
 
 	public ServerBackground() {
 		Collections.synchronizedList(gameRoomList);
+		Collections.synchronizedMap(clients);
+		Collections.synchronizedMap(bgMessageClients);
 	}
 
 	public void startServer() {
 		try {
 			server = new ServerSocket(9090);
-			backgroundMessageServer = new ServerSocket(9191);
+			bgMessageServer = new ServerSocket(9191);
 			while (true) {
 				System.out.println("Server: Waiting for request.");
-				client = server.accept();
+				final Socket clientSocket = server.accept();
 				System.out.println("Server: accepted.");
 
 				System.out.println("Background Message Server: Waiting for request.");
-				backgroundMessageClient = backgroundMessageServer.accept();
+				final Socket bgMessageClientSocket = bgMessageServer.accept();
 				System.out.println("Background Message Server: accepted.");
-				backgroundMessageClients.add(new DataOutputStream(backgroundMessageClient.getOutputStream()));
 
 				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
-				final ServerController receiver = new ServerController(new GameController(strategy), client);
+				final ServerController receiver = new ServerController(new GameController(strategy), clientSocket,
+						bgMessageClientSocket);
 				receiver.start();
 			}
 		} catch (IOException e) {
@@ -78,20 +81,25 @@ public class ServerBackground {
 		private DataInputStream dataInputStream;
 		private DataOutputStream dataOutputStream;
 
-		public ServerController(GameController gameController, Socket socket) {
+		private DataInputStream bgMessageClientInputStream;
+		private DataOutputStream bgMessageClientOutputStream;
+
+		public ServerController(GameController gameController, Socket socket, Socket bgMessageClientSocket) {
 			this.gameEngine = gameController;
 			try {
 				this.dataInputStream = new DataInputStream(socket.getInputStream());
 				this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+				this.bgMessageClientInputStream = new DataInputStream(bgMessageClientSocket.getInputStream());
+				this.bgMessageClientOutputStream = new DataOutputStream(bgMessageClientSocket.getOutputStream());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		public void sendToAll(String message) {
-			backgroundMessageClients.forEach(c -> {
+		public void sendToAll(GameRoom gameRoom, String message) {
+			gameRoom.getUsers().forEach(u -> {
 				try {
-					c.writeUTF(message);
+					bgMessageClients.get(u).writeUTF(message);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -118,15 +126,19 @@ public class ServerBackground {
 					ObjectMapper objectMapper = new ObjectMapper();
 					String jsonResult;
 					switch (messageType) {
-						case CONNECTION:
-//							jsonResult = objectMapper.writeValueAsString(gameRoomList);
-//							dataOutputStream.writeUTF(jsonResult);
-							break;
 						case CREATE_ROOM:
-							final GameRoom newGameRoom = GameRoomMaker.make(gameRoomList, value);
-							gameRoomList.add(newGameRoom);
-							jsonResult = objectMapper.writeValueAsString(newGameRoom);
-							dataOutputStream.writeUTF(jsonResult);
+							if (value != null) {
+								final String[] clientSendValues = value.split(":");
+								final String gameRoomName = clientSendValues[0];
+								final String userId = clientSendValues[2];
+								final User ownerUser = clients.entrySet().stream().filter(entry -> entry.getKey()
+										.getId().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
+										.get(0);
+								final GameRoom newGameRoom = GameRoomMaker.make(gameRoomList, gameRoomName, ownerUser);
+								gameRoomList.add(newGameRoom);
+								jsonResult = objectMapper.writeValueAsString(newGameRoom);
+								dataOutputStream.writeUTF(jsonResult);
+							}
 							break;
 						case JOIN:
 							if (value != null) {
@@ -134,22 +146,20 @@ public class ServerBackground {
 								final long gameRoomId = Long.valueOf(clientSendValues[0]);
 								final String role = clientSendValues[4];
 								final String userId = clientSendValues[2];
-								final User joinedUser = new User(userId, new Role(RoleType.valueOf(role)));
-
+								final User joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
+										.getId().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
+										.get(0);
+								joinedUser.setRole(new Role(RoleType.valueOf(role)));
 								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
 
-								final ErrorMessage errorMessage = new ErrorMessage();
-								String errorMessageJson;
-								if (gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId)).count() > 0) {
-									errorMessage.setType(ErrorType.DUPLICATE_USER_ID);
-									errorMessageJson = objectMapper.writeValueAsString("[ " + userId + " ]는 " +
-											errorMessage);
-								} else {
-									gameRoom.getUsers().add(joinedUser);
-									errorMessageJson = objectMapper.writeValueAsString(errorMessage);
+								ErrorMessage errorMessage = new ErrorMessage();
+								if (!gameRoom.getOwner().getId().equals(joinedUser.getId()) && gameRoom.getUsers()
+										.stream().filter(u -> u.getId().equals(joinedUser.getId())).count() > 0) {
+									errorMessage.setType(ErrorType.ALREADY_JOIN);
 								}
-								dataOutputStream.writeUTF(errorMessageJson);
+
+								dataOutputStream.writeUTF(objectMapper.writeValueAsString(errorMessage));
 							}
 							break;
 						case GET_ROOM_LIST:
@@ -157,7 +167,12 @@ public class ServerBackground {
 							dataOutputStream.writeUTF(jsonResult);
 							break;
 						case READY:
-							sendToAll("게임이 준비중 입니다. 게임 준비를 선택해 주세요.");
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								sendToAll(gameRoom, "게임이 준비중 입니다. 게임 준비를 선택해 주세요.");
+							}
 							break;
 						case START:
 							gameEngine.generateNum();
@@ -188,20 +203,20 @@ public class ServerBackground {
 							break;
 						case SET_SETTING:
 							if (value != null) {
-								final long gameRoomId = Long.parseLong(value);
-								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
 								// TODO json object 로 처리할것
 								final String[] clientSendValues = value.split(":");
+								final long gameRoomId = Long.parseLong(clientSendValues[0]);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
 
 								//잘못된 숫자 입력 횟수 제한
-								final int limitWrongInputCount = Integer.parseInt(clientSendValues[1]);
+								final int limitWrongInputCount = Integer.parseInt(clientSendValues[2]);
 
 								// 야구 게임 횟수
-								final int limitGuessInputCount = Integer.parseInt(clientSendValues[3]);
+								final int limitGuessInputCount = Integer.parseInt(clientSendValues[4]);
 
 								// 생성 숫자 갯수
-								final int generationNumberCount = Integer.parseInt(clientSendValues[5]);
+								final int generationNumberCount = Integer.parseInt(clientSendValues[6]);
 
 								gameRoom.getSetting().setLimitWrongInputCount(limitWrongInputCount);
 								gameRoom.getSetting().setLimitGuessInputCount(limitGuessInputCount);
@@ -209,6 +224,32 @@ public class ServerBackground {
 
 								jsonResult = objectMapper.writeValueAsString(gameRoom.getSetting());
 								dataOutputStream.writeUTF(jsonResult);
+							}
+							break;
+						case LOGIN:
+							if (value != null) {
+								User newUser = new User(value, null);
+								ErrorMessage errorMessage = new ErrorMessage();
+
+								if (clients.entrySet().stream().filter(entry -> entry.getKey().getId().equals(newUser
+										.getId())).count() > 0) {
+									errorMessage.setType(ErrorType.DUPLICATE_USER_ID);
+								} else {
+									clients.put(newUser, dataOutputStream);
+									bgMessageClients.put(newUser, bgMessageClientOutputStream);
+								}
+
+								jsonResult = objectMapper.writeValueAsString(errorMessage);
+								dataOutputStream.writeUTF(jsonResult);
+							}
+							break;
+						case LOGOUT:
+							if (value != null) {
+								final String userId = value;
+								User leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getId()
+										.equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
+								clients.remove(leaveUser);
+								bgMessageClients.remove(leaveUser);
 							}
 							break;
 						default:
