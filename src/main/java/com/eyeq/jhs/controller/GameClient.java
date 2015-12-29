@@ -78,8 +78,7 @@ public class GameClient {
 
 		boolean gameRoomLeft = false;
 		while (!gameRoomLeft) {
-			client.sendSocketData("GET_ROOM_LIST");
-			final List<GameRoom> gameRoomList = getGameRoomList();
+			final List<GameRoom> gameRoomList = fetchGameRoomList();
 
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomNum).collect
 					(Collectors.toList()).get(0);
@@ -87,9 +86,7 @@ public class GameClient {
 			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining(", " +
 					""));
 			System.out.println("접속 유저 : " + userList);
-			client.sendSocketData("GET_SETTING," + gameRoomNum);
-			final String settingJson = client.getServerMessage();
-			final Setting setting = objectMapper.readValue(settingJson, Setting.class);
+			final Setting setting = fetchGameSetting(gameRoomNum);
 			System.out.println("** 현재 설정 **");
 			System.out.println("* 공격 횟수 " + setting.getLimitGuessInputCount() + "회");
 			System.out.println("* 생성 갯수 " + setting.getGenerationNumberCount() + "개");
@@ -130,7 +127,14 @@ public class GameClient {
 		}
 	}
 
-	private List<GameRoom> getGameRoomList() throws IOException {
+	private Setting fetchGameSetting(long gameRoomNum) throws IOException {
+		client.sendSocketData("GET_SETTING," + gameRoomNum);
+		final String settingJson = client.getServerMessage();
+		return objectMapper.readValue(settingJson, Setting.class);
+	}
+
+	private List<GameRoom> fetchGameRoomList() throws IOException {
+		client.sendSocketData("GET_ROOM_LIST");
 		return objectMapper.readValue(client.getServerMessage(), objectMapper.getTypeFactory().constructCollectionType
 				(List.class, GameRoom.class));
 	}
@@ -195,8 +199,7 @@ public class GameClient {
 		while (!gameTerminated) {
 			client.sendSocketData("CONNECTION");
 			System.out.println("*** 게임룸 리스트 ***");
-			client.sendSocketData("GET_ROOM_LIST");
-			final List<GameRoom> gameRoomList = getGameRoomList();
+			final List<GameRoom> gameRoomList = fetchGameRoomList();
 			if (gameRoomList.isEmpty()) {
 				System.out.println("생성된 게임룸이 없습니다.");
 			} else {
@@ -226,9 +229,7 @@ public class GameClient {
 						Scanner gameRoomNameScanner = new Scanner(System.in);
 						if (gameRoomNameScanner.hasNextLine()) {
 							final String gameRoomName = gameRoomNameScanner.nextLine();
-							client.sendSocketData("CREATE_ROOM," + gameRoomName);
-							final String createdRoomJson = client.getServerMessage();
-							final GameRoom createdGameRoom = objectMapper.readValue(createdRoomJson, GameRoom.class);
+							final GameRoom createdGameRoom = createGameRoom(gameRoomName);
 
 							boolean joinCompleted = false;
 							User userInfo = null;
@@ -271,6 +272,12 @@ public class GameClient {
 				}
 			}
 		}
+	}
+
+	private GameRoom createGameRoom(String gameRoomName) throws IOException {
+		client.sendSocketData("CREATE_ROOM," + gameRoomName);
+		final String createdRoomJson = client.getServerMessage();
+		return objectMapper.readValue(createdRoomJson, GameRoom.class);
 	}
 
 	private User makeUserInfo() throws IOException {
