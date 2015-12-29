@@ -13,4 +13,7 @@ public class Setting {
 
 	// 야구 게임 횟수
 	private int limitGuessInputCount = 10;
+
+	// 생성 숫자 갯수
+	private int generationNumberCount = 3;
 }

@@ -141,8 +141,7 @@ public class ServerBackground {
 
 								final ErrorMessage errorMessage = new ErrorMessage();
 								String errorMessageJson;
-								if (gameRoom.getUsers().stream().filter(u -> u.getUserId().equals(userId)).count() >
-										0) {
+								if (gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId)).count() > 0) {
 									errorMessage.setType(ErrorType.DUPLICATE_USER_ID);
 									errorMessageJson = objectMapper.writeValueAsString("[ " + userId + " ]는 " +
 											errorMessage);
@@ -176,6 +175,40 @@ public class ServerBackground {
 								dataOutputStream.writeUTF(jsonResult);
 							} catch (IllegalArgumentException e) {
 
+							}
+							break;
+						case GET_SETTING:
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								jsonResult = objectMapper.writeValueAsString(gameRoom.getSetting());
+								dataOutputStream.writeUTF(jsonResult);
+							}
+							break;
+						case SET_SETTING:
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								// TODO json object 로 처리할것
+								final String[] clientSendValues = value.split(":");
+
+								//잘못된 숫자 입력 횟수 제한
+								final int limitWrongInputCount = Integer.parseInt(clientSendValues[1]);
+
+								// 야구 게임 횟수
+								final int limitGuessInputCount = Integer.parseInt(clientSendValues[3]);
+
+								// 생성 숫자 갯수
+								final int generationNumberCount = Integer.parseInt(clientSendValues[5]);
+
+								gameRoom.getSetting().setLimitWrongInputCount(limitWrongInputCount);
+								gameRoom.getSetting().setLimitGuessInputCount(limitGuessInputCount);
+								gameRoom.getSetting().setGenerationNumberCount(generationNumberCount);
+
+								jsonResult = objectMapper.writeValueAsString(gameRoom.getSetting());
+								dataOutputStream.writeUTF(jsonResult);
 							}
 							break;
 						default:

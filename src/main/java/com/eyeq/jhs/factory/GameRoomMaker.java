@@ -1,6 +1,7 @@
 package com.eyeq.jhs.factory;
 
 import com.eyeq.jhs.model.GameRoom;
+import com.eyeq.jhs.model.Setting;
 
 import java.util.List;
 
@@ -15,6 +16,6 @@ public class GameRoomMaker {
 
 		final Long maxId = gameRoomList.isEmpty() ? 1L : gameRoomList.stream().map(GameRoom::getId).reduce(Long::max)
 				.get();
-		return new GameRoom(maxId + 1, roomName, LIMIT_USER_COUNT);
+		return new GameRoom(maxId + 1, roomName, LIMIT_USER_COUNT, new Setting());
 	}
 }

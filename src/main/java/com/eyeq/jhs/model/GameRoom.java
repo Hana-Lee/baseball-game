@@ -19,20 +19,23 @@ public class GameRoom {
 	private int limit = 5;
 	private User owner;
 	private Set<User> users = new HashSet<>();
+	private Setting setting;
 
-	public GameRoom(long id, String name, User owner, int limit) {
+	public GameRoom(long id, String name, User owner, int limit, Setting setting) {
 		this.id = id;
 		this.name = name;
 		this.owner = owner;
 		this.limit = limit;
+		this.setting = setting;
 
 		init(this.owner);
 	}
 
-	public GameRoom(long id, String name, int limit) {
+	public GameRoom(long id, String name, int limit, Setting setting) {
 		this.id = id;
 		this.name = name;
 		this.limit = limit;
+		this.setting = setting;
 	}
 
 	private void init(User owner) {
