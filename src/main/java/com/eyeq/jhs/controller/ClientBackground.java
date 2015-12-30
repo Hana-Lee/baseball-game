@@ -92,7 +92,7 @@ public class ClientBackground {
 		public void run() {
 			while (dataInputStream != null) {
 				try {
-					System.out.println("Server auto msg : " + dataInputStream.readUTF());
+					System.out.println("\nServer auto msg : " + dataInputStream.readUTF());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

@@ -2,6 +2,7 @@ package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.model.Ball;
 import com.eyeq.jhs.model.Result;
+import com.eyeq.jhs.model.Setting;
 import com.eyeq.jhs.model.Solve;
 import com.eyeq.jhs.model.Strike;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
@@ -16,12 +17,12 @@ public class GameController {
 		this.strategy = strategy;
 	}
 
-	public void guess(String inputNumber) {
+	public void userInputValidate(String inputNumber, Setting setting) {
 		if (inputNumber == null || inputNumber.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 
-		if (inputNumber.length() != 3) {
+		if (inputNumber.length() != setting.getLimitGuessInputCount()) {
 			throw new IllegalArgumentException();
 		}
 

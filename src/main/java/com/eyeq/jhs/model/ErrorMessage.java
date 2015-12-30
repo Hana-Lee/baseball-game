@@ -1,6 +1,5 @@
 package com.eyeq.jhs.model;
 
-import com.eyeq.jhs.type.ErrorType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ErrorMessage {
 
-	private ErrorType type;
+	private String message;
+
 }

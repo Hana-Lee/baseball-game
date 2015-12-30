@@ -26,7 +26,6 @@ public class GameClient {
 	}
 
 	private void runningGame() throws IOException {
-		client.sendSocketData("START");
 		boolean isGameOver = false;
 		while (!isGameOver) {
 			System.out.print("숫자를 입력해주세요 :  ");
@@ -40,8 +39,9 @@ public class GameClient {
 				final ResultDto resultDto = objectMapper.readValue(resultDtoJson, ResultDto.class);
 				System.out.println("Result : " + resultDto);
 
-				if (resultDto.getErrorMessage() != null && resultDto.getErrorMessage().getType() != null) {
-					System.out.println("오류 메세지 : " + resultDto.getErrorMessage().getType().getMessage());
+				if (resultDto.getErrorMessage() != null && resultDto.getErrorMessage().getMessage() != null &&
+						!resultDto.getErrorMessage().getMessage().isEmpty()) {
+					System.out.println("오류 메세지 : " + resultDto.getErrorMessage().getMessage());
 				} else {
 					final int strikeCount = resultDto.getResult().getStrike().getValue();
 					final int ballCount = resultDto.getResult().getBall().getValue();
@@ -57,8 +57,8 @@ public class GameClient {
 		}
 	}
 
-	private Setting fetchGameSetting(long gameRoomNum) throws IOException {
-		client.sendSocketData("GET_SETTING," + gameRoomNum);
+	private Setting fetchGameSetting(long gameRoomId) throws IOException {
+		client.sendSocketData("GET_SETTING," + gameRoomId);
 		final String settingJson = client.getServerMessage();
 		return objectMapper.readValue(settingJson, Setting.class);
 	}
@@ -180,7 +180,7 @@ public class GameClient {
 			if (s.hasNextLine()) {
 				switch (s.nextInt()) {
 					case 1:
-						System.out.println("게임룸 이름을 입력해주세요 : ");
+						System.out.print("게임룸 이름을 입력해주세요 : ");
 						Scanner gameRoomNameScanner = new Scanner(System.in);
 						if (gameRoomNameScanner.hasNextLine()) {
 							final String gameRoomName = gameRoomNameScanner.nextLine();
@@ -188,21 +188,19 @@ public class GameClient {
 
 							user.setRole(selectUserRole());
 
-							if (joiningGameRoom(createdGameRoom.getId())) {
-								joinGameRoom(createdGameRoom.getId());
-							}
+							joinGameRoom(createdGameRoom.getId());
 						}
 						break;
 					case 2:
-						System.out.println("게임룸 번호 선택 : ");
-						Scanner gameRoomNumScanner = new Scanner(System.in);
-						if (gameRoomNumScanner.hasNextLine()) {
-							final long gameRoomNum = Long.valueOf(gameRoomNumScanner.nextLine());
+						System.out.print("게임룸 번호 선택 : ");
+						Scanner gameRoomIdScanner = new Scanner(System.in);
+						if (gameRoomIdScanner.hasNextLine()) {
+							final long gameRoomId = Long.valueOf(gameRoomIdScanner.nextLine());
 
 							user.setRole(selectUserRole());
 
-							if (joiningGameRoom(gameRoomNum)) {
-								joinGameRoom(gameRoomNum);
+							if (joiningGameRoom(gameRoomId)) {
+								joinGameRoom(gameRoomId);
 							}
 						}
 						break;
@@ -219,7 +217,7 @@ public class GameClient {
 	private void login() throws IOException {
 		boolean loginCompleted = false;
 		while (!loginCompleted) {
-			System.out.println("유저 아이디를 입력해주세요 : ");
+			System.out.print("유저 아이디를 입력해주세요 : ");
 			Scanner userNameScanner = new Scanner(System.in);
 			if (userNameScanner.hasNextLine()) {
 				final String userId = userNameScanner.nextLine();
@@ -227,10 +225,10 @@ public class GameClient {
 				client.sendSocketData("LOGIN," + userId);
 				final String errorMessageJson = client.getServerMessage();
 				final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
-				if (errorMessage.getType() != null) {
-					System.out.println(errorMessage.getType().getMessage());
+				if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
+					System.out.println(errorMessage.getMessage());
 				} else {
-					this.user = new User(userId, null);
+					this.user = new User(userId, null, false);
 					loginCompleted = true;
 				}
 			}
@@ -238,7 +236,7 @@ public class GameClient {
 	}
 
 	private Role selectUserRole() {
-		System.out.println("1. 공격, 2. 수비 중에 하나를 선택해주세요 :");
+		System.out.print("1. 공격(숫자 맞추기), 2. 수비(숫자생성) 중에 하나의 역할을 선택해주세요 :");
 		Scanner userRoleScanner = new Scanner(System.in);
 		String userRole = "ATTACKER";
 		if (userRoleScanner.hasNextLine()) {
@@ -251,16 +249,16 @@ public class GameClient {
 		return new Role(RoleType.valueOf(userRole));
 	}
 
-	private boolean joiningGameRoom(long gameRoomNum) throws IOException {
-		client.sendSocketData("JOIN," + gameRoomNum + ":USER:" + user.getId() + ":ROLE:" +
+	private boolean joiningGameRoom(long gameRoomId) throws IOException {
+		client.sendSocketData("JOIN," + gameRoomId + ":USER:" + user.getId() + ":ROLE:" +
 				user.getRole().getRoleType().name());
 		final String errorMessageJson = client.getServerMessage();
 		final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
 
 		boolean joinCompleted;
-		if (errorMessage != null && errorMessage.getType() != null) {
+		if (errorMessage != null && errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
 			joinCompleted = false;
-			System.out.println(errorMessage.getType().getMessage());
+			System.out.println(errorMessage.getMessage());
 		} else {
 			joinCompleted = true;
 		}
@@ -268,23 +266,21 @@ public class GameClient {
 		return joinCompleted;
 	}
 
-	private void joinGameRoom(long gameRoomNum) throws IOException {
-		System.out.println("안녕하세요 " + user.getId() + "님, " + gameRoomNum + "번 방에 입장하셨습니다");
+	private void joinGameRoom(long gameRoomId) throws IOException {
+		System.out.println("안녕하세요 " + user.getId() + "님, " + gameRoomId + "번 방에 입장하셨습니다");
 
 		boolean gameRoomLeft = false;
 		while (!gameRoomLeft) {
 			final List<GameRoom> gameRoomList = fetchGameRoomList();
 
-			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomNum).collect
+			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining
-					("," +
-					" " +
-					"" + ""));
+			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining(", " +
+					""));
 			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
 			System.out.println("접속 유저 : " + userList);
-			final Setting setting = fetchGameSetting(gameRoomNum);
+			final Setting setting = fetchGameSetting(gameRoomId);
 			System.out.println("** 현재 설정 **");
 			System.out.println("* 공격 횟수 " + setting.getLimitGuessInputCount() + "회");
 			System.out.println("* 생성 갯수 " + setting.getGenerationNumberCount() + "개");
@@ -302,16 +298,36 @@ public class GameClient {
 			}
 			System.out.println("0. 게임룸 나가기");
 			System.out.println("---------------");
-			System.out.println("메뉴를 선택해 주세요 : ");
+			System.out.print("메뉴를 선택해 주세요 : ");
 			Scanner roomMenuScanner = new Scanner(System.in);
 			if (roomMenuScanner.hasNextLine()) {
 				final int selectedMenu = Integer.valueOf(roomMenuScanner.nextLine());
 				switch (selectedMenu) {
 					case 1:
+
+						boolean allUsersReady = false;
+						while (!allUsersReady) {
+							// TODO 모든 사용자가 준비할때까지 메세지가 무한정 날아가는것 해결 하기.
+							if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
+								client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
+							} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+								client.sendSocketData("START," + gameRoomId + ":USER_ID:" + user.getId());
+							}
+
+							final String errorMessageJson = client.getServerMessage();
+							final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage
+									.class);
+							if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
+								System.out.println(errorMessage.getMessage());
+							} else {
+								allUsersReady = true;
+							}
+						}
+						System.out.println("게임이 시작되었습니다. 행운을 빌어요~");
 						runningGame();
 						break;
 					case 2:
-						showingGameRoomMenu(gameRoomNum);
+						showingGameRoomMenu(gameRoomId);
 						break;
 					case 0:
 						System.out.println("안녕히가세요");
