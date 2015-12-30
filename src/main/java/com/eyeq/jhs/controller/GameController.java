@@ -1,11 +1,15 @@
 package com.eyeq.jhs.controller;
 
 import com.eyeq.jhs.model.Ball;
+import com.eyeq.jhs.model.ErrorMessage;
 import com.eyeq.jhs.model.Result;
 import com.eyeq.jhs.model.Setting;
 import com.eyeq.jhs.model.Solve;
 import com.eyeq.jhs.model.Strike;
 import com.eyeq.jhs.strategy.GenerationNumberStrategy;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class GameController {
 
@@ -17,12 +21,12 @@ public class GameController {
 		this.strategy = strategy;
 	}
 
-	public void userInputValidate(String inputNumber, Setting setting) {
+	public void userInputValidation(String inputNumber, Setting setting) {
 		if (inputNumber == null || inputNumber.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 
-		if (inputNumber.length() != setting.getLimitGuessInputCount()) {
+		if (inputNumber.length() != setting.getGenerationNumberCount()) {
 			throw new IllegalArgumentException();
 		}
 
@@ -43,7 +47,7 @@ public class GameController {
 	}
 
 	// 입력받 숫자와 랜덤하게 생성된 숫자 비교(strike, ball체크)
-	public Result checkNumber(String inputNum) {
+	public Result checkNumber(String generatedNumber, String inputNum) {
 		int strike = 0;
 		int ball = 0;
 
@@ -51,7 +55,7 @@ public class GameController {
 
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				if (generateNum.substring(i, i + 1).equals(inputNum.substring(j, j + 1))) {
+				if (generatedNumber.substring(i, i + 1).equals(inputNum.substring(j, j + 1))) {
 					if (i == j) {
 						strike++;
 						break;
@@ -78,39 +82,22 @@ public class GameController {
 		return new Result(new Solve(isSolved), strike, ball);
 	}
 
-	public boolean endingGame(Result result) {
-		boolean ending;
-
-		if (result.getSolve().isValue()) {
-			ending = true;
-		} else if (nthGame > 10) {
-			ending = true;
-		} else {
-			ending = false;
+	public void generatedNumbersValidator(String numbers, ErrorMessage errorMessage) {
+		Set<Character> characters = new HashSet<>(numbers.length());
+		for (Character ch : numbers.toCharArray()) {
+			if (ch < '0' || ch > '9') {
+				errorMessage.setMessage("0 ~ 9 사이의 숫자만 입력 가능합니다");
+				break;
+			}
+			characters.add(ch);
 		}
 
-		return ending;
-	}
-
-	public boolean isGameOver(Result result) {
-		if (result.getSolve().isValue()) {
-			return true;
-		} else if (nthGame == 10) {
-			return true;
+		if (characters.size() < numbers.length()) {
+			errorMessage.setMessage("중복된 숫자는 입력 할 수 없습니다.");
 		}
-
-		return false;
 	}
 
-	public int getNthGame() {
-		return nthGame;
-	}
-
-	public void generateNum() {
-		generateNum = strategy.generateNumber();
-	}
-
-	public void resetStatus() {
-		nthGame = 0;
+	public String generateNumber() {
+		return strategy.generateNumber();
 	}
 }

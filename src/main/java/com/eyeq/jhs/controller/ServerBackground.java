@@ -98,23 +98,30 @@ public class ServerBackground {
 		public void sendErrorMessageToAllRoomMembers(User excludeUser, String message) throws IOException {
 			final ErrorMessage errorMessage = new ErrorMessage();
 			errorMessage.setMessage(message);
-			sendMessageAllClients(clients.get(excludeUser), objectMapper.writeValueAsString(errorMessage));
+			sendMessage(clients.get(excludeUser), objectMapper.writeValueAsString(errorMessage));
 		}
 
 		public void sendBgErrorMessageToAllRoomMembers(GameRoom gameRoom, String message) {
-			final ErrorMessage errorMessage = new ErrorMessage();
 			gameRoom.getUsers().forEach(u -> {
 				try {
-					errorMessage.setMessage(message);
-
-					sendMessageAllClients(bgMessageClients.get(u), objectMapper.writeValueAsString(errorMessage));
+					sendMessage(bgMessageClients.get(u), message);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			});
 		}
 
-		public void sendMessageAllClients(DataOutputStream dataOutputStream, String message) throws IOException {
+		public void sendMessageToAllRoomMembers(GameRoom gameRoom, String message) throws IOException {
+			gameRoom.getUsers().forEach(u -> {
+				try {
+					sendMessage(clients.get(u), message);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			});
+		}
+
+		public void sendMessage(DataOutputStream dataOutputStream, String message) throws IOException {
 			dataOutputStream.writeUTF(message);
 		}
 
@@ -192,76 +199,60 @@ public class ServerBackground {
 										.findFirst().get();
 								user.setReady(true);
 
-								final long readyCount = gameRoom.getUsers().stream().filter(User::isReady).count();
+								final long readyCount = gameRoom.getUsers().stream().filter(User::getReady).count();
 								final int totalUserCount = gameRoom.getUsers().size();
 
-								String message;
-								if (readyCount == totalUserCount) {
-									message = null;
-								} else {
-									message = "게임이 준비중 입니다. 게임 준비를 선택해 주세요.\n" +
-											"모든 유저가 준비되면 게임이 시직됩니다.\n" +
+								if (readyCount < totalUserCount) {
+									final String message = "게임이 준비중 입니다. 모든 유저가 준비되면 게임이 시직됩니다.\n" +
 											"대기중.. (" + readyCount + "/" + totalUserCount + ")";
+									sendBgErrorMessageToAllRoomMembers(gameRoom, message);
 								}
-
-								sendErrorMessageToAllRoomMembers(user, message);
-								sendBgErrorMessageToAllRoomMembers(gameRoom, message);
 							}
 							break;
 						case START:
 							if (value != null) {
-								final String[] clientSendValues = value.split(":");
-								final long gameRoomId = Long.parseLong(clientSendValues[0]);
+								final long gameRoomId = Long.parseLong(value);
 								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
 
-								final String userId = clientSendValues[2];
-								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
-										.findFirst().get();
-								user.setReady(true);
-
-								final String generationNumber = clientSendValues[4];
-								gameRoom.setGenerationNumbers(generationNumber);
-
-								final long readyCount = gameRoom.getUsers().stream().filter(User::isReady).count();
-								final int totalUserCount = gameRoom.getUsers().size();
-								String message;
-								if (readyCount == totalUserCount) {
-									message = null;
-								} else {
-									message = "게임이 준비중 입니다.\n" +
-											"모든 유저가 준비되면 게임이 시직됩니다.\n" +
-											"대기중.. (" + readyCount + "/" + totalUserCount + ")";
+								if (gameRoom.getGenerationNumbers() == null || gameRoom.getGenerationNumbers().isEmpty
+										()) {
+									gameRoom.setGenerationNumbers(gameEngine.generateNumber());
 								}
-
-								sendErrorMessageToAllRoomMembers(user, message);
-								sendBgErrorMessageToAllRoomMembers(gameRoom, message);
 							}
 							break;
 						case GUESS_NUM:
 							try {
 								if (value != null) {
 									final String[] clientSendValues = value.split(":");
-									final long gameRoomId = Long.parseLong(clientSendValues[0]);
+									final long gameRoomId = Long.parseLong(clientSendValues[2]);
 									GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
 											.collect(Collectors.toList()).get(0);
 
-									final String userId = clientSendValues[2];
+									final String userId = clientSendValues[4];
 									final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals
 											(userId)).findFirst().get();
 
-									gameEngine.userInputValidate(clientSendValues[4], gameRoom.getSetting());
+									gameEngine.userInputValidation(clientSendValues[0], gameRoom.getSetting());
 									user.setGuessCount(user.getGuessCount() + 1);
-									Result result = gameEngine.checkNumber(value);
+									Result result = gameEngine.checkNumber(gameRoom.getGenerationNumbers(), value);
 									if (result.getSolve().isValue()) {
 										user.setReady(false);
 										user.setGuessCount(0);
+										user.setGameOver(true);
 									} else if (!result.getSolve().isValue() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
 										user.setReady(false);
 										user.setGuessCount(0);
+										user.setGameOver(true);
 										result = null;
 									}
+
+									if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
+											.getUsers().size()) {
+										gameRoom.setGenerationNumbers(null);
+									}
+
 									Score score = ScoreCalculator.calculateScore(user.getGuessCount(), result);
 
 									ResultDto resultDto = new ResultDto(result, user, gameRoom, score, null);
@@ -332,6 +323,34 @@ public class ServerBackground {
 										.equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
 								clients.remove(leaveUser);
 								bgMessageClients.remove(leaveUser);
+							}
+							break;
+						case GET_READY_STATE:
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								final boolean allUserReady = gameRoom.getUsers().stream().filter(User::getReady).count
+										() == gameRoom.getUsers().size();
+								final String messageJson = objectMapper.writeValueAsString(allUserReady);
+								dataOutputStream.writeUTF(messageJson);
+							}
+							break;
+						case SET_GENERATION_NUMBER:
+							if (value != null) {
+								final String[] clientSendValues = value.split(":");
+								final String generationNumbers = clientSendValues[0];
+								final ErrorMessage errorMessage = new ErrorMessage();
+								gameEngine.generatedNumbersValidator(generationNumbers, errorMessage);
+
+								if (errorMessage.getMessage() == null || errorMessage.getMessage().isEmpty()) {
+									final long gameRoomId = Long.parseLong(clientSendValues[2]);
+									GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+											.collect(Collectors.toList()).get(0);
+									gameRoom.setGenerationNumbers(generationNumbers);
+								}
+
+								dataOutputStream.writeUTF(objectMapper.writeValueAsString(errorMessage));
 							}
 							break;
 						default:

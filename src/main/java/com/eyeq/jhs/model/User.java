@@ -23,8 +23,9 @@ public class User {
 	@Setter(AccessLevel.NONE)
 	private String id;
 	private Role role;
-	private boolean ready = false;
+	private Boolean ready = false;
 	private int guessCount = 0;
+	private Boolean gameOver = false;
 
 	public User(String id, Role role, boolean ready) {
 		this.id = id;

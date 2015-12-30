@@ -25,17 +25,20 @@ public class GameClient {
 		client.connect();
 	}
 
-	private void runningGame() throws IOException {
+	private void runningGame(long gameRoomId) throws IOException {
+		client.sendSocketData("START," + gameRoomId);
+		System.out.println("게임이 시작되었습니다. 행운을 빌어요~");
+
 		boolean isGameOver = false;
 		while (!isGameOver) {
 			System.out.print("숫자를 입력해주세요 :  ");
 			Scanner s2 = new Scanner(System.in);
 			if (s2.hasNextLine()) {
 				final String inputNum = s2.nextLine();
-				client.sendSocketData("GUESS_NUM," + inputNum);
+				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getId());
 
 				final String resultDtoJson = client.getServerMessage();
-
+				System.out.println("result dto json : " + resultDtoJson);
 				final ResultDto resultDto = objectMapper.readValue(resultDtoJson, ResultDto.class);
 				System.out.println("Result : " + resultDto);
 
@@ -143,7 +146,7 @@ public class GameClient {
 		}
 	}
 
-	public void startGame() throws IOException {
+	public void startGame() throws IOException, InterruptedException {
 		Boolean gameTerminated = false;
 
 		System.out.println("====== 야구게임을 시작합니다 ======");
@@ -205,7 +208,7 @@ public class GameClient {
 						}
 						break;
 					case 0:
-						System.out.println("안녕히가세요");
+						System.out.println("게임을 끝냅니다.");
 						gameTerminated = true;
 						client.closeConnection();
 						break;
@@ -266,7 +269,7 @@ public class GameClient {
 		return joinCompleted;
 	}
 
-	private void joinGameRoom(long gameRoomId) throws IOException {
+	private void joinGameRoom(long gameRoomId) throws IOException, InterruptedException {
 		System.out.println("안녕하세요 " + user.getId() + "님, " + gameRoomId + "번 방에 입장하셨습니다");
 
 		boolean gameRoomLeft = false;
@@ -277,7 +280,7 @@ public class GameClient {
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
 			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining(", " +
-					""));
+					"" + ""));
 			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
 			System.out.println("접속 유저 : " + userList);
 			final Setting setting = fetchGameSetting(gameRoomId);
@@ -287,12 +290,7 @@ public class GameClient {
 			System.out.println("* 입력오류제한 : " + setting.getLimitWrongInputCount() + "회");
 			System.out.println();
 			System.out.println("----- 메뉴 -----");
-			if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
-				System.out.println("1. 준비");
-			} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
-				System.out.println("1. 시작");
-			}
-
+			System.out.println("1. 준비");
 			if (joinedGameRoom.getOwner().getId().equals(user.getId())) {
 				System.out.println("2. 설정");
 			}
@@ -304,27 +302,27 @@ public class GameClient {
 				final int selectedMenu = Integer.valueOf(roomMenuScanner.nextLine());
 				switch (selectedMenu) {
 					case 1:
+						client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
+
+						if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+							generateNumber(gameRoomId);
+						}
 
 						boolean allUsersReady = false;
 						while (!allUsersReady) {
-							// TODO 모든 사용자가 준비할때까지 메세지가 무한정 날아가는것 해결 하기.
-							if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
-								client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
-							} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
-								client.sendSocketData("START," + gameRoomId + ":USER_ID:" + user.getId());
-							}
-
-							final String errorMessageJson = client.getServerMessage();
-							final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage
-									.class);
-							if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
-								System.out.println(errorMessage.getMessage());
-							} else {
+							// TODO 옵저버 패턴이나 콜백 패턴 사용해보기
+							client.sendSocketData("GET_READY_STATE," + gameRoomId);
+							final String readyStateJson = client.getServerMessage();
+							final Boolean readyState = objectMapper.readValue(readyStateJson, Boolean.class);
+							if (readyState) {
 								allUsersReady = true;
 							}
+
+							// 1초에 한번씩 확인
+							Thread.sleep(1000);
 						}
-						System.out.println("게임이 시작되었습니다. 행운을 빌어요~");
-						runningGame();
+
+						runningGame(gameRoomId);
 						break;
 					case 2:
 						showingGameRoomMenu(gameRoomId);
@@ -332,13 +330,42 @@ public class GameClient {
 					case 0:
 						System.out.println("안녕히가세요");
 						gameRoomLeft = true;
-						client.closeConnection();
 						break;
 					default:
 						break;
 				}
 			}
 		}
+	}
+
+	private void generateNumber(long gameRoomId) throws IOException {
+		boolean generateNumberCompleted = false;
+		while (!generateNumberCompleted) {
+			final int generationNumberCount = fetchGameSetting(gameRoomId).getGenerationNumberCount();
+			System.out.print("0 ~ 9 사이의 숫자중 중복되지 않게 " + generationNumberCount + "자리의 숫자를 입력해주세요 : ");
+			Scanner generateNumScanner = new Scanner(System.in);
+			if (generateNumScanner.hasNextLine()) {
+				final String generatedNum = generateNumScanner.nextLine();
+				if (setGenerationNumberToGameRoom(gameRoomId, generatedNum)) {
+					generateNumberCompleted = true;
+				}
+			}
+		}
+	}
+
+	private boolean setGenerationNumberToGameRoom(long gameRoomId, String generatedNumber) throws IOException {
+		boolean setCompleted = false;
+		client.sendSocketData("SET_GENERATION_NUMBER," + generatedNumber + ":ROOM_ID:" + gameRoomId);
+		final String errorMessageJson = client.getServerMessage();
+		final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
+
+		if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
+			System.out.println(errorMessage.getMessage());
+		} else {
+			setCompleted = true;
+		}
+
+		return setCompleted;
 	}
 
 	private GameRoom createGameRoom(String gameRoomName) throws IOException {

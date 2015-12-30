@@ -14,7 +14,7 @@ public class ClientStarter {
 		GameClient client = new GameClient();
 		try {
 			client.startGame();
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
