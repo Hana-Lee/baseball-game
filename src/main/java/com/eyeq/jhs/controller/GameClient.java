@@ -318,8 +318,8 @@ public class GameClient {
 								allUsersReady = true;
 							}
 
-							// 1초에 한번씩 확인
-							Thread.sleep(1000);
+							// 0.5초에 한번씩 확인
+							Thread.sleep(500);
 						}
 
 						runningGame(gameRoomId);
