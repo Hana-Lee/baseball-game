@@ -1401,4 +1401,327 @@ public class ScoreCalculatorTest {
 		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
 		assertEquals(425, score.getValue());
 	}
+
+	// 공격자 점수 계산 규칙 테스트 (게임 설정 : 4개 5회)
+	// TODO 테스트 코드 완성하기
+	@Test
+	public void testHardGenerationCountHardGuessCountSettingScoreCalculation() {
+		// 공동으로 사용할 result 인스턴스
+		final Result result = new Result(new Solve(true), new Strike(3), new Ball(0));
+		final Setting setting = new Setting();
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		// 총 1명
+		final User firstRankUser = new User("이하나", new Role(RoleType.ATTACKER), true);
+		firstRankUser.setRank(new Rank(1));
+		this.gameRoom.getUsers().add(firstRankUser);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		// 1명중 1등일때 점수 계산
+		Score score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(23, score.getValue());
+
+		// 총 2명
+		final User secRankUser = new User("이두나", new Role(RoleType.ATTACKER), true);
+		secRankUser.setRank(new Rank(2));
+		this.gameRoom.getUsers().add(secRankUser);
+
+		assertEquals(2, gameRoom.getUsers().size());
+
+		// 2명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(35, score.getValue());
+
+		// 2명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 총 3명
+		final User thrRankUser = new User("이세나", new Role(RoleType.ATTACKER), true);
+		thrRankUser.setRank(new Rank(3));
+		this.gameRoom.getUsers().add(thrRankUser);
+
+		assertEquals(3, gameRoom.getUsers().size());
+
+		// 3명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 3명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 3명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 총 4명
+		final User fourRankUser = new User("이네나", new Role(RoleType.ATTACKER), true);
+		fourRankUser.setRank(new Rank(4));
+		this.gameRoom.getUsers().add(fourRankUser);
+
+		assertEquals(4, gameRoom.getUsers().size());
+
+		// 4명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 4명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 4명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 4명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 총 5명
+		final User fiveRankUser = new User("이다섯나", new Role(RoleType.ATTACKER), true);
+		fiveRankUser.setRank(new Rank(5));
+		this.gameRoom.getUsers().add(fiveRankUser);
+
+		assertEquals(5, gameRoom.getUsers().size());
+
+		// 5명중 5등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fiveRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 5명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 5명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 5명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(105, score.getValue());
+
+		// 5명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(117, score.getValue());
+	}
+
+	// 공격자 점수 계산 규칙 테스트 (게임 설정 : 4개 15회)
+	// TODO 테스트 코드 완성하기
+	@Test
+	public void testHardGenerationCountEasyGuessCountSettingScoreCalculation() {
+		// 공동으로 사용할 result 인스턴스
+		final Result result = new Result(new Solve(true), new Strike(3), new Ball(0));
+		final Setting setting = new Setting();
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		// 총 1명
+		final User firstRankUser = new User("이하나", new Role(RoleType.ATTACKER), true);
+		firstRankUser.setRank(new Rank(1));
+		this.gameRoom.getUsers().add(firstRankUser);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		// 1명중 1등일때 점수 계산
+		Score score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(23, score.getValue());
+
+		// 총 2명
+		final User secRankUser = new User("이두나", new Role(RoleType.ATTACKER), true);
+		secRankUser.setRank(new Rank(2));
+		this.gameRoom.getUsers().add(secRankUser);
+
+		assertEquals(2, gameRoom.getUsers().size());
+
+		// 2명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(35, score.getValue());
+
+		// 2명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 총 3명
+		final User thrRankUser = new User("이세나", new Role(RoleType.ATTACKER), true);
+		thrRankUser.setRank(new Rank(3));
+		this.gameRoom.getUsers().add(thrRankUser);
+
+		assertEquals(3, gameRoom.getUsers().size());
+
+		// 3명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 3명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 3명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 총 4명
+		final User fourRankUser = new User("이네나", new Role(RoleType.ATTACKER), true);
+		fourRankUser.setRank(new Rank(4));
+		this.gameRoom.getUsers().add(fourRankUser);
+
+		assertEquals(4, gameRoom.getUsers().size());
+
+		// 4명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 4명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 4명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 4명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 총 5명
+		final User fiveRankUser = new User("이다섯나", new Role(RoleType.ATTACKER), true);
+		fiveRankUser.setRank(new Rank(5));
+		this.gameRoom.getUsers().add(fiveRankUser);
+
+		assertEquals(5, gameRoom.getUsers().size());
+
+		// 5명중 5등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fiveRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 5명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 5명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 5명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(105, score.getValue());
+
+		// 5명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(117, score.getValue());
+	}
+
+	// 공격자 점수 계산 규칙 테스트 (게임 설정 : 4개 20회)
+	// TODO 테스트 코드 완성하기
+	@Test
+	public void testHardGenerationCountVeryEasyGuessCountSettingScoreCalculation() {
+		// 공동으로 사용할 result 인스턴스
+		final Result result = new Result(new Solve(true), new Strike(3), new Ball(0));
+		final Setting setting = new Setting();
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		// 총 1명
+		final User firstRankUser = new User("이하나", new Role(RoleType.ATTACKER), true);
+		firstRankUser.setRank(new Rank(1));
+		this.gameRoom.getUsers().add(firstRankUser);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		// 1명중 1등일때 점수 계산
+		Score score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(23, score.getValue());
+
+		// 총 2명
+		final User secRankUser = new User("이두나", new Role(RoleType.ATTACKER), true);
+		secRankUser.setRank(new Rank(2));
+		this.gameRoom.getUsers().add(secRankUser);
+
+		assertEquals(2, gameRoom.getUsers().size());
+
+		// 2명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(35, score.getValue());
+
+		// 2명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 총 3명
+		final User thrRankUser = new User("이세나", new Role(RoleType.ATTACKER), true);
+		thrRankUser.setRank(new Rank(3));
+		this.gameRoom.getUsers().add(thrRankUser);
+
+		assertEquals(3, gameRoom.getUsers().size());
+
+		// 3명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(47, score.getValue());
+
+		// 3명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 3명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 총 4명
+		final User fourRankUser = new User("이네나", new Role(RoleType.ATTACKER), true);
+		fourRankUser.setRank(new Rank(4));
+		this.gameRoom.getUsers().add(fourRankUser);
+
+		assertEquals(4, gameRoom.getUsers().size());
+
+		// 4명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(58, score.getValue());
+
+		// 4명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 4명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 4명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 총 5명
+		final User fiveRankUser = new User("이다섯나", new Role(RoleType.ATTACKER), true);
+		fiveRankUser.setRank(new Rank(5));
+		this.gameRoom.getUsers().add(fiveRankUser);
+
+		assertEquals(5, gameRoom.getUsers().size());
+
+		// 5명중 5등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fiveRankUser, gameRoom);
+		assertEquals(70, score.getValue());
+
+		// 5명중 4등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, fourRankUser, gameRoom);
+		assertEquals(82, score.getValue());
+
+		// 5명중 3등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, thrRankUser, gameRoom);
+		assertEquals(93, score.getValue());
+
+		// 5명중 2등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, secRankUser, gameRoom);
+		assertEquals(105, score.getValue());
+
+		// 5명중 1등일때 점수 계산
+		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
+		assertEquals(117, score.getValue());
+	}
+
+	// TODO 5개 1회, 5회, 15회, 20회 테스트 코드 작성하기
 }
