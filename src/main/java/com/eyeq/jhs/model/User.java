@@ -26,6 +26,7 @@ public class User {
 	private Boolean ready = false;
 	private int guessCount = 0;
 	private Boolean gameOver = false;
+	private Rank rank;
 
 	public User(String id, Role role, boolean ready) {
 		this.id = id;
