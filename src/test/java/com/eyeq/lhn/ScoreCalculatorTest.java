@@ -2147,7 +2147,7 @@ public class ScoreCalculatorTest {
 
 	// 숫자를 맞추지 못한경우 점수 계산 테스트
 	@Test
-	public void testNotFocused() {
+	public void testNotFocusedScoreCalculation() {
 		final Result result = new Result(new Solve(false), new Strike(2), new Ball(1));
 		// 기본 설정
 		final Setting setting = new Setting();
@@ -2355,5 +2355,18 @@ public class ScoreCalculatorTest {
 
 		score = ScoreCalculator.calculateScore(result, user, gameRoom);
 		assertEquals(22, score.getValue());
+	}
+
+	// 잘못된 입력 초과시 점수 계산 테스트
+	@Test
+	public void testWrongNumberScoreCalculation() {
+		final User user = new User("이하나", new Role(RoleType.ATTACKER), true);
+		gameRoom.getUsers().add(user);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		final Score score = ScoreCalculator.calculateScore(null, user, gameRoom);
+
+		assertEquals(0, score.getValue());
 	}
 }

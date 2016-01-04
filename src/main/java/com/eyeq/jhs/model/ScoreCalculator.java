@@ -11,39 +11,42 @@ public class ScoreCalculator {
 		int totalScore = 0;
 
 		final Setting setting = gameRoom.getSetting();
-		final int totalUsers = gameRoom.getUsers().size();
-		final Role role = user.getRole();
-		final int guessInputCount = setting.getLimitGuessInputCount();
-		final int generationNumberCount = setting.getGenerationNumberCount();
 
-		if (result.getSolve().isValue() && (user.getRank() != null && user.getRank().getRanking() > 0)) {
-			if (role.getRoleType().equals(RoleType.ATTACKER)) {
-				final Rank rank = user.getRank();
-				final float baseScore = 20 * totalUsers - ((rank.getRanking() - 1) * 10);
+		if (result != null && user.getWrongCount() < setting.getLimitWrongInputCount()) {
+			final int totalUsers = gameRoom.getUsers().size();
+			final Role role = user.getRole();
+			final int guessInputCount = setting.getLimitGuessInputCount();
+			final int generationNumberCount = setting.getGenerationNumberCount();
+
+			if (result.getSolve().isValue() && (user.getRank() != null && user.getRank().getRanking() > 0)) {
+				if (role.getRoleType().equals(RoleType.ATTACKER)) {
+					final Rank rank = user.getRank();
+					final float baseScore = 20 * totalUsers - ((rank.getRanking() - 1) * 10);
+
+					float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore);
+
+					float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore);
+
+					totalScore = Math.round(guessScoreValue + numberCountScoreValue);
+				} else if (role.getRoleType().equals(RoleType.DEPENDER)) {
+
+				}
+			} else if (!result.getSolve().isValue() && setting.getLimitGuessInputCount() == user.getGuessCount() &&
+					role.getRoleType().equals(RoleType.ATTACKER)) {
+				// 추측가능 횟수에 도달하였으나 숫자를 못맞춘경우
+				final float baseScore = 5;
 
 				float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore);
 
 				float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore);
 
 				totalScore = Math.round(guessScoreValue + numberCountScoreValue);
-			} else if (role.getRoleType().equals(RoleType.DEPENDER)) {
 
+			} else if (!result.getSolve().isValue() && user.getWrongCount() == setting.getLimitWrongInputCount() &&
+					role.getRoleType().equals(RoleType.ATTACKER)) {
+				// 입력 오류 횟수 도달시
+				totalScore = 0;
 			}
-		} else if (!result.getSolve().isValue() && setting.getLimitGuessInputCount() == user.getGuessCount() && role
-				.getRoleType().equals(RoleType.ATTACKER)) {
-			// 추측가능 횟수에 도달하였으나 숫자를 못맞춘경우
-			final float baseScore = 5;
-
-			float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore);
-
-			float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore);
-
-			totalScore = Math.round(guessScoreValue + numberCountScoreValue);
-
-		} else if (!result.getSolve().isValue() && user.getWrongCount() == setting.getLimitWrongInputCount() && role
-				.getRoleType().equals(RoleType.ATTACKER)) {
-			// 입력 오류 횟수 도달시
-			totalScore = 0;
 		}
 
 		return new Score(totalScore);
