@@ -2144,4 +2144,216 @@ public class ScoreCalculatorTest {
 		score = ScoreCalculator.calculateScore(result, firstRankUser, gameRoom);
 		assertEquals(444, score.getValue());
 	}
+
+	// 숫자를 맞추지 못한경우 점수 계산 테스트
+	@Test
+	public void testNotFocused() {
+		final Result result = new Result(new Solve(false), new Strike(2), new Ball(1));
+		// 기본 설정
+		final Setting setting = new Setting();
+		setting.setLimitGuessInputCount(10);
+		setting.setGenerationNumberCount(3);
+		gameRoom.setSetting(setting);
+
+		// 총 1명
+		final User user = new User("이하나", new Role(RoleType.ATTACKER), true);
+		user.setRank(new Rank(0));
+		user.setGuessCount(10);
+		this.gameRoom.getUsers().add(user);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		Score score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(10, score.getValue());
+
+		// Easy Guess, Normal Generation Number
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(3);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(15);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(8, score.getValue());
+
+		// Very Easy Guess, Normal Generation Number
+		setting.setLimitGuessInputCount(20);
+		setting.setGenerationNumberCount(3);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(20);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(7, score.getValue());
+
+		// Hard Guess, Normal Generation Number
+		setting.setLimitGuessInputCount(5);
+		setting.setGenerationNumberCount(3);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(5);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(13, score.getValue());
+
+		// Very Hard Guess, Normal Generation Number
+		setting.setLimitGuessInputCount(1);
+		setting.setGenerationNumberCount(3);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(1);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(16, score.getValue());
+
+		// Very Hard Guess, Easy Generation Number
+		setting.setLimitGuessInputCount(1);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(1);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(14, score.getValue());
+
+		// Hard Guess, Easy Generation Number
+		setting.setLimitGuessInputCount(5);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(5);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(10, score.getValue());
+
+		// Normal Guess, Easy Generation Number
+		setting.setLimitGuessInputCount(10);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(10);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(8, score.getValue());
+
+		// Easy Guess, Easy Generation Number
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(15);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(6, score.getValue());
+
+		// Very Easy Guess, Easy Generation Number
+		setting.setLimitGuessInputCount(20);
+		setting.setGenerationNumberCount(2);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(20);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(5, score.getValue());
+
+		// Very Hard Guess, Hard Generation Number
+		setting.setLimitGuessInputCount(1);
+		setting.setGenerationNumberCount(4);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(1);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(21, score.getValue());
+
+		// Hard Guess, Hard Generation Number
+		setting.setLimitGuessInputCount(5);
+		setting.setGenerationNumberCount(4);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(5);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(18, score.getValue());
+
+		// Normal Guess, Hard Generation Number
+		setting.setLimitGuessInputCount(10);
+		setting.setGenerationNumberCount(4);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(10);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(15, score.getValue());
+
+		// Easy Guess, Hard Generation Number
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(4);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(15);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(13, score.getValue());
+
+		// Very Easy Guess, Hard Generation Number
+		setting.setLimitGuessInputCount(20);
+		setting.setGenerationNumberCount(4);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(20);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(12, score.getValue());
+
+		// Very Hard Guess, Very Hard Generation Number
+		setting.setLimitGuessInputCount(1);
+		setting.setGenerationNumberCount(5);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(1);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(31, score.getValue());
+
+		// Hard Guess, Very Hard Generation Number
+		setting.setLimitGuessInputCount(5);
+		setting.setGenerationNumberCount(5);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(5);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(28, score.getValue());
+
+		// Normal Guess, Very Hard Generation Number
+		setting.setLimitGuessInputCount(10);
+		setting.setGenerationNumberCount(5);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(10);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(25, score.getValue());
+
+		// Easy Guess, Very Hard Generation Number
+		setting.setLimitGuessInputCount(15);
+		setting.setGenerationNumberCount(5);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(15);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(23, score.getValue());
+
+		// Very Easy Guess, Very Hard Generation Number
+		setting.setLimitGuessInputCount(20);
+		setting.setGenerationNumberCount(5);
+		gameRoom.setSetting(setting);
+
+		user.setGuessCount(20);
+
+		score = ScoreCalculator.calculateScore(result, user, gameRoom);
+		assertEquals(22, score.getValue());
+	}
 }
