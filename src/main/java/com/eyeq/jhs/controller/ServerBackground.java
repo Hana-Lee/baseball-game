@@ -253,7 +253,7 @@ public class ServerBackground {
 										gameRoom.setGenerationNumbers(null);
 									}
 
-									Score score = ScoreCalculator.calculateScore(result, user, gameRoom);
+									Score score = ScoreCalculator.attackerScore(result, user, gameRoom);
 
 									ResultDto resultDto = new ResultDto(result, user, gameRoom, score, null);
 

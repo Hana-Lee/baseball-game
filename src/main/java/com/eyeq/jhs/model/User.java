@@ -28,6 +28,7 @@ public class User {
 	private Boolean gameOver = false;
 	private Rank rank;
 	private int wrongCount = 0;
+	private Result result;
 
 	public User(String id, Role role, boolean ready) {
 		this.id = id;
