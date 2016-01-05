@@ -15,7 +15,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @Getter
-public class Solve {
+public class Settlement {
 
-	private boolean value;
+	private boolean solved;
 }
