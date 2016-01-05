@@ -13,7 +13,7 @@ import lombok.ToString;
 @Getter
 public class Result {
 
-	private Solve solve;
+	private Settlement settlement;
 	private Strike strike;
 	private Ball ball;
 }

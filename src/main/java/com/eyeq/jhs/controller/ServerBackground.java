@@ -235,12 +235,12 @@ public class ServerBackground {
 
 									gameEngine.userInputValidation(clientSendValues[0], gameRoom.getSetting());
 									user.setGuessCount(user.getGuessCount() + 1);
-									Result result = gameEngine.checkNumber(gameRoom.getGenerationNumbers(), value);
-									if (result.getSolve().isValue()) {
+									Result result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), value);
+									if (result.getSettlement().isSolved()) {
 										user.setReady(false);
 										user.setGuessCount(0);
 										user.setGameOver(true);
-									} else if (!result.getSolve().isValue() && user.getGuessCount() == gameRoom
+									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
 										user.setReady(false);
 										user.setGuessCount(0);
@@ -253,7 +253,9 @@ public class ServerBackground {
 										gameRoom.setGenerationNumbers(null);
 									}
 
-									Score score = ScoreCalculator.attackerScore(result, user, gameRoom);
+									user.setResult(result);
+
+									Score score = ScoreCalculator.attackerScore(user, gameRoom);
 
 									ResultDto resultDto = new ResultDto(result, user, gameRoom, score, null);
 

@@ -51,7 +51,7 @@ public class GameClient {
 					System.out.println(strikeCount + "스트라이크, " + ballCount + "볼 입니다.");
 				}
 
-				if (resultDto.getResult().getSolve().isValue()) {
+				if (resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
 					System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
 					isGameOver = true;

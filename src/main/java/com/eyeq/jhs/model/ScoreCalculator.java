@@ -11,84 +11,97 @@ public class ScoreCalculator {
 	 * 게임이 종료된 후 수비자의 점수를 계산한다.
 	 * 점수는 소숫점 반올림 적용
 	 *
+	 * @param user     게임 유저
 	 * @param gameRoom 게임룸
 	 * @return Score 계산된 점수 객체
 	 */
-	public static Score dependerScore(GameRoom gameRoom) {
-		int totalScore;
+	public static Score dependerScore(final User user, final GameRoom gameRoom) {
+		final float baseScore = makeBaseScore(user, gameRoom, gameRoom.getSetting());
 
-		final Setting setting = gameRoom.getSetting();
-		final int guessInputCount = setting.getLimitGuessInputCount();
-		final int generationNumberCount = setting.getGenerationNumberCount();
+		return new Score(scoreCalculation(user, gameRoom.getSetting(), baseScore));
+	}
 
-		final long totalUsers = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType
-				.ATTACKER)).count();
-		final long totalSolvedUsers = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals
-				(RoleType.ATTACKER) && u.getResult().getSolve().isValue()).count();
-		final float baseScore = 40 * totalUsers - (totalSolvedUsers * 20);
+	private static long getSolvedUserCount(final GameRoom gameRoom) {
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER) && u
+				.getResult().getSettlement().isSolved()).count();
+	}
 
-		float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore, false);
-		float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore, false);
-
-		totalScore = Math.round(guessScoreValue + numberCountScoreValue);
-
-		return new Score(totalScore);
+	private static long getAttackerCount(final GameRoom gameRoom) {
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
 	}
 
 	/**
 	 * 유저의 게임이 종료된 후 각각의 유저별로 계산 된다.
 	 * 점수는 소숫점 반올림 적용
 	 *
-	 * @param result   게임의 결과 객체
 	 * @param user     게임 유저
 	 * @param gameRoom 게임룸
 	 * @return Score 계산된 점수 객체
 	 */
-	public static Score attackerScore(Result result, User user, GameRoom gameRoom) {
+	public static Score attackerScore(final User user, final GameRoom gameRoom) {
 		int totalScore = 0;
 
-		final Setting setting = gameRoom.getSetting();
+		if (user.getResult() != null) {
+			final Setting setting = gameRoom.getSetting();
 
-		if (result != null && user.getWrongCount() < setting.getLimitWrongInputCount()) {
-			final Role role = user.getRole();
-			final int guessInputCount = setting.getLimitGuessInputCount();
-			final int generationNumberCount = setting.getGenerationNumberCount();
+			final float baseScore = makeBaseScore(user, gameRoom, setting);
 
-			if (result.getSolve().isValue() && (user.getRank() != null && user.getRank().getRanking() > 0)) {
-				if (role.getRoleType().equals(RoleType.ATTACKER)) {
-					final int totalUsers = gameRoom.getUsers().size();
-					final Rank rank = user.getRank();
-					final float baseScore = 20 * totalUsers - ((rank.getRanking() - 1) * 10);
-
-					float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore, true);
-
-					float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore, true);
-
-					totalScore = Math.round(guessScoreValue + numberCountScoreValue);
-				}
-			} else if (!result.getSolve().isValue() && setting.getLimitGuessInputCount() == user.getGuessCount() &&
-					role.getRoleType().equals(RoleType.ATTACKER)) {
-				// 추측가능 횟수에 도달하였으나 숫자를 못맞춘경우
-				final float baseScore = 5;
-
-				float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore, true);
-
-				float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore, true);
-
-				totalScore = Math.round(guessScoreValue + numberCountScoreValue);
-
-			} else if (!result.getSolve().isValue() && user.getWrongCount() == setting.getLimitWrongInputCount() &&
-					role.getRoleType().equals(RoleType.ATTACKER)) {
-				// 입력 오류 횟수 도달시
-				totalScore = 0;
-			}
+			totalScore = scoreCalculation(user, setting, baseScore);
 		}
 
 		return new Score(totalScore);
 	}
 
-	private static float getNumberCountScoreValue(int generationNumberCount, float baseScore, boolean isAttacker) {
+	private static float makeBaseScore(User user, GameRoom gameRoom, Setting setting) {
+		if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
+			return makeAttackerBaseScore(user, gameRoom, setting);
+		} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+			return makeDependerBaseScore(gameRoom);
+		}
+
+		return 0.0f;
+	}
+
+	private static float makeAttackerBaseScore(User user, GameRoom gameRoom, Setting setting) {
+		if (successGuess(user)) {
+			// 성공적으로 숫자를 맞춘경우 랭크가 0 이상
+			return makeSuccessAttackerBaseScore(user, gameRoom);
+		} else if (exceededLimitGuessCount(user, setting)) {
+			// 추측가능 횟수에 도달하였으나 숫자를 못맞춘경우
+			return 5;
+		}
+		return 0;
+	}
+
+	private static long makeDependerBaseScore(final GameRoom gameRoom) {
+		return 40 * getAttackerCount(gameRoom) - (getSolvedUserCount(gameRoom) * 20);
+	}
+
+	private static int makeSuccessAttackerBaseScore(User user, GameRoom gameRoom) {
+		return 20 * gameRoom.getUsers().size() - ((user.getRank().getRanking() - 1) * 10);
+	}
+
+	private static boolean successGuess(User user) {
+		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getRanking() > 0;
+	}
+
+	private static boolean exceededLimitGuessCount(User user, Setting setting) {
+		return setting.getLimitGuessInputCount() == user.getGuessCount();
+	}
+
+	private static int scoreCalculation(User user, Setting setting, float baseScore) {
+		final int guessInputCount = setting.getLimitGuessInputCount();
+		final int generationNumberCount = setting.getGenerationNumberCount();
+
+		float guessScoreValue = getGuessScoreValue(guessInputCount, baseScore, user);
+		float numberCountScoreValue = getNumberCountScoreValue(generationNumberCount, baseScore, user);
+
+		return Math.round(guessScoreValue + numberCountScoreValue);
+	}
+
+	private static float getNumberCountScoreValue(int generationNumberCount, float baseScore, User user) {
 		float numberCountScoreValue;
+		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
 		switch (generationNumberCount) {
 			case 2:
 				if (isAttacker) {
@@ -121,8 +134,9 @@ public class ScoreCalculator {
 		return numberCountScoreValue;
 	}
 
-	private static float getGuessScoreValue(int guessInputCount, float baseScore, boolean isAttacker) {
+	private static float getGuessScoreValue(int guessInputCount, float baseScore, User user) {
 		float guessScoreValue;
+		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
 		switch (guessInputCount) {
 			case 20:
 				if (isAttacker) {

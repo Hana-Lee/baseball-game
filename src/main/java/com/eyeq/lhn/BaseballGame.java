@@ -168,14 +168,14 @@ public class BaseballGame {
 	private GuessResult createNonSolvedResult(String guessNumbers) {
 		int strikes = 0;
 		int balls = 0;
-		for (int i = 0; i < generatedNumber.length(); i++) {
-			int idx = generatedNumber.indexOf(guessNumbers.charAt(i));
-			if (idx == i) {
-				strikes++;
-			} else if (idx > -1) {
-				balls++;
-			}
-		}
+//		for (int i = 0; i < generatedNumber.length(); i++) {
+//			int idx = generatedNumber.indexOf(guessNumbers.charAt(i));
+//			if (idx == i) {
+//				strikes++;
+//			} else if (idx > -1) {
+//				balls++;
+//			}
+//		}
 		return new GuessResult(false, new Strike(strikes), new Ball(balls));
 	}
 

@@ -8,7 +8,7 @@ import com.eyeq.jhs.model.Role;
 import com.eyeq.jhs.model.Score;
 import com.eyeq.jhs.model.ScoreCalculator;
 import com.eyeq.jhs.model.Setting;
-import com.eyeq.jhs.model.Solve;
+import com.eyeq.jhs.model.Settlement;
 import com.eyeq.jhs.model.Strike;
 import com.eyeq.jhs.model.User;
 import com.eyeq.jhs.type.RoleType;
@@ -126,7 +126,8 @@ public class ScoreCalculatorTest {
 		assertDependerScoreCalculationEachLevelCase(20, 5, expScores, "Very Easy Guess, Very Hard Generation, %d Users");
 	}
 
-	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, int[][] expScoreArray, String assertFailMessage) {
+	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, int[][] expScoreArray,
+	                                                         String assertFailMessage) {
 		for (int[] expScores : expScoreArray) {
 			assertDependerScoreCalculationEachLevelCase(guessLevel, generationLevel, expScores, assertFailMessage);
 		}
@@ -136,7 +137,7 @@ public class ScoreCalculatorTest {
 	                                                         String assertFailMessage) {
 		for (int solvedUserCount = 0; solvedUserCount < expScores.length; solvedUserCount++) {
 			makeGameRoomForTest(guessLevel, generationLevel, expScores.length, solvedUserCount);
-			Score score = ScoreCalculator.dependerScore(gameRoom);
+			Score score = ScoreCalculator.dependerScore(findDepender(), gameRoom);
 			assertEquals(String.format(assertFailMessage, expScores.length), expScores[solvedUserCount], score.getValue());
 		}
 	}
@@ -152,14 +153,18 @@ public class ScoreCalculatorTest {
 		for (int i = 1; i <= attackUserCount; i++) {
 			User newUser = new User("이하나" + i, new Role(RoleType.ATTACKER), true);
 			if (count < solvedUserCount) {
-				newUser.setResult(new Result(new Solve(true), new Strike(2), new Ball(0)));
+				newUser.setResult(new Result(new Settlement(true), new Strike(2), new Ball(0)));
 			} else {
-				newUser.setResult(new Result(new Solve(false), new Strike(2), new Ball(0)));
+				newUser.setResult(new Result(new Settlement(false), new Strike(2), new Ball(0)));
 			}
 			this.gameRoom.getUsers().add(newUser);
 
 			count++;
 		}
+	}
+
+	private User findDepender() {
+		return this.gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.DEPENDER)).findFirst().get();
 	}
 
 	@Test
@@ -255,18 +260,19 @@ public class ScoreCalculatorTest {
 	private void assertAttackerScoreCalculation(String userId, Setting setting, Rank rank, int userCount, List<Integer>
 			expectedScores) {
 		// 공동으로 사용할 result 인스턴스
-		final Result result = new Result(new Solve(true), new Strike(3), new Ball(0));
+		final Result result = new Result(new Settlement(true), new Strike(3), new Ball(0));
 		this.gameRoom.setSetting(setting);
 		// 총 1명
 		final User newUser = new User(userId, new Role(RoleType.ATTACKER), true);
 		newUser.setRank(rank);
+		newUser.setResult(result);
 		this.gameRoom.getUsers().add(newUser);
 
 		assertEquals(userCount, gameRoom.getUsers().size());
 
 		int count = 0;
 		for (User user : this.gameRoom.getUsers()) {
-			final Score score = ScoreCalculator.attackerScore(result, user, gameRoom);
+			final Score score = ScoreCalculator.attackerScore(user, gameRoom);
 			final int expectedScore = expectedScores.get(count++);
 			assertEquals(expectedScore, score.getValue());
 		}
@@ -321,19 +327,20 @@ public class ScoreCalculatorTest {
 	}
 
 	private void assertNotFocusedScoreCalculation(int guessLevel, int generationLevel, int expectedScore) {
-		final Result result = new Result(new Solve(false), new Strike(2), new Ball(1));
+		final Result result = new Result(new Settlement(false), new Strike(2), new Ball(1));
 		final Setting setting = new Setting(5, guessLevel, generationLevel);
 		gameRoom.setSetting(setting);
 
 		final User user = new User("이하나", new Role(RoleType.ATTACKER), true);
 		user.setRank(new Rank(0));
 		user.setGuessCount(guessLevel);
+		user.setResult(result);
 		this.gameRoom.getUsers().clear();
 		this.gameRoom.getUsers().add(user);
 
 		assertEquals(1, gameRoom.getUsers().size());
 
-		final Score score = ScoreCalculator.attackerScore(result, user, gameRoom);
+		final Score score = ScoreCalculator.attackerScore(user, gameRoom);
 		assertEquals(expectedScore, score.getValue());
 	}
 
@@ -345,7 +352,7 @@ public class ScoreCalculatorTest {
 
 		assertEquals(1, gameRoom.getUsers().size());
 
-		final Score score = ScoreCalculator.attackerScore(null, user, gameRoom);
+		final Score score = ScoreCalculator.attackerScore(user, gameRoom);
 
 		assertEquals(0, score.getValue());
 	}
