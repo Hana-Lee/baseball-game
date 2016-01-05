@@ -4,6 +4,11 @@ import com.eyeq.jhs.type.RoleType;
 
 public class ScoreCalculator {
 
+	private static final int DEPENDER_BASE = 40;
+	private static final int DEPENDER_EACH_USER = 20;
+	private static final int ATTACKER_BASE = 20;
+	private static final int ATTACKER_EACH_USER = 10;
+
 	public ScoreCalculator() {
 	}
 
@@ -52,7 +57,7 @@ public class ScoreCalculator {
 		return new Score(totalScore);
 	}
 
-	private static float makeBaseScore(User user, GameRoom gameRoom, Setting setting) {
+	private static float makeBaseScore(final User user, final GameRoom gameRoom, final Setting setting) {
 		if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
 			return makeAttackerBaseScore(user, gameRoom, setting);
 		} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
@@ -62,7 +67,7 @@ public class ScoreCalculator {
 		return 0.0f;
 	}
 
-	private static float makeAttackerBaseScore(User user, GameRoom gameRoom, Setting setting) {
+	private static float makeAttackerBaseScore(final User user, final GameRoom gameRoom, final Setting setting) {
 		if (successGuess(user)) {
 			// 성공적으로 숫자를 맞춘경우 랭크가 0 이상
 			return makeSuccessAttackerBaseScore(user, gameRoom);
@@ -74,22 +79,22 @@ public class ScoreCalculator {
 	}
 
 	private static long makeDependerBaseScore(final GameRoom gameRoom) {
-		return 40 * getAttackerCount(gameRoom) - (getSolvedUserCount(gameRoom) * 20);
+		return DEPENDER_BASE * getAttackerCount(gameRoom) - (getSolvedUserCount(gameRoom) * DEPENDER_EACH_USER);
 	}
 
-	private static int makeSuccessAttackerBaseScore(User user, GameRoom gameRoom) {
-		return 20 * gameRoom.getUsers().size() - ((user.getRank().getRanking() - 1) * 10);
+	private static int makeSuccessAttackerBaseScore(final User user, final GameRoom gameRoom) {
+		return ATTACKER_BASE * gameRoom.getUsers().size() - ((user.getRank().getRanking() - 1) * ATTACKER_EACH_USER);
 	}
 
-	private static boolean successGuess(User user) {
+	private static boolean successGuess(final User user) {
 		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getRanking() > 0;
 	}
 
-	private static boolean exceededLimitGuessCount(User user, Setting setting) {
+	private static boolean exceededLimitGuessCount(final User user, final Setting setting) {
 		return setting.getLimitGuessInputCount() == user.getGuessCount();
 	}
 
-	private static int scoreCalculation(User user, Setting setting, float baseScore) {
+	private static int scoreCalculation(final User user, final Setting setting, final float baseScore) {
 		final int guessInputCount = setting.getLimitGuessInputCount();
 		final int generationNumberCount = setting.getGenerationNumberCount();
 
@@ -99,7 +104,7 @@ public class ScoreCalculator {
 		return Math.round(guessScoreValue + numberCountScoreValue);
 	}
 
-	private static float getNumberCountScoreValue(int generationNumberCount, float baseScore, User user) {
+	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final User user) {
 		float numberCountScoreValue;
 		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
 		switch (generationNumberCount) {
@@ -134,7 +139,7 @@ public class ScoreCalculator {
 		return numberCountScoreValue;
 	}
 
-	private static float getGuessScoreValue(int guessInputCount, float baseScore, User user) {
+	private static float getGuessScoreValue(final int guessInputCount, final float baseScore, final User user) {
 		float guessScoreValue;
 		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
 		switch (guessInputCount) {
