@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -28,7 +28,7 @@ public class GameRoom {
 	private String name;
 	private int limit = 5;
 	private User owner;
-	private Set<User> users = new HashSet<>();
+	private Set<User> users = new LinkedHashSet<>();
 	private Setting setting;
 	private int gameCount = 0;
 	private String generationNumbers;
