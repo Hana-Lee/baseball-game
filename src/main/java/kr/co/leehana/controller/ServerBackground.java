@@ -1,8 +1,10 @@
 package kr.co.leehana.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.factory.GameRoomMaker;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Result;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
@@ -12,7 +14,6 @@ import kr.co.leehana.model.User;
 import kr.co.leehana.type.ErrorType;
 import kr.co.leehana.type.MessageType;
 import kr.co.leehana.type.RoleType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -225,6 +226,10 @@ public class ServerBackground {
 										user.setReady(false);
 										user.setGuessCount(0);
 										user.setGameOver(true);
+										gameRoom.setGenerationNumbers(null);
+
+										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() != null && u.getRank().getRanking() > 0).count() + 1);
+										user.setRank(new Rank(ranking));
 									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
 										user.setReady(false);
