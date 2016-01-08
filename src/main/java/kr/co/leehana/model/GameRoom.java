@@ -39,8 +39,6 @@ public class GameRoom {
 		this.owner = owner;
 		this.limit = limit;
 		this.setting = setting;
-
-		init(this.owner);
 	}
 
 	public GameRoom(long id, String name, int limit, Setting setting) {
@@ -48,9 +46,5 @@ public class GameRoom {
 		this.name = name;
 		this.limit = limit;
 		this.setting = setting;
-	}
-
-	private void init(User owner) {
-		getUsers().add(owner);
 	}
 }

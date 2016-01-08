@@ -191,7 +191,9 @@ public class GameClient {
 
 							user.setRole(selectUserRole());
 
-							joinGameRoom(createdGameRoom.getId());
+							if (joiningGameRoom(createdGameRoom.getId())) {
+								joinGameRoom(createdGameRoom.getId());
+							}
 						}
 						break;
 					case 2:
