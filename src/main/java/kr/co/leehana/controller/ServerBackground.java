@@ -93,26 +93,10 @@ public class ServerBackground {
 			}
 		}
 
-		public void sendErrorMessageToAllRoomMembers(User excludeUser, String message) throws IOException {
-			final ErrorMessage errorMessage = new ErrorMessage();
-			errorMessage.setMessage(message);
-			sendMessage(clients.get(excludeUser), objectMapper.writeValueAsString(errorMessage));
-		}
-
-		public void sendBgErrorMessageToAllRoomMembers(GameRoom gameRoom, String message) {
+		public void sendBgMessageToAllRoomMembers(GameRoom gameRoom, String message) {
 			gameRoom.getUsers().forEach(u -> {
 				try {
 					sendMessage(bgMessageClients.get(u), message);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			});
-		}
-
-		public void sendMessageToAllRoomMembers(GameRoom gameRoom, String message) throws IOException {
-			gameRoom.getUsers().forEach(u -> {
-				try {
-					sendMessage(clients.get(u), message);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -203,7 +187,10 @@ public class ServerBackground {
 								if (readyCount < totalUserCount) {
 									final String message = "게임이 준비중 입니다. 모든 유저가 준비되면 게임이 시직됩니다.\n" +
 											"대기중.. (" + readyCount + "/" + totalUserCount + ")";
-									sendBgErrorMessageToAllRoomMembers(gameRoom, message);
+									sendBgMessageToAllRoomMembers(gameRoom, message);
+								} else {
+									final String message = "모든 유저의 준비가 완료 되었습니다.";
+									sendBgMessageToAllRoomMembers(gameRoom, message);
 								}
 							}
 							break;
