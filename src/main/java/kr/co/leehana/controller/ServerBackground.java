@@ -242,10 +242,11 @@ public class ServerBackground {
 
 									Score score = ScoreCalculator.attackerScore(user, gameRoom);
 
+									user.setGuessCompleted(true);
+
 									ResultDto resultDto = new ResultDto(result, user, gameRoom, score, null);
 
 									jsonResult = objectMapper.writeValueAsString(resultDto);
-
 									dataOutputStream.writeUTF(jsonResult);
 								}
 							} catch (IllegalArgumentException e) {
@@ -314,13 +315,7 @@ public class ServerBackground {
 							break;
 						case GET_READY_STATE:
 							if (value != null) {
-								final long gameRoomId = Long.parseLong(value);
-								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
-								final boolean allUserReady = gameRoom.getUsers().stream().filter(User::getReady).count
-										() == gameRoom.getUsers().size();
-								final String messageJson = objectMapper.writeValueAsString(allUserReady);
-								dataOutputStream.writeUTF(messageJson);
+								broadCastCurrentState(value, messageType);
 							}
 							break;
 						case SET_GENERATION_NUMBER:
@@ -340,6 +335,20 @@ public class ServerBackground {
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(errorMessage));
 							}
 							break;
+						case ALL_USER_COMPLETED_GUESS:
+							if (value != null) {
+								broadCastCurrentState(value, messageType);
+							}
+							break;
+						case ALL_USER_GUESS_COMPLETE_STATE_RESET:
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								gameRoom.getUsers().forEach(u -> u.setGuessCompleted(false));
+								dataOutputStream.writeUTF(objectMapper.writeValueAsString(true));
+							}
+							break;
 						default:
 							break;
 					}
@@ -347,6 +356,26 @@ public class ServerBackground {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+
+		private void broadCastCurrentState(String value, MessageType messageType) throws IOException {
+			final long gameRoomId = Long.parseLong(value);
+			GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+					(Collectors.toList()).get(0);
+			boolean currentState = false;
+			switch (messageType) {
+				case GET_READY_STATE:
+					currentState = gameRoom.getUsers().stream().filter(User::getReady).count
+							() == gameRoom.getUsers().size();
+					break;
+				case ALL_USER_COMPLETED_GUESS:
+					currentState = gameRoom.getUsers().stream().filter(User::isGuessCompleted).count
+							() == gameRoom.getUsers().size();
+					break;
+			}
+
+			final String messageJson = objectMapper.writeValueAsString(currentState);
+			dataOutputStream.writeUTF(messageJson);
 		}
 	}
 }

@@ -25,7 +25,7 @@ public class GameClient {
 		client.connect();
 	}
 
-	private void runningGame(long gameRoomId) throws IOException {
+	private void runningGame(long gameRoomId) throws IOException, InterruptedException {
 		client.sendSocketData("START," + gameRoomId);
 		System.out.println("게임이 시작되었습니다. 행운을 빌어요~");
 
@@ -56,6 +56,23 @@ public class GameClient {
 					System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
 					isGameOver = true;
 				}
+			}
+
+			System.out.println("모든 유저가 입력을 마칠때까지 대기중 입니다");
+			boolean allUserCompletedGuess = false;
+			while (!allUserCompletedGuess) {
+				client.sendSocketData("ALL_USER_COMPLETED_GUESS," + gameRoomId);
+				String allUserCompletedGuessJson = client.getServerMessage();
+				allUserCompletedGuess = objectMapper.readValue(allUserCompletedGuessJson, Boolean.class);
+
+				Thread.sleep(500);
+			}
+
+			client.sendSocketData("ALL_USER_GUESS_COMPLETE_STATE_RESET," + gameRoomId);
+			String resetCompleteJson = client.getServerMessage();
+			boolean resetCompleted = objectMapper.readValue(resetCompleteJson, Boolean.class);
+			if (!resetCompleted) {
+				System.out.println("모든 유저의 Guess state 를 초기화 하는 중 오류가 발생하였습니다");
 			}
 		}
 	}

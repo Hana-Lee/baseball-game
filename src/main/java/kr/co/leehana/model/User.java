@@ -29,6 +29,7 @@ public class User {
 	private Rank rank;
 	private int wrongCount = 0;
 	private Result result;
+	private boolean guessCompleted;
 
 	public User(String id, Role role, boolean ready) {
 		this.id = id;
