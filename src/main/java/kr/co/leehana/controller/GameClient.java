@@ -1,5 +1,6 @@
 package kr.co.leehana.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.ResultDto;
@@ -7,7 +8,6 @@ import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.User;
 import kr.co.leehana.type.RoleType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,8 +30,10 @@ public class GameClient {
 		System.out.println("게임이 시작되었습니다. 행운을 빌어요~");
 
 		boolean isGameOver = false;
+		int count = 1;
 		while (!isGameOver) {
-			System.out.print("숫자를 입력해주세요 :  ");
+			System.out.println(count + "번째 턴입니다.");
+			System.out.print("숫자를 입력해주세요 : ");
 			Scanner s2 = new Scanner(System.in);
 			boolean hasErrorMessage = false;
 			if (s2.hasNextLine()) {
@@ -47,6 +49,12 @@ public class GameClient {
 						!resultDto.getErrorMessage().getMessage().isEmpty()) {
 					System.out.println("오류 메세지 : " + resultDto.getErrorMessage().getMessage());
 					hasErrorMessage = true;
+					if (resultDto.getUser().getWrongCount() >= resultDto.getGameRoom().getSetting()
+							.getLimitWrongInputCount()) {
+						System.out.println("입력 오류 횟수 제한을 초과하여 게임을 종료합니다");
+						System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
+						isGameOver = true;
+					}
 				} else {
 					final int strikeCount = resultDto.getResult().getStrike().getValue();
 					final int ballCount = resultDto.getResult().getBall().getValue();
@@ -55,12 +63,15 @@ public class GameClient {
 
 				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
+					System.out.println("총 " + resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
+							.getRoleType().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser()
+							.getRank().getRanking() + "등 입니다.");
 					System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
 					isGameOver = true;
 				}
 			}
 
-			if (!hasErrorMessage) {
+			if (!hasErrorMessage && !isGameOver) {
 				System.out.println("모든 유저가 입력을 마칠때까지 대기중 입니다");
 				boolean allUserCompletedGuess = false;
 				while (!allUserCompletedGuess) {
@@ -77,6 +88,8 @@ public class GameClient {
 				if (!resetCompleted) {
 					System.out.println("모든 유저의 Guess state 를 초기화 하는 중 오류가 발생하였습니다");
 				}
+
+				count++;
 			}
 		}
 	}
@@ -302,7 +315,8 @@ public class GameClient {
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining(", " +
+			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining("," +
+					" " +
 					"" + ""));
 			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
 			System.out.println("접속 유저 : " + userList);
