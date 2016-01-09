@@ -5,6 +5,7 @@ import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
+import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.User;
 import kr.co.leehana.type.RoleType;
@@ -63,10 +64,11 @@ public class GameClient {
 
 				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
-					System.out.println("총 " + resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
+					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
 							.getRoleType().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser()
 							.getRank().getRanking() + "등 입니다.");
-					System.out.println("점수는 : " + resultDto.getScore().getValue() + "점 입니다.");
+					System.out.println("점수 : " + resultDto.getScore().getValue() + "점 입니다.");
+					System.out.println("누적 점수 : " + resultDto.getUser().getTotalScore().getValue() + "점 입니다.");
 					isGameOver = true;
 				}
 			}
@@ -267,7 +269,7 @@ public class GameClient {
 				if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
 					System.out.println(errorMessage.getMessage());
 				} else {
-					this.user = new User(userId, null, false);
+					this.user = new User(userId, null, new Score());
 					loginCompleted = true;
 				}
 			}

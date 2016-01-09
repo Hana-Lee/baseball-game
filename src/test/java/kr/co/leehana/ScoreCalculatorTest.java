@@ -146,12 +146,12 @@ public class ScoreCalculatorTest {
 		this.gameRoom.getUsers().clear();
 		this.gameRoom.setSetting(new Setting(5, guessLevel, generationLevel));
 
-		User user = new User("이하나", new Role(RoleType.DEPENDER), true);
+		User user = new User("이하나", new Role(RoleType.DEPENDER), new Score());
 		this.gameRoom.getUsers().add(user);
 
 		int count = 0;
 		for (int i = 1; i <= attackUserCount; i++) {
-			User newUser = new User("이하나" + i, new Role(RoleType.ATTACKER), true);
+			User newUser = new User("이하나" + i, new Role(RoleType.ATTACKER), new Score());
 			if (count < solvedUserCount) {
 				newUser.setResult(new Result(new Settlement(true), new Strike(2), new Ball(0)));
 			} else {
@@ -263,7 +263,7 @@ public class ScoreCalculatorTest {
 		final Result result = new Result(new Settlement(true), new Strike(3), new Ball(0));
 		this.gameRoom.setSetting(setting);
 		// 총 1명
-		final User newUser = new User(userId, new Role(RoleType.ATTACKER), true);
+		final User newUser = new User(userId, new Role(RoleType.ATTACKER), new Score());
 		newUser.setRank(rank);
 		newUser.setResult(result);
 		this.gameRoom.getUsers().add(newUser);
@@ -331,7 +331,7 @@ public class ScoreCalculatorTest {
 		final Setting setting = new Setting(5, guessLevel, generationLevel);
 		gameRoom.setSetting(setting);
 
-		final User user = new User("이하나", new Role(RoleType.ATTACKER), true);
+		final User user = new User("이하나", new Role(RoleType.ATTACKER), new Score());
 		user.setRank(new Rank(0));
 		user.setGuessCount(guessLevel);
 		user.setResult(result);
@@ -347,7 +347,7 @@ public class ScoreCalculatorTest {
 	// 잘못된 입력 초과시 점수 계산 테스트
 	@Test
 	public void testWrongNumberScoreCalculation() {
-		final User user = new User("이하나", new Role(RoleType.ATTACKER), true);
+		final User user = new User("이하나", new Role(RoleType.ATTACKER), new Score());
 		gameRoom.getUsers().add(user);
 
 		assertEquals(1, gameRoom.getUsers().size());

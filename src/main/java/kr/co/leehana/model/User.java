@@ -30,10 +30,11 @@ public class User {
 	private int wrongCount = 0;
 	private Result result;
 	private boolean guessCompleted;
+	private Score totalScore;
 
-	public User(String id, Role role, boolean ready) {
+	public User(String id, Role role, Score totalScore) {
 		this.id = id;
 		this.role = role;
-		this.ready = ready;
+		this.totalScore = totalScore;
 	}
 }

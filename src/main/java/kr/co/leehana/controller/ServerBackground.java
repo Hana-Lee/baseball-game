@@ -252,10 +252,19 @@ public class ServerBackground {
 									user.setGuessCompleted(true);
 								}
 
-								final Score score = ScoreCalculator.calculation(user, gameRoom);
-
 								if (user.getWrongCount() >= gameRoom.getSetting().getLimitWrongInputCount()) {
 									user.setGameOver(true);
+								}
+
+								Score score = null;
+								if (user.getGameOver()) {
+									score = ScoreCalculator.calculation(user, gameRoom);
+
+									if (user.getTotalScore() == null) {
+										user.setTotalScore(score);
+									} else {
+										user.getTotalScore().setValue(user.getTotalScore().getValue() + score.getValue());
+									}
 								}
 
 								if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
@@ -306,7 +315,7 @@ public class ServerBackground {
 							break;
 						case LOGIN:
 							if (value != null) {
-								User newUser = new User(value, null, false);
+								User newUser = new User(value, null, new Score());
 								ErrorMessage errorMessage = new ErrorMessage();
 
 								if (clients.entrySet().stream().filter(entry -> entry.getKey().getId().equals(newUser
