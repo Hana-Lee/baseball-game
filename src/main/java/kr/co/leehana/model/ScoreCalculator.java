@@ -81,9 +81,15 @@ public class ScoreCalculator {
 			return makeSuccessAttackerBaseScore(user, gameRoom);
 		} else if (exceededLimitGuessCount(user, setting)) {
 			// 추측가능 횟수에 도달하였으나 숫자를 못맞춘경우
-			return 5;
+			return 5.0f;
+		} else if (exceededLimitWrongCount(user, setting)) {
+			return 0.0f;
 		}
 		return 0;
+	}
+
+	private static boolean exceededLimitWrongCount(User user, Setting setting) {
+		return user.getWrongCount() == setting.getLimitWrongInputCount();
 	}
 
 	private static long makeDependerBaseScore(final GameRoom gameRoom) {
