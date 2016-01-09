@@ -180,6 +180,9 @@ public class ServerBackground {
 								final String userId = clientSendValues[2];
 								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
 										.findFirst().get();
+
+								resetUser(user);
+
 								user.setReady(true);
 
 								final long readyCount = gameRoom.getUsers().stream().filter(User::getReady).count();
@@ -222,22 +225,18 @@ public class ServerBackground {
 								try {
 									gameEngine.userInputValidation(clientSendValues[0], gameRoom.getSetting());
 								} catch (IllegalArgumentException e) {
-									errorMessage.setMessage("숫자 입력이 잘못 되었습니다. 다시 시도해주세요.");
 									user.setWrongCount(user.getWrongCount() + 1);
+									errorMessage.setMessage("숫자 입력이 잘못 되었습니다. 다시 시도해주세요. " + user.getWrongCount() +
+											"/" + gameRoom.getSetting().getLimitWrongInputCount());
 								}
 
 								Result result = null;
-								Score score = null;
 								if (errorMessage.getMessage() == null || errorMessage.getMessage().isEmpty()) {
 									user.setWrongCount(0);
 									user.setGuessCount(user.getGuessCount() + 1);
 									result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), value);
 									if (result.getSettlement().isSolved()) {
-										user.setReady(false);
-										user.setGuessCount(0);
 										user.setGameOver(true);
-										user.setWrongCount(0);
-										gameRoom.setGenerationNumbers(null);
 
 										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() !=
 												null && u.getRank().getRanking() > 0).count() + 1);
@@ -245,22 +244,24 @@ public class ServerBackground {
 										user.setRank(new Rank(ranking));
 									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
-										user.setReady(false);
-										user.setGuessCount(0);
 										user.setGameOver(true);
-										user.setWrongCount(0);
 										result = null;
 									}
 
-									if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
-											.getUsers().size()) {
-										gameRoom.setGenerationNumbers(null);
-									}
-
 									user.setResult(result);
-
-									score = ScoreCalculator.calculation(user, gameRoom);
 									user.setGuessCompleted(true);
+								}
+
+								final Score score = ScoreCalculator.calculation(user, gameRoom);
+
+								if (user.getWrongCount() >= gameRoom.getSetting().getLimitWrongInputCount()) {
+									user.setGameOver(true);
+								}
+
+								if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
+										.getUsers().size()) {
+									gameRoom.setGenerationNumbers(null);
+									gameRoom.getUsers().forEach(u -> u.setReady(false));
 								}
 
 								ResultDto resultDto = new ResultDto(result, user, gameRoom, score, errorMessage);
@@ -393,5 +394,15 @@ public class ServerBackground {
 			final String messageJson = objectMapper.writeValueAsString(currentState);
 			dataOutputStream.writeUTF(messageJson);
 		}
+	}
+
+	private void resetUser(User user) {
+		user.setGameOver(false);
+		user.setGuessCompleted(false);
+		user.setGuessCount(0);
+		user.setRank(null);
+		user.setReady(false);
+		user.setResult(null);
+		user.setWrongCount(0);
 	}
 }
