@@ -12,6 +12,14 @@ public class ScoreCalculator {
 	public ScoreCalculator() {
 	}
 
+	public static Score calculation(final User user, final GameRoom gameRoom) {
+		if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
+			return attackerScore(user, gameRoom);
+		} else {
+			return dependerScore(user, gameRoom);
+		}
+	}
+
 	/**
 	 * 게임이 종료된 후 수비자의 점수를 계산한다.
 	 * 점수는 소숫점 반올림 적용

@@ -208,33 +208,47 @@ public class ServerBackground {
 							}
 							break;
 						case GUESS_NUM:
-							try {
-								if (value != null) {
-									final String[] clientSendValues = value.split(":");
-									final long gameRoomId = Long.parseLong(clientSendValues[2]);
-									GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
-											.collect(Collectors.toList()).get(0);
+							if (value != null) {
+								final String[] clientSendValues = value.split(":");
+								final long gameRoomId = Long.parseLong(clientSendValues[2]);
+								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
 
-									final String userId = clientSendValues[4];
-									final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals
-											(userId)).findFirst().get();
+								final String userId = clientSendValues[4];
+								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
+										.findFirst().get();
 
+								final ErrorMessage errorMessage = new ErrorMessage();
+								try {
 									gameEngine.userInputValidation(clientSendValues[0], gameRoom.getSetting());
+								} catch (IllegalArgumentException e) {
+									errorMessage.setMessage("숫자 입력이 잘못 되었습니다. 다시 시도해주세요.");
+									user.setWrongCount(user.getWrongCount() + 1);
+								}
+
+								Result result = null;
+								Score score = null;
+								if (errorMessage.getMessage() == null || errorMessage.getMessage().isEmpty()) {
+									user.setWrongCount(0);
 									user.setGuessCount(user.getGuessCount() + 1);
-									Result result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), value);
+									result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), value);
 									if (result.getSettlement().isSolved()) {
 										user.setReady(false);
 										user.setGuessCount(0);
 										user.setGameOver(true);
+										user.setWrongCount(0);
 										gameRoom.setGenerationNumbers(null);
 
-										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() != null && u.getRank().getRanking() > 0).count() + 1);
+										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() !=
+												null && u.getRank().getRanking() > 0).count() + 1);
+
 										user.setRank(new Rank(ranking));
 									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
 										user.setReady(false);
 										user.setGuessCount(0);
 										user.setGameOver(true);
+										user.setWrongCount(0);
 										result = null;
 									}
 
@@ -245,17 +259,15 @@ public class ServerBackground {
 
 									user.setResult(result);
 
-									Score score = ScoreCalculator.attackerScore(user, gameRoom);
-
-									user.setGuessCompleted(true);
-
-									ResultDto resultDto = new ResultDto(result, user, gameRoom, score, null);
-
-									jsonResult = objectMapper.writeValueAsString(resultDto);
-									dataOutputStream.writeUTF(jsonResult);
+									score = ScoreCalculator.calculation(user, gameRoom);
 								}
-							} catch (IllegalArgumentException e) {
 
+								user.setGuessCompleted(true);
+
+								ResultDto resultDto = new ResultDto(result, user, gameRoom, score, errorMessage);
+
+								jsonResult = objectMapper.writeValueAsString(resultDto);
+								dataOutputStream.writeUTF(jsonResult);
 							}
 							break;
 						case GET_SETTING:
@@ -365,17 +377,17 @@ public class ServerBackground {
 
 		private void broadCastCurrentState(String value, MessageType messageType) throws IOException {
 			final long gameRoomId = Long.parseLong(value);
-			GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-					(Collectors.toList()).get(0);
+			GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect(Collectors.toList()
+			).get(0);
 			boolean currentState = false;
 			switch (messageType) {
 				case GET_READY_STATE:
-					currentState = gameRoom.getUsers().stream().filter(User::getReady).count
-							() == gameRoom.getUsers().size();
+					currentState = gameRoom.getUsers().stream().filter(User::getReady).count() == gameRoom.getUsers()
+							.size();
 					break;
 				case ALL_USER_COMPLETED_GUESS:
-					currentState = gameRoom.getUsers().stream().filter(User::isGuessCompleted).count
-							() == gameRoom.getUsers().size();
+					currentState = gameRoom.getUsers().stream().filter(User::isGuessCompleted).count() == gameRoom
+							.getUsers().size();
 					break;
 			}
 
