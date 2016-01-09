@@ -33,6 +33,7 @@ public class GameClient {
 		while (!isGameOver) {
 			System.out.print("숫자를 입력해주세요 :  ");
 			Scanner s2 = new Scanner(System.in);
+			boolean hasErrorMessage = false;
 			if (s2.hasNextLine()) {
 				final String inputNum = s2.nextLine();
 				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getId());
@@ -45,6 +46,7 @@ public class GameClient {
 				if (resultDto.getErrorMessage() != null && resultDto.getErrorMessage().getMessage() != null &&
 						!resultDto.getErrorMessage().getMessage().isEmpty()) {
 					System.out.println("오류 메세지 : " + resultDto.getErrorMessage().getMessage());
+					hasErrorMessage = true;
 				} else {
 					final int strikeCount = resultDto.getResult().getStrike().getValue();
 					final int ballCount = resultDto.getResult().getBall().getValue();
@@ -58,21 +60,23 @@ public class GameClient {
 				}
 			}
 
-			System.out.println("모든 유저가 입력을 마칠때까지 대기중 입니다");
-			boolean allUserCompletedGuess = false;
-			while (!allUserCompletedGuess) {
-				client.sendSocketData("ALL_USER_COMPLETED_GUESS," + gameRoomId);
-				String allUserCompletedGuessJson = client.getServerMessage();
-				allUserCompletedGuess = objectMapper.readValue(allUserCompletedGuessJson, Boolean.class);
+			if (!hasErrorMessage) {
+				System.out.println("모든 유저가 입력을 마칠때까지 대기중 입니다");
+				boolean allUserCompletedGuess = false;
+				while (!allUserCompletedGuess) {
+					client.sendSocketData("ALL_USER_COMPLETED_GUESS," + gameRoomId);
+					String allUserCompletedGuessJson = client.getServerMessage();
+					allUserCompletedGuess = objectMapper.readValue(allUserCompletedGuessJson, Boolean.class);
 
-				Thread.sleep(500);
-			}
+					Thread.sleep(500);
+				}
 
-			client.sendSocketData("ALL_USER_GUESS_COMPLETE_STATE_RESET," + gameRoomId);
-			String resetCompleteJson = client.getServerMessage();
-			boolean resetCompleted = objectMapper.readValue(resetCompleteJson, Boolean.class);
-			if (!resetCompleted) {
-				System.out.println("모든 유저의 Guess state 를 초기화 하는 중 오류가 발생하였습니다");
+				client.sendSocketData("ALL_USER_GUESS_COMPLETE_STATE_RESET," + gameRoomId);
+				String resetCompleteJson = client.getServerMessage();
+				boolean resetCompleted = objectMapper.readValue(resetCompleteJson, Boolean.class);
+				if (!resetCompleted) {
+					System.out.println("모든 유저의 Guess state 를 초기화 하는 중 오류가 발생하였습니다");
+				}
 			}
 		}
 	}

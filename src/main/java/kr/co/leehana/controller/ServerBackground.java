@@ -260,9 +260,8 @@ public class ServerBackground {
 									user.setResult(result);
 
 									score = ScoreCalculator.calculation(user, gameRoom);
+									user.setGuessCompleted(true);
 								}
-
-								user.setGuessCompleted(true);
 
 								ResultDto resultDto = new ResultDto(result, user, gameRoom, score, errorMessage);
 
