@@ -458,6 +458,7 @@ public class GameClient {
 		}
 	}
 
+	// TODO 유저가 임의로 입력한 숫자의 자리수 및 중복수 체크 로직 넣을것
 	private void generateNumber(long gameRoomId) throws IOException {
 		boolean generateNumberCompleted = false;
 		while (!generateNumberCompleted) {

@@ -33,6 +33,7 @@ public class ScoreCalculator {
 	 * @return Score 계산된 점수 객체
 	 */
 	public static Score dependerScore(final User user, final GameRoom gameRoom) {
+		// TODO 수비자의 점수 계산이 잘못되는것 수정(모든 유저가 맞춘경우의 점수가 제대로 반영되지 않음)
 		final float baseScore = makeBaseScore(user, gameRoom, gameRoom.getSetting());
 
 		return new Score(scoreCalculation(user, gameRoom.getSetting(), baseScore));
