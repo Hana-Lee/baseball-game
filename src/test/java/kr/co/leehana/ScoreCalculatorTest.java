@@ -360,4 +360,34 @@ public class ScoreCalculatorTest {
 
 		assertEquals(0, score.getValue());
 	}
+
+	@Test
+	public void testTotalScoreCalculation() {
+		final User user = new User("이하나", new Role(RoleType.ATTACKER), new Score());
+		user.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
+		user.setGuessCount(2);
+		user.setRank(new Rank(1));
+
+		gameRoom.setSetting(new Setting());
+		gameRoom.getUsers().add(user);
+
+		assertEquals(1, gameRoom.getUsers().size());
+
+		final Score firstScore = ScoreCalculator.calculation(user, gameRoom);
+		user.getTotalScore().setValue(user.getTotalScore().getValue() + firstScore.getValue());
+		assertEquals("기본 설정, 1명중 1등은 40점이여야 합니다.", 40, firstScore.getValue());
+
+		final User secUser = new User("이두나", new Role(RoleType.ATTACKER), new Score());
+		secUser.setRank(new Rank(1));
+		gameRoom.getUsers().add(secUser);
+
+		assertEquals(2, gameRoom.getUsers().size());
+
+		user.setRank(new Rank(2));
+
+		final Score secScore = ScoreCalculator.calculation(user, gameRoom);
+		user.getTotalScore().setValue(user.getTotalScore().getValue() + secScore.getValue());
+		assertEquals("기본 설정, 2명중 1등은 60점이여야 합니다.", 60, secScore.getValue());
+		assertEquals("총점은 100점 이여야 합니다.", 100, user.getTotalScore().getValue());
+	}
 }
