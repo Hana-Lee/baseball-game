@@ -1,5 +1,9 @@
-package kr.co.leehana.model;
+package kr.co.leehana.controller;
 
+import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.Score;
+import kr.co.leehana.model.Setting;
+import kr.co.leehana.model.User;
 import kr.co.leehana.type.RoleType;
 
 public class ScoreCalculator {

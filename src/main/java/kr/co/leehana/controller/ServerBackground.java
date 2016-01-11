@@ -9,7 +9,6 @@ import kr.co.leehana.model.Result;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
-import kr.co.leehana.model.ScoreCalculator;
 import kr.co.leehana.model.User;
 import kr.co.leehana.type.ErrorType;
 import kr.co.leehana.type.MessageType;

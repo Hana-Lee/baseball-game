@@ -6,7 +6,7 @@ import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Result;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
-import kr.co.leehana.model.ScoreCalculator;
+import kr.co.leehana.controller.ScoreCalculator;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
@@ -348,6 +348,10 @@ public class ScoreCalculatorTest {
 	@Test
 	public void testWrongNumberScoreCalculation() {
 		final User user = new User("이하나", new Role(RoleType.ATTACKER), new Score());
+		user.setResult(new Result(new Settlement(false), new Strike(0), new Ball(0)));
+		user.setGuessCount(0);
+		user.setWrongCount(5);
+		gameRoom.setSetting(new Setting());
 		gameRoom.getUsers().add(user);
 
 		assertEquals(1, gameRoom.getUsers().size());
