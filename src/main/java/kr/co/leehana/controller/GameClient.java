@@ -37,6 +37,7 @@ public class GameClient {
 			System.out.print("숫자를 입력해주세요 : ");
 			Scanner s2 = new Scanner(System.in);
 			boolean hasErrorMessage = false;
+			boolean onlyOneAttacker = false;
 			if (s2.hasNextLine()) {
 				final String inputNum = s2.nextLine();
 				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getId());
@@ -45,6 +46,9 @@ public class GameClient {
 				System.out.println("result dto json : " + resultDtoJson);
 				final ResultDto resultDto = objectMapper.readValue(resultDtoJson, ResultDto.class);
 				System.out.println("Result : " + resultDto);
+
+				onlyOneAttacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
+						.equals(RoleType.ATTACKER)).count() == 1;
 
 				if (resultDto.getErrorMessage() != null && resultDto.getErrorMessage().getMessage() != null &&
 						!resultDto.getErrorMessage().getMessage().isEmpty()) {
@@ -64,16 +68,16 @@ public class GameClient {
 
 				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
-					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
-							.getRoleType().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser()
-							.getRank().getRanking() + "등 입니다.");
+					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType
+							().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank()
+							.getRanking() + "등 입니다.");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점 입니다.");
 					System.out.println("누적 점수 : " + resultDto.getUser().getTotalScore().getValue() + "점 입니다.");
 					isGameOver = true;
 				}
 			}
 
-			if (!hasErrorMessage && !isGameOver) {
+			if (!onlyOneAttacker && !hasErrorMessage && !isGameOver) {
 				System.out.println("모든 유저가 입력을 마칠때까지 대기중 입니다");
 				boolean allUserCompletedGuess = false;
 				while (!allUserCompletedGuess) {
@@ -90,7 +94,9 @@ public class GameClient {
 				if (!resetCompleted) {
 					System.out.println("모든 유저의 Guess state 를 초기화 하는 중 오류가 발생하였습니다");
 				}
+			}
 
+			if (!hasErrorMessage) {
 				count++;
 			}
 		}
@@ -225,7 +231,7 @@ public class GameClient {
 							final String gameRoomName = gameRoomNameScanner.nextLine();
 							final GameRoom createdGameRoom = createGameRoom(gameRoomName);
 
-							user.setRole(selectUserRole());
+							user.setRole(selectUserRole(createdGameRoom.getId()));
 
 							if (joiningGameRoom(createdGameRoom.getId())) {
 								joinGameRoom(createdGameRoom.getId());
@@ -238,7 +244,7 @@ public class GameClient {
 						if (gameRoomIdScanner.hasNextLine()) {
 							final long gameRoomId = Long.valueOf(gameRoomIdScanner.nextLine());
 
-							user.setRole(selectUserRole());
+							user.setRole(selectUserRole(gameRoomId));
 
 							if (joiningGameRoom(gameRoomId)) {
 								joinGameRoom(gameRoomId);
@@ -276,14 +282,29 @@ public class GameClient {
 		}
 	}
 
-	private Role selectUserRole() {
-		System.out.print("1. 공격(숫자 맞추기), 2. 수비(숫자생성) 중에 하나의 역할을 선택해주세요 :");
-		Scanner userRoleScanner = new Scanner(System.in);
-		String userRole = "ATTACKER";
-		if (userRoleScanner.hasNextLine()) {
-			final String userRoleSelect = userRoleScanner.nextLine();
-			if (userRoleSelect.equals("2")) {
-				userRole = "DEPENDER";
+	private Role selectUserRole(long gameRoomId) throws IOException {
+		String userRole = null;
+		boolean userRoleSelectCompleted = false;
+		while (!userRoleSelectCompleted) {
+			System.out.print("1. 공격(숫자 맞추기), 2. 수비(숫자생성) 중에 하나의 역할을 선택해주세요 : ");
+			Scanner userRoleScanner = new Scanner(System.in);
+			userRole = "ATTACKER";
+			if (userRoleScanner.hasNextLine()) {
+				final String userRoleSelect = userRoleScanner.nextLine();
+				if (userRoleSelect.equals("2")) {
+					userRole = "DEPENDER";
+					client.sendSocketData("DEPENDER_ALREADY_EXIST," + gameRoomId);
+					final String alreadyExistJson = client.getServerMessage();
+					final boolean alreadyExist = objectMapper.readValue(alreadyExistJson, Boolean.class);
+
+					if (alreadyExist) {
+						System.out.println("수비는 이미 존재 하기 때문에 선택 할 수 없습니다. 공격을 선택해주세요.");
+					} else {
+						userRoleSelectCompleted = true;
+					}
+				} else {
+					userRoleSelectCompleted = true;
+				}
 			}
 		}
 
@@ -317,7 +338,8 @@ public class GameClient {
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining("," +
+			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining
+					("," +
 					" " +
 					"" + ""));
 			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
@@ -341,11 +363,11 @@ public class GameClient {
 				final int selectedMenu = Integer.valueOf(roomMenuScanner.nextLine());
 				switch (selectedMenu) {
 					case 1:
-						client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
-
 						if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
 							generateNumber(gameRoomId);
 						}
+
+						client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
 
 						boolean allUsersReady = false;
 						while (!allUsersReady) {
@@ -361,7 +383,11 @@ public class GameClient {
 							Thread.sleep(500);
 						}
 
-						runningGame(gameRoomId);
+						if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+							monitoringGame(gameRoomId);
+						} else {
+							runningGame(gameRoomId);
+						}
 						break;
 					case 2:
 						showingGameRoomMenu(gameRoomId);
@@ -372,6 +398,61 @@ public class GameClient {
 						break;
 					default:
 						break;
+				}
+			}
+		}
+	}
+
+	private void monitoringGame(long gameRoomId) throws IOException {
+		boolean allUsersResolved = false;
+		while (!allUsersResolved) {
+			final String resultDtoJson = client.getServerMessage();
+			final ResultDto resultDto = objectMapper.readValue(resultDtoJson, ResultDto.class);
+
+			allUsersResolved = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
+					.equals(RoleType.ATTACKER) && u.getGameOver()).count() == resultDto.getGameRoom().getUsers()
+					.stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
+
+			if (allUsersResolved) {
+				System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+				System.out.println("모든 유저가 게임을 마쳤습니다");
+				System.out.println("게임 결과");
+				long allUserCount = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
+						.equals(RoleType.ATTACKER)).count();
+				for (int i = 1; i <= allUserCount; i++) {
+					final int rankValue = i;
+					final User attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
+							.getRanking() == rankValue).findFirst().get();
+					System.out.println(attacker.getRank().getRanking() + "등 : " + attacker.getId() + ", 점수 : " +
+							attacker.getCurrentScore().getValue());
+				}
+
+				System.out.println("****************************************************");
+				client.sendSocketData("GET_DEPENDER_SCORE," + gameRoomId + ":USER_ID:" + user.getId());
+				final String dependerScoreJson = client.getServerMessage();
+				final Score dependerScore = objectMapper.readValue(dependerScoreJson, Score.class);
+				System.out.println("수비 " + user.getId() + "님의 점수는 : " + dependerScore.getValue() + "입니다.");
+				System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+			} else {
+				if (resultDto.getResult().getSettlement().isSolved()) {
+					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
+					System.out.println(resultDto.getUser().getId() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
+							resultDto.getResult().getBall().getValue() + "볼");
+
+					System.out.println("등수 : " + resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
+							.getRoleType().equals(RoleType.ATTACKER)).count() + "명중 " + resultDto.getUser().getRank()
+							.getRanking() + "등");
+					System.out.println("점수 : " + resultDto.getScore().getValue() + "점");
+					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+				} else {
+					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
+					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
+					System.out.println(resultDto.getUser().getId() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
+							resultDto.getResult().getBall().getValue() + "볼");
+					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 				}
 			}
 		}

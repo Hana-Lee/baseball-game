@@ -31,6 +31,8 @@ public class User {
 	private Result result;
 	private boolean guessCompleted;
 	private Score totalScore;
+	private String guessNum;
+	private Score currentScore;
 
 	public User(String id, Role role, Score totalScore) {
 		this.id = id;

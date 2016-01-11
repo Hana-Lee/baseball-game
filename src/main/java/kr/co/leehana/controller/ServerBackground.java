@@ -219,10 +219,11 @@ public class ServerBackground {
 								final String userId = clientSendValues[4];
 								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
 										.findFirst().get();
+								user.setGuessNum(clientSendValues[0]);
 
 								final ErrorMessage errorMessage = new ErrorMessage();
 								try {
-									gameEngine.userInputValidation(clientSendValues[0], gameRoom.getSetting());
+									gameEngine.userInputValidation(user.getGuessNum(), gameRoom.getSetting());
 								} catch (IllegalArgumentException e) {
 									user.setWrongCount(user.getWrongCount() + 1);
 									errorMessage.setMessage("숫자 입력이 잘못 되었습니다. 다시 시도해주세요. " + user.getWrongCount() +
@@ -233,7 +234,8 @@ public class ServerBackground {
 								if (errorMessage.getMessage() == null || errorMessage.getMessage().isEmpty()) {
 									user.setWrongCount(0);
 									user.setGuessCount(user.getGuessCount() + 1);
-									result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), value);
+									result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), user
+											.getGuessNum());
 									if (result.getSettlement().isSolved()) {
 										user.setGameOver(true);
 
@@ -262,9 +264,12 @@ public class ServerBackground {
 									if (user.getTotalScore() == null) {
 										user.setTotalScore(score);
 									} else {
-										user.getTotalScore().setValue(user.getTotalScore().getValue() + score.getValue());
+										user.getTotalScore().setValue(user.getTotalScore().getValue() + score.getValue
+												());
 									}
 								}
+
+								user.setCurrentScore(score);
 
 								if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
 										.getUsers().size()) {
@@ -276,6 +281,12 @@ public class ServerBackground {
 
 								jsonResult = objectMapper.writeValueAsString(resultDto);
 								dataOutputStream.writeUTF(jsonResult);
+
+								final User depender = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType
+										().equals(RoleType.DEPENDER)).findFirst().orElse(null);
+								if (depender != null) {
+									clients.get(depender).writeUTF(jsonResult);
+								}
 							}
 							break;
 						case GET_SETTING:
@@ -374,6 +385,28 @@ public class ServerBackground {
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(true));
 							}
 							break;
+						case DEPENDER_ALREADY_EXIST:
+							if (value != null) {
+								final long gameRoomId = Long.parseLong(value);
+								final GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								boolean dependerAlreadyExist = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType
+										.DEPENDER)).count() > 0;
+								dataOutputStream.writeUTF(objectMapper.writeValueAsString(dependerAlreadyExist));
+							}
+							break;
+						case GET_DEPENDER_SCORE:
+							if (value != null) {
+								final String[] clientSendValues = value.split(":");
+								final long gameRoomId = Long.parseLong(clientSendValues[0]);
+								final String userId = clientSendValues[2];
+								final GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+										(Collectors.toList()).get(0);
+								final User depender = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId)).findFirst().get();
+								final Score score = ScoreCalculator.calculation(depender, gameRoom);
+								dataOutputStream.writeUTF(objectMapper.writeValueAsString(score));
+							}
+							break;
 						default:
 							break;
 					}
@@ -394,8 +427,9 @@ public class ServerBackground {
 							.size();
 					break;
 				case ALL_USER_COMPLETED_GUESS:
-					currentState = gameRoom.getUsers().stream().filter(User::isGuessCompleted).count() == gameRoom
-							.getUsers().size();
+					currentState = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType
+							.ATTACKER) && u.isGuessCompleted()).count() == gameRoom.getUsers().stream().filter(u -> u
+							.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
 					break;
 			}
 
