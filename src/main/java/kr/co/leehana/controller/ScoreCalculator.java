@@ -80,6 +80,20 @@ public class ScoreCalculator {
 		return 0.0f;
 	}
 
+	private static float makeDependerBaseScore(final GameRoom gameRoom) {
+		if (allUserFocusedNumber(gameRoom)) {
+			return makeAllUserFocusedDependerBaseScore();
+		} else {
+			return makeBasicDependerBaseScore(gameRoom);
+		}
+	}
+
+	private static boolean allUserFocusedNumber(final GameRoom gameRoom) {
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER) && u
+				.getResult().getSettlement().isSolved()).count() == gameRoom.getUsers().stream().filter(u -> u.getRole
+				().getRoleType().equals(RoleType.ATTACKER)).count();
+	}
+
 	private static float makeAttackerBaseScore(final User user, final GameRoom gameRoom, final Setting setting) {
 		if (successGuess(user)) {
 			// 성공적으로 숫자를 맞춘경우 랭크가 0 이상
@@ -97,8 +111,12 @@ public class ScoreCalculator {
 		return user.getWrongCount() == setting.getLimitWrongInputCount();
 	}
 
-	private static long makeDependerBaseScore(final GameRoom gameRoom) {
+	private static long makeBasicDependerBaseScore(final GameRoom gameRoom) {
 		return DEPENDER_BASE * getAttackerCount(gameRoom) - (getSolvedUserCount(gameRoom) * DEPENDER_EACH_USER);
+	}
+
+	private static long makeAllUserFocusedDependerBaseScore() {
+		return 10L;
 	}
 
 	private static long makeSuccessAttackerBaseScore(final User user, final GameRoom gameRoom) {
@@ -106,7 +124,8 @@ public class ScoreCalculator {
 	}
 
 	private static boolean successGuess(final User user) {
-		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getRanking() > 0;
+		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getRanking()
+				> 0;
 	}
 
 	private static boolean exceededLimitGuessCount(final User user, final Setting setting) {
@@ -123,7 +142,8 @@ public class ScoreCalculator {
 		return Math.round(guessScoreValue + numberCountScoreValue);
 	}
 
-	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final User user) {
+	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final User
+			user) {
 		float numberCountScoreValue;
 		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
 		switch (generationNumberCount) {

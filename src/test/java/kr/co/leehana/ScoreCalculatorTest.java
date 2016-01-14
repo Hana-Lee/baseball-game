@@ -168,6 +168,22 @@ public class ScoreCalculatorTest {
 	}
 
 	@Test
+	public void testAllUserFocusedDependerScoreCalculation() {
+		this.gameRoom.setSetting(new Setting());
+		final User depender = new User("이하나", new Role(RoleType.DEPENDER), new Score());
+		final User attacker = new User("이두나", new Role(RoleType.ATTACKER), new Score());
+		attacker.setGameOver(true);
+		attacker.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
+
+		this.gameRoom.getUsers().add(depender);
+		this.gameRoom.getUsers().add(attacker);
+
+		final Score dependerScore = ScoreCalculator.calculation(depender, this.gameRoom);
+
+		assertEquals("기본 설정에서 모든 유저가 맞춘경우 수비자의 점수는 20점 이여야 합니다", 20, dependerScore.getValue());
+	}
+
+	@Test
 	public void testAttackerScoreCalculation() {
 		// Very Hard Guess, Easy Generation
 		Integer[][] expScore = new Integer[][]{
