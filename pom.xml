@@ -95,12 +95,6 @@
 			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>webix</artifactId>
-			<version>${webjars-webix.version}</version>
-		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
