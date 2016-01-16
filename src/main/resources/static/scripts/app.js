@@ -15,6 +15,7 @@ var app = (function () {
 
 	initModule = function(container) {
 		app.v_shell.initModule(container);
+		app.v_login.initModule();
 	};
 
 	return {

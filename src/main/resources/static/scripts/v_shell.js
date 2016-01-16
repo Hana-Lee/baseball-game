@@ -18,8 +18,8 @@ app.v_shell = (function () {
 	}, initModule, makeMainLayout, makeGameRoomLayout;
 
 	initModule = function (container) {
-		makeGameRoomLayout(container);
-		//makeMainLayout(container);
+		//makeGameRoomLayout(container);
+		makeMainLayout(container);
 	};
 
 	makeGameRoomLayout = function (container) {
@@ -84,7 +84,18 @@ app.v_shell = (function () {
 			width: configMap.width,
 			rows: [
 				{template: '야구게임 v0.1', height: 45, type: 'header'},
-				{template: '메뉴', height: 45},
+				{
+					id: 'main-menu', view: 'menu', height: 45, data: [
+					{id: 1, value: 'Google'},
+					{id: 2, value: 'Facebook'},
+					{id: 3, value: 'Twitter'}
+				], on: {
+					onMenuItemClick: function (id) {
+						webix.message('Click: ' + this.getMenuItem(id).value);
+						app.v_login.show();
+					}
+				}
+				},
 				{
 					cols: [
 						{
