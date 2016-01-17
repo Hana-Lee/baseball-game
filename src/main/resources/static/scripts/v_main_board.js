@@ -52,10 +52,10 @@ app.v_main_board = (function () {
 					},
 					{
 						template: '유저 컨테이너',
-						width: 280,
+						width: 300,
 						margin: 10,
 						rows: [
-							{template: '유저정보', height: 220},
+							app.v_user_profile.getView(),
 							{template: '유저리스트'}
 						]
 					}
