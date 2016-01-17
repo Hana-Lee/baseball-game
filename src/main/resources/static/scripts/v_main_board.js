@@ -45,7 +45,7 @@ app.v_main_board = (function () {
 						margin: 10,
 						rows: [
 							app.v_user_profile.getView(),
-							{template: '유저리스트'}
+							app.v_user_list.getView()
 						]
 					}
 				]

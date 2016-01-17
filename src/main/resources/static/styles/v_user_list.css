@@ -1,0 +1,10 @@
+.custom_item{
+	width:255px;
+	height:55px;
+	border:1px solid #009966;
+	border-radius:4px;
+	margin:10px 5px;
+	overflow:hidden;
+	background-color:#ffffee;
+	padding:10px;
+}
