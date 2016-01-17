@@ -22,18 +22,7 @@ app.v_main_board = (function () {
 	initModule = function () {
 		view = [
 			{template: '야구게임 v0.1', height: 45, type: 'header'},
-			{
-				id: 'main-menu', view: 'menu', height: 45, data: [
-				{id: 1, value: 'Google'},
-				{id: 2, value: 'Facebook'},
-				{id: 3, value: 'Twitter'}
-			], on: {
-				onMenuItemClick: function (id) {
-					webix.message('Click: ' + this.getMenuItem(id).value);
-					app.v_login.show();
-				}
-			}
-			},
+			app.v_main_menu.getView(),
 			{
 				cols: [
 					{
