@@ -25,19 +25,19 @@ app.v_game_list = (function () {
 			id: 'game-list-container',
 			rows: [
 				{cols: [
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸1</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸2</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸3</div>'}
+					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸1</div>'},
+					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸2</div>'},
+					{template: '<div style="border: 2px dashed green;width:100%;height:100%;">게임룸3</div>'}
 				]},
 				{cols: [
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸4</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸5</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸6</div>'}
+					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸4</div>'},
+					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸5</div>'},
+					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸6</div>'}
 				]},
 				{cols: [
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸7</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸8</div>'},
-					{template: '<div style="border: 1px solid red;width:100%;height:100%;">게임룸9</div>'}
+					{template: '<div style="border: 2px dashed green;width:100%;height:100%;">게임룸7</div>'},
+					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸8</div>'},
+					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸9</div>'}
 				]}
 			]
 		};
