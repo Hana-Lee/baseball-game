@@ -1,5 +1,6 @@
 /**
- * Created by leehana on 2016. 1. 16..
+ * @author Hana Lee
+ * @since 2016-01-16 19:35
  */
 /*jslint         browser : true, continue : true,
  devel  : true, indent  : 2,    maxerr   : 50,
