@@ -14,7 +14,8 @@ app.v_main_menu = (function () {
 	'use strict';
 
 	var configMap = {
-			height: 45
+			height: 45,
+			button_width: 200
 		}, getView, initModule,
 		view;
 
@@ -24,15 +25,10 @@ app.v_main_menu = (function () {
 
 	initModule = function () {
 		view = {
-			id: 'main-menu', view: 'menu', height: configMap.height, data: [
-				{id: 1, value: '방만들기'},
-				{id: 2, value: '빠른입장'}
-			], on: {
-				onMenuItemClick: function (id) {
-					webix.message('Click: ' + this.getMenuItem(id).value);
-					app.v_login.show();
-				}
-			}
+			id: 'main-menu', height: configMap.height, cols: [
+				{id: 'make-room', view: 'button', label: '방만들기', type: 'danger', width: configMap.button_width},
+				{id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width}
+			]
 		};
 	};
 
