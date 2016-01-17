@@ -30,7 +30,7 @@ app.v_main_board = (function () {
 						margin: 10,
 						css: 'bbg-mr-10',
 						rows: [
-							{template: '게임룸 리스트'},
+							app.v_game_list.getView(),
 							{
 								template: '채팅', height: 200, rows: [
 								{template: '채팅내용'},

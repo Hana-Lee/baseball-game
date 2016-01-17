@@ -19,6 +19,7 @@ var app = (function () {
 		app.v_user_profile.initModule();
 		app.v_main_menu.initModule();
 		app.v_user_list.initModule();
+		app.v_game_list.initModule();
 		app.v_main_board.initModule();
 		app.v_shell.initModule(container);
 	};
