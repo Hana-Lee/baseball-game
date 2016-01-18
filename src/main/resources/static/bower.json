@@ -1,0 +1,24 @@
+{
+  "name": "Baseball Game",
+  "homepage": "https://github.com/Hana-Lee/baseball-game",
+  "authors": [
+    "Hana Lee <i@leehana.co.kr>"
+  ],
+  "description": "Baseball Game",
+  "main": "",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "baseball",
+    "game"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

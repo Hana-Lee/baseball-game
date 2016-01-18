@@ -8,7 +8,7 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, app, webix */
+/*global $, app, webix, $$ */
 
 app.v_shell = (function () {
 	'use strict';
@@ -28,6 +28,8 @@ app.v_shell = (function () {
 			width: configMap.width,
 			rows: app.v_main_board.getView()
 		});
+
+		webix.UIManager.setFocus($$("message"));
 	};
 
 	return {

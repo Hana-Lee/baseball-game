@@ -214,3 +214,5 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 
+node_modules
+bower_components

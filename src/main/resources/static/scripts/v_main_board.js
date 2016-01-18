@@ -31,12 +31,7 @@ app.v_main_board = (function () {
 						css: 'bbg-mr-10',
 						rows: [
 							app.v_game_list.getView(),
-							{
-								template: '채팅', height: 200, rows: [
-								{template: '채팅내용'},
-								{template: '채팅입력', height: 30}
-							]
-							}
+							app.v_main_chat.getView()
 						]
 					},
 					{
