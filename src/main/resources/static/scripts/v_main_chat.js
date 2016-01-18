@@ -36,70 +36,73 @@ app.v_main_chat = (function () {
 
 		webix.proxy.faye.client = new Faye.Client('//localhost:8000/');
 		webix.proxy.faye.clientId = webix.uid();
-		var user_name = "Guest " + Math.ceil(Math.random() * 9999);
+
+		var user_name = '이하나';
 
 		function send_message() {
-			var text = $$("message").getValue();
+			console.log(arguments);
+			var text = $$('message').getValue();
 
 			if (text) {
-				if (text.indexOf("/nick ") === 0) {
+				if (text.indexOf('/nick ') === 0) {
 					user_name = text.substr(6);
 
 				} else {
-					$$("chat").add({
+					$$('chat').add({
 						user: user_name,
 						value: text
 					});
 				}
 			}
 
+			$$('message').setValue('');
 
-			$$("message").setValue("");
-			$$("message").focus();
+			setTimeout(function() {
+				$$('message').focus();
+			}, 100);
 		}
 
 		function chat_template(obj) {
-			return "<span " + (obj.user === user_name ? "class='own'" : "" ) + ">" + obj.user + "</span> " + obj.value;
+			return '<span style="font-weight:bold;">' + obj.user + '</span>: ' + obj.value;
 		}
-
 
 		view = {
 			id: 'main-chat',
 			rows: [
-				//{template: "Webix Based Chat", type: "header"},
+				//{template: 'Webix Based Chat', type: 'header'},
 				{
-					view: "list", id: "chat", gravity: 3,
-					//url: "faye->/data", save: "faye->/data",
-					type: {height: "auto"},
+					view: 'list', id: 'chat', gravity: 3,
+					//url: 'faye->/data', save: 'faye->/data',
+					type: {height: 'auto'},
 					template: chat_template
 				},
 				{
 					cols: [
-						{view: "text", id: "message", placeholder: "채팅 메세지를 입력해주세요", gravity: 3},
-						{view: "button", value: "Send", click: send_message}
+						{view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3},
+						{view: 'button', value: 'Send', click: send_message, hotkey: 'enter'}
 					]
 				}
 			]
 		};
 
-		//webix.dp($$("chat")).ignore(function () {
-		//	$$("chat").add({
-		//		user: "System", value: "Welcome to chat :)"
+		//webix.dp($$('chat')).ignore(function () {
+		//	$$('chat').add({
+		//		user: 'System', value: 'Welcome to chat :)'
 		//	});
-		//	$$("chat").add({
-		//		user: "System", value: "Uset '/nick Name' to set a name"
+		//	$$('chat').add({
+		//		user: 'System', value: 'Uset '/nick Name' to set a name'
 		//	});
 		//});
 
-		//$$("chat").attachEvent("onAfterAdd", function (id) {
+		//$$('chat').attachEvent('onAfterAdd', function (id) {
 		//	webix.delay(function () {
 		//		this.showItem(id);
 		//	}, this);
 		//});
 
 
-		webix.UIManager.addHotKey("Enter", send_message, $$("message"));
-		//webix.UIManager.setFocus($$("message"));
+		//webix.UIManager.addHotKey('Enter', send_message, $$('message'));
+		//webix.UIManager.setFocus($$('message'));
 	};
 
 	return {

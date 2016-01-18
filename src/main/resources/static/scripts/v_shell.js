@@ -30,6 +30,12 @@ app.v_shell = (function () {
 		});
 
 		webix.UIManager.setFocus($$("message"));
+
+		$$('chat').attachEvent('onAfterAdd', function (id) {
+			webix.delay(function () {
+				this.showItem(id);
+			}, this);
+		});
 	};
 
 	return {
