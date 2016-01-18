@@ -1,6 +1,6 @@
 .custom_item {
 	width: 195px;
-	height: 94px;
+	height: 88px;
 	border: 1px solid #009966;
 	border-radius: 4px;
 	margin: 10px 5px;
@@ -8,4 +8,5 @@
 	background-color: #ffffee;
 	padding: 10px;
 	float: left;
+	box-shadow: 5px 5px 5px #888888;
 }
