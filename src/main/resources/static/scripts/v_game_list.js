@@ -22,23 +22,26 @@ app.v_game_list = (function () {
 
 	initModule = function () {
 		view = {
-			id: 'game-list-container',
-			rows: [
-				{cols: [
-					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸1</div>'},
-					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸2</div>'},
-					{template: '<div style="border: 2px dashed green;width:100%;height:100%;">게임룸3</div>'}
-				]},
-				{cols: [
-					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸4</div>'},
-					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸5</div>'},
-					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸6</div>'}
-				]},
-				{cols: [
-					{template: '<div style="border: 2px dashed green;width:100%;height:100%;">게임룸7</div>'},
-					{template: '<div style="border: 2px dashed blue;width:100%;height:100%;">게임룸8</div>'},
-					{template: '<div style="border: 2px dashed red;width:100%;height:100%;">게임룸9</div>'}
-				]}
+			id: 'game-room-list',
+			view: 'dataview',
+			type: {
+				height: 128,
+				width: 228,
+				templateStart: '<div class="custom_item">',
+				template: '<div class="webix_strong">#name#</div>#user_count#/5, 횟수: #guess_num#, 갯수: #gen_num#<div>방장: #owner#</div><button style="float: right;">입장</button>',
+				templateEnd: '</div>'
+			},
+			data: [
+				{id: 1, name: '게임룸1', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나1'},
+				{id: 2, name: '게임룸2', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나2'},
+				{id: 3, name: '게임룸3', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나3'},
+				{id: 4, name: '게임룸4', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나4'},
+				{id: 5, name: '게임룸5', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나5'},
+				{id: 6, name: '게임룸6', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나6'},
+				{id: 7, name: '게임룸7', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나7'},
+				{id: 8, name: '게임룸8', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나8'},
+				{id: 9, name: '게임룸9', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나9'},
+				{id: 10, name: '게임룸10', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나10'}
 			]
 		};
 	};
