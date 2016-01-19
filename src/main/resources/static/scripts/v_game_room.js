@@ -25,7 +25,7 @@ app.v_game_room = (function () {
 
 	initModule = function () {
 		view = [
-			{template: '야구게임 v0.1', height: 45, type: 'header'},
+			{template: '[1번방] 왕초보들 오세요', height: 45, type: 'header'},
 			app.v_game_room_menu.getView(),
 			{
 				cols: [
