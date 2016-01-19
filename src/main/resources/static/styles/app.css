@@ -9,3 +9,11 @@
 .bbg-mr-10 {
 	margin-right: 10px;
 }
+
+.bbg-ml-10 {
+	margin-left: 10px !important;
+}
+
+.bbg-pl-10 {
+	padding-left: 10px;
+}
