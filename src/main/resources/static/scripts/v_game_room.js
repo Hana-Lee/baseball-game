@@ -13,9 +13,11 @@
 app.v_game_room = (function () {
 	'use strict';
 
-	var configMap = {}, stateMap = {
-		selected_num: []
-	}, initModule, view, getView;
+	var configMap = {
+			gen_num_count: 3
+		}, stateMap = {
+			selected_num: []
+		}, initModule, view, getView;
 
 	getView = function () {
 		return view;
@@ -24,7 +26,7 @@ app.v_game_room = (function () {
 	initModule = function () {
 		view = [
 			{template: '야구게임 v0.1', height: 45, type: 'header'},
-			{template: '메뉴', height: 45},
+			app.v_game_room_menu.getView(),
 			{
 				cols: [
 					{
@@ -37,7 +39,7 @@ app.v_game_room = (function () {
 								template: '유저정보', height: 200, cols: [
 								{
 									width: 120, rows: [
-									{template: '아이디', height: 35, type: 'header'},
+									{template: '이하나님', height: 35, type: 'header'},
 									{
 										template: '<img src="images/character.gif" height="100%" width="100%">',
 										width: 130
@@ -78,8 +80,8 @@ app.v_game_room = (function () {
 												{id: '9', number: 9}
 											],
 											on: {
-												'onItemClick': function(id, evt, el) {
-													if (stateMap.selected_num.length === 3) {
+												'onItemClick': function (id, evt, el) {
+													if (stateMap.selected_num.length === configMap.gen_num_count) {
 														webix.alert({
 															title: '경고',
 															ok: '확인',
@@ -95,7 +97,7 @@ app.v_game_room = (function () {
 													}
 												}
 											}
-										},{
+										}, {
 											id: 'number-submit',
 											view: 'button',
 											label: '제출'
