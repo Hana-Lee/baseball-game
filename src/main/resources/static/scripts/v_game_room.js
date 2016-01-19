@@ -39,11 +39,12 @@ app.v_game_room = (function () {
 								template: '유저정보', height: 200, cols: [
 								{
 									width: 120, rows: [
-									{template: '이하나님', height: 35, type: 'header'},
-									{
-										template: '<img src="images/character.gif" height="100%" width="100%">',
-										width: 130
-									}
+									//{template: '이하나님', height: 35, type: 'header'},
+									//{
+									//	template: '<img src="images/character.gif" height="100%" width="100%">',
+									//	width: 130
+									//}
+									{view: 'button', type: 'danger', height: 200, label: '준비!'}
 								]
 								},
 								{
