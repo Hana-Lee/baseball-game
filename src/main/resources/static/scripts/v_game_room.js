@@ -34,7 +34,7 @@ app.v_game_room = (function () {
 						margin: 10,
 						css: 'bbg-mr-10',
 						rows: [
-							{template: '게임룸'},
+							app.v_game_board.getView(),
 							{
 								template: '유저정보', height: 200, cols: [
 								{
