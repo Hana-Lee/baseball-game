@@ -1,0 +1,104 @@
+/**
+ * @author Hana Lee
+ * @since 2016-01-20 21:19
+ */
+/*jslint         browser : true, continue : true,
+ devel  : true, indent  : 2,    maxerr   : 50,
+ newcap : true, nomen   : true, plusplus : true,
+ regexp : true, sloppy  : true, vars     : false,
+ white  : true
+ */
+/*global $, app, webix, $$ */
+
+app.v_game_pad = (function () {
+	'use strict';
+
+	var configMap = {
+			gen_num_count: 3
+		}, stateMap = {
+			selected_num: []
+		}, view,
+		initModule, getView;
+
+	getView = function () {
+		return view;
+	};
+
+	initModule = function () {
+		view = {
+			template: '유저정보', height: 200, cols: [
+				{
+					width: 120, rows: [
+					{view: 'button', type: 'danger', height: 200, label: '준비!'}
+				]
+				},
+				{
+					id: 'game-pad-container',
+					rows: [
+						{
+							id: 'game-pad',
+							view: 'dataview',
+							css: 'game_pad',
+							type: {
+								width: 112,
+								height: 70,
+								//templateStart: '<div item_id="#id#" class="game_pad">',
+								//template: '<div class="webix_strong">#number#</div>',
+								//templateEnd: '</div>'
+								template: '<div class="overall">#number#</div>'
+							},
+							select: true,
+							multiselect: true,
+							scroll: false,
+							data: [
+								{id: '0', number: 0},
+								{id: '1', number: 1},
+								{id: '2', number: 2},
+								{id: '3', number: 3},
+								{id: '4', number: 4},
+								{id: '5', number: 5},
+								{id: '6', number: 6},
+								{id: '7', number: 7},
+								{id: '8', number: 8},
+								{id: '9', number: 9}
+							],
+							on: {
+								'onItemClick': function (id, evt, el) {
+									var idIndex;
+									if ($$('game-pad').isSelected(id)) {
+										idIndex = stateMap.selected_num.indexOf(id);
+										stateMap.selected_num.splice(idIndex, 1);
+									} else {
+										if (stateMap.selected_num.length === configMap.gen_num_count) {
+											webix.alert({
+												title: '경고',
+												ok: '확인',
+												text: '3개 이상 선택 할 수 없습니다'
+											});
+											return false;
+										}
+
+										stateMap.selected_num.push(id);
+									}
+
+									setTimeout(function () {
+										$$('game-pad').select(stateMap.selected_num);
+									}, 0);
+								}
+							}
+						}, {
+							id: 'number-submit',
+							view: 'button',
+							label: '제출'
+						}
+					]
+				}
+			]
+		};
+	};
+
+	return {
+		initModule: initModule,
+		getView: getView
+	};
+}());

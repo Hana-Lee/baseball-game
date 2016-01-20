@@ -24,6 +24,7 @@ var app = (function () {
 		app.v_main_board.initModule();
 		app.v_game_room_menu.initModule();
 		app.v_game_board.initModule();
+		app.v_game_pad.initModule();
 		app.v_game_room.initModule();
 		app.v_shell.initModule(container);
 	};

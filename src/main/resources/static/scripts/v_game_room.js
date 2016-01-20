@@ -14,9 +14,7 @@ app.v_game_room = (function () {
 	'use strict';
 
 	var configMap = {
-			gen_num_count: 3
 		}, stateMap = {
-			selected_num: []
 		}, initModule, view, getView;
 
 	getView = function () {
@@ -35,78 +33,7 @@ app.v_game_room = (function () {
 						css: 'bbg-mr-10',
 						rows: [
 							app.v_game_board.getView(),
-							{
-								template: '유저정보', height: 200, cols: [
-								{
-									width: 120, rows: [
-									//{template: '이하나님', height: 35, type: 'header'},
-									//{
-									//	template: '<img src="images/character.gif" height="100%" width="100%">',
-									//	width: 130
-									//}
-									{view: 'button', type: 'danger', height: 200, label: '준비!'}
-								]
-								},
-								{
-									id: 'game-pad-container',
-									rows: [
-										{
-											id: 'game-pad',
-											view: 'dataview',
-											css: 'game_pad',
-											type: {
-												width: 112,
-												height: 70,
-												//templateStart: '<div item_id="#id#" class="game_pad">',
-												//template: '<div class="webix_strong">#number#</div>',
-												//templateEnd: '</div>'
-												template: '<div class="overall">#number#</div>'
-											},
-											select: true,
-											multiselect: true,
-											scroll: false,
-											hover: 'game_pad_hover',
-											//xCount: 5,
-											//yCount: 2,
-											data: [
-												{id: '0', number: 0},
-												{id: '1', number: 1},
-												{id: '2', number: 2},
-												{id: '3', number: 3},
-												{id: '4', number: 4},
-												{id: '5', number: 5},
-												{id: '6', number: 6},
-												{id: '7', number: 7},
-												{id: '8', number: 8},
-												{id: '9', number: 9}
-											],
-											on: {
-												'onItemClick': function (id, evt, el) {
-													if (stateMap.selected_num.length === configMap.gen_num_count) {
-														webix.alert({
-															title: '경고',
-															ok: '확인',
-															text: '3개 이상 선택 할 수 없습니다'
-														});
-														return false;
-													} else {
-														stateMap.selected_num.push(id);
-
-														setTimeout(function () {
-															$$('game-pad').select(stateMap.selected_num);
-														}, 0);
-													}
-												}
-											}
-										}, {
-											id: 'number-submit',
-											view: 'button',
-											label: '제출'
-										}
-									]
-								}
-							]
-							}
+							app.v_game_pad.getView()
 						]
 					},
 					{
