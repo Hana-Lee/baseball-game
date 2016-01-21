@@ -27,7 +27,7 @@ app.v_user_profile = (function () {
 			id: 'user-profile-container',
 			height: 230,
 			rows: [
-				{template: '이하나님', height: 35, type: 'header'},
+				{template: '이하나님', type: 'header'},
 				{
 					cols: [
 						{template: '<img src="images/character.gif" height="100%" width="100%">', width: 130},

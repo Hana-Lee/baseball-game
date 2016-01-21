@@ -26,7 +26,7 @@ app.v_game_list = (function () {
 			view: 'dataview',
 			type: {
 				height: 128,
-				width: 228,
+				//width: 215,
 				templateStart: '<div class="custom_item">',
 				template: '<div class="webix_strong">#name#</div>#user_count#/5, 횟수: #guess_num#, 갯수: #gen_num#<div>방장: #owner#</div><button style="float: right;">입장</button>',
 				templateEnd: '</div>'

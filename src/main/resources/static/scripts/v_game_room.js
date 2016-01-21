@@ -23,18 +23,20 @@ app.v_game_room = (function () {
 
 	initModule = function () {
 		view = [
-			{template: '[1번방] 왕초보들 오세요', height: 45, type: 'header'},
+			{template: '[1번방] 왕초보들 오세요', type: 'header'},
 			app.v_game_room_menu.getView(),
 			{
 				cols: [
 					{
 						template: '게임룸 컨테이너',
 						margin: 10,
-						css: 'bbg-mr-10',
 						rows: [
 							app.v_game_board.getView(),
 							app.v_game_pad.getView()
 						]
+					},
+					{
+						width: 10
 					},
 					{
 						template: '유저 컨테이너',

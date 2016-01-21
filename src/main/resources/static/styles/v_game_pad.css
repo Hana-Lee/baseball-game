@@ -1,12 +1,18 @@
 .game_pad_container .ready_btn button {
-	font-size: 32pt;
+	font-size: 28pt;
+	text-shadow: 1px 2px 0 #444444;
+	color: #E6E6E6;
+}
+
+.game_pad .webix_scroll_cont {
+	padding-top: 10px;
+	padding-left: 7px;
 }
 
 .game_pad .webix_dataview_item, .game_pad .webix_dataview_item.webix_selected {
 	padding: 3px 2px;
 	border-color: #fff;
-	background-image: none;
-	background-color: #fff;
+	background: #fff none;
 }
 
 .game_pad .webix_dataview_item.webix_selected .overall {
@@ -25,15 +31,18 @@
 	-moz-border-radius: 8px;
 	height: 44px;
 	padding: 10px;
-	color: #303030;
-	text-shadow: 0 1px 0 #FFFFFF;
+	color: #5d5d5d;
+	text-shadow: 1px 2px 0 #c1c1c1;
 	background-color: #e1e4ea;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #edeff4), color-stop(1, #e1e4ea));
 	background: -o-linear-gradient(top, #edeff4 0%, #e1e4ea 100%);
 	background: -ms-linear-gradient(top, #edeff4 0%, #e1e4ea 100%);
 	background: -moz-linear-gradient(top, #edeff4 0%, #e1e4ea 100%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #edeff4), color-stop(1, #e1e4ea));
-	box-shadow: 0 1px 1px #d4d7de;
+	box-shadow: 1px 3px 1px #d4d7de;
+	font-size: 40px;
+	text-align: center;
+	line-height: 44px;
 }
 
 .game_pad .webix_dataview_item .overall:hover {

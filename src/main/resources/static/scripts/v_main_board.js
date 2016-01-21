@@ -21,18 +21,20 @@ app.v_main_board = (function () {
 
 	initModule = function () {
 		view = [
-			{template: '야구게임 v0.1', height: 45, type: 'header'},
+			{template: '야구게임 v0.1', type: 'header'},
 			app.v_main_menu.getView(),
 			{
 				cols: [
 					{
 						template: '게임룸 컨테이너',
 						margin: 10,
-						css: 'bbg-mr-10',
 						rows: [
 							app.v_game_list.getView(),
 							app.v_main_chat.getView()
 						]
+					},
+					{
+						width: 10
 					},
 					{
 						template: '유저 컨테이너',
