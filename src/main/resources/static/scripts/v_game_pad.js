@@ -16,6 +16,7 @@ app.v_game_pad = (function () {
 	var configMap = {
 			gen_num_count: 3
 		}, stateMap = {
+			isReady: false,
 			selected_num: []
 		}, view,
 		initModule, getView;
@@ -26,14 +27,25 @@ app.v_game_pad = (function () {
 
 	initModule = function () {
 		view = {
-			template: '유저정보', height: 200, cols: [
+			id: 'game-pad-container', css: 'game_pad_container', height: 200, cols: [
 				{
-					width: 120, rows: [
-					{view: 'button', type: 'danger', height: 200, label: '준비!'}
-				]
+					width: 120,
+					rows: [
+						{
+							view: 'button',
+							type: 'danger',
+							height: 200,
+							label: '준비!!',
+							css: 'ready_btn',
+							on: {
+								onItemClick: function () {
+									stateMap.isReady = true;
+								}
+							}
+						}
+					]
 				},
 				{
-					id: 'game-pad-container',
 					rows: [
 						{
 							id: 'game-pad',
@@ -47,7 +59,7 @@ app.v_game_pad = (function () {
 								//templateEnd: '</div>'
 								template: '<div class="overall">#number#</div>'
 							},
-							select: true,
+							select: false,
 							multiselect: true,
 							scroll: false,
 							data: [
@@ -63,33 +75,47 @@ app.v_game_pad = (function () {
 								{id: '9', number: 9}
 							],
 							on: {
-								'onItemClick': function (id, evt, el) {
+								'onItemClick': function (id/*, evt, el*/) {
 									var idIndex;
-									if ($$('game-pad').isSelected(id)) {
-										idIndex = stateMap.selected_num.indexOf(id);
-										stateMap.selected_num.splice(idIndex, 1);
-									} else {
-										if (stateMap.selected_num.length === configMap.gen_num_count) {
-											webix.alert({
-												title: '경고',
-												ok: '확인',
-												text: '3개 이상 선택 할 수 없습니다'
-											});
-											return false;
+									if (stateMap.isReady) {
+										if ($$('game-pad').isSelected(id)) {
+											idIndex = stateMap.selected_num.indexOf(id);
+											stateMap.selected_num.splice(idIndex, 1);
+										} else {
+											if (stateMap.selected_num.length === configMap.gen_num_count) {
+												webix.alert({
+													title: '경고',
+													ok: '확인',
+													text: configMap.gen_num_count + '개 이상 선택 할 수 없습니다'
+												});
+												return false;
+											}
+
+											stateMap.selected_num.push(id);
 										}
 
-										stateMap.selected_num.push(id);
-									}
+										setTimeout(function () {
+											$$('game-pad').select(stateMap.selected_num);
+										}, 0);
 
-									setTimeout(function () {
-										$$('game-pad').select(stateMap.selected_num);
-									}, 0);
+										if (stateMap.selected_num.length === configMap.gen_num_count) {
+											$$('number-submit').enable();
+										}
+									}
 								}
 							}
 						}, {
 							id: 'number-submit',
 							view: 'button',
-							label: '제출'
+							label: '제출',
+							disabled: true,
+							on: {
+								onItemClick: function (/*id, evt*/) {
+									stateMap.selected_num = [];
+									$$('game-pad').unselectAll();
+									this.disable();
+								}
+							}
 						}
 					]
 				}

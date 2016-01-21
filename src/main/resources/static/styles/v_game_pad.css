@@ -1,3 +1,7 @@
+.game_pad_container .ready_btn button {
+	font-size: 32pt;
+}
+
 .game_pad .webix_dataview_item, .game_pad .webix_dataview_item.webix_selected {
 	padding: 3px 2px;
 	border-color: #fff;
