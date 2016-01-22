@@ -134,7 +134,6 @@ app.v_game_pad = (function () {
 				}
 			]
 		};
-		//webix.extend($$('game-pad-container'), webix.ProgressBar);
 	};
 
 	return {
