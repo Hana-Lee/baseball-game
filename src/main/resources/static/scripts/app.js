@@ -16,6 +16,7 @@ var app = (function () {
 
 	initModule = function(container) {
 		app.v_login.initModule();
+		app.v_theme_selector.initModule();
 		app.v_main_chat.initModule();
 		app.v_user_profile.initModule();
 		app.v_main_menu.initModule();

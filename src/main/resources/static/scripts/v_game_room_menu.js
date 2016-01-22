@@ -27,7 +27,11 @@ app.v_game_room_menu = (function () {
 		view = {
 			id: 'main-menu', height: configMap.height, cols: [
 				{id: 'exit-room', view: 'button', label: '방나가기', type: 'danger', width: configMap.button_width},
-				{id: 'room-setting', view: 'button', label: '설정', width: configMap.button_width}
+				{id: 'room-setting', view: 'button', label: '설정', width: configMap.button_width},
+				{
+					width: 409
+				},
+				app.v_theme_selector.getView()
 			]
 		};
 	};

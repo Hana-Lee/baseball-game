@@ -27,7 +27,11 @@ app.v_main_menu = (function () {
 		view = {
 			id: 'main-menu', height: configMap.height, cols: [
 				{id: 'make-room', view: 'button', label: '방만들기', type: 'danger', width: configMap.button_width},
-				{id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width}
+				{id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width},
+				{
+					width: 409
+				},
+				app.v_theme_selector.getView()
 			]
 		};
 	};

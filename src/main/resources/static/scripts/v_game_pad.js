@@ -34,7 +34,7 @@ app.v_game_pad = (function () {
 						{
 							view: 'button',
 							type: 'danger',
-							height: 200,
+							height: 160,
 							label: '준비!!',
 							css: 'ready_btn',
 							on: {
