@@ -19,10 +19,19 @@ app.v_game_pad = (function () {
 			isReady: false,
 			selected_num: []
 		}, view,
-		initModule, getView;
+		initModule, getView, showProgressBar;
 
 	getView = function () {
 		return view;
+	};
+
+	showProgressBar = function () {
+		$$('game-pad').showProgress({
+			type: 'top',
+			delay: 25000,
+			hide: false,
+			position: 0
+		});
 	};
 
 	initModule = function () {
@@ -34,12 +43,13 @@ app.v_game_pad = (function () {
 						{
 							view: 'button',
 							type: 'danger',
-							height: 160,
+							height: 200,
 							label: '준비!!',
 							css: 'ready_btn',
 							on: {
 								onItemClick: function () {
 									stateMap.isReady = true;
+									showProgressBar();
 								}
 							}
 						}
@@ -74,6 +84,9 @@ app.v_game_pad = (function () {
 								{id: '8', number: 8},
 								{id: '9', number: 9}
 							],
+							ready: function() {
+								webix.extend(this, webix.ProgressBar);
+							},
 							on: {
 								'onItemClick': function (id/*, evt, el*/) {
 									var idIndex;
@@ -121,6 +134,7 @@ app.v_game_pad = (function () {
 				}
 			]
 		};
+		//webix.extend($$('game-pad-container'), webix.ProgressBar);
 	};
 
 	return {

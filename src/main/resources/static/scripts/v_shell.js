@@ -29,14 +29,6 @@ app.v_shell = (function () {
 			//rows: app.v_main_board.getView()
 			rows: app.v_game_room.getView()
 		});
-
-		webix.UIManager.setFocus($$("message"));
-
-		$$('chat').attachEvent('onAfterAdd', function (id) {
-			webix.delay(function () {
-				this.showItem(id);
-			}, this);
-		});
 	};
 
 	return {

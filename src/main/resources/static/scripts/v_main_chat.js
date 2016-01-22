@@ -74,11 +74,25 @@ app.v_main_chat = (function () {
 					view: 'list', id: 'chat', gravity: 3,
 					//url: 'faye->/data', save: 'faye->/data',
 					type: {height: 'auto'},
+					ready: function() {
+						this.attachEvent('onAfterAdd', function (id) {
+							webix.delay(function () {
+								this.showItem(id);
+							}, this);
+						});
+					},
 					template: chat_template
 				},
 				{
 					cols: [
-						{view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3},
+						{
+							view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3,
+							on: {
+								onAfterRender: function() {
+									webix.UIManager.setFocus(this);
+								}
+							}
+						},
 						{view: 'button', value: 'Send', click: send_message, hotkey: 'enter'}
 					]
 				}

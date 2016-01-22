@@ -4,8 +4,17 @@
 	color: #E6E6E6;
 }
 
+.game_pad .webix_progress_bottom, .game_pad .webix_progress_top {
+	height: 16px;
+}
+
+.game_pad .webix_progress_bottom .webix_progress_state, .game_pad .webix_progress_top .webix_progress_state {
+	background: #85ff63;
+	height: 16px;
+}
+
 .game_pad .webix_scroll_cont {
-	padding-top: 10px;
+	padding-top: 15px;
 	padding-left: 7px;
 }
 
