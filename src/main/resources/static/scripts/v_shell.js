@@ -26,8 +26,8 @@ app.v_shell = (function () {
 			css: 'main-layout',
 			height: configMap.height,
 			width: configMap.width,
-			//rows: app.v_main_board.getView()
-			rows: app.v_game_room.getView()
+			rows: app.v_main_board.getView()
+			//rows: app.v_game_room.getView()
 		});
 	};
 

@@ -68,6 +68,7 @@ app.v_main_chat = (function () {
 
 		view = {
 			id: 'main-chat',
+			height: 240,
 			rows: [
 				//{template: 'Webix Based Chat', type: 'header'},
 				{

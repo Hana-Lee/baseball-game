@@ -30,6 +30,7 @@ app.v_main_board = (function () {
 						margin: 10,
 						rows: [
 							app.v_game_list.getView(),
+							{view: 'resizer'},
 							app.v_main_chat.getView()
 						]
 					},
