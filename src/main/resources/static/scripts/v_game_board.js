@@ -28,8 +28,13 @@ app.v_game_board = (function () {
 					id: 'left-user-container', width: 220, rows: [{
 					rows: [{template: '유저1', type: 'header'}, {template: '유저1 정보'}]
 				}, {
+					height: 5
+				}, {
 					rows: [{template: '유저2', type: 'header'}, {template: '유저2 정보'}]
 				}]
+				},
+				{
+					width: 5
 				},
 				{
 					id: 'game-progress-container',
@@ -44,14 +49,26 @@ app.v_game_board = (function () {
 							{message: '숫자를 입력해주세요...'},
 							{message: '1S 0B'},
 							{message: '다른유저의 입력을 기다립니다'}
-						]
+						],
+						ready: function() {
+							this.attachEvent('onAfterAdd', function (id) {
+								webix.delay(function () {
+									this.showItem(id);
+								}, this);
+							});
+						}
 					}]
 				},
 				{
+					width: 5
+				},
+				{
 					id: 'right-user-container', width: 220, rows: [{
-					rows: [{template: '유저2', type: 'header'}, {template: '유저2 정보'}]
+					rows: [{template: '유저3', type: 'header'}, {template: '유저3 정보'}]
 				}, {
-					rows: [{template: '유저2', type: 'header'}, {template: '유저2 정보'}]
+					height: 5
+				}, {
+					rows: [{template: '유저4', type: 'header'}, {template: '유저4 정보'}]
 				}]
 				}
 			]
