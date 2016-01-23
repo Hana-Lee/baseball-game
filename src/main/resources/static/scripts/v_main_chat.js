@@ -21,19 +21,6 @@ app.v_main_chat = (function () {
 	};
 
 	initModule = function () {
-		//view = {
-		//	id: 'main-chat',
-		//	view: 'form',
-		//	type: {
-		//		margin: 0,
-		//		padding: 0
-		//	},
-		//	height: 200, elements: [
-		//		{view: 'textarea', readonly: true},
-		//		{view: 'text', placeholder: '내용을 입력해주세요'}
-		//	]
-		//};
-
 		webix.proxy.faye.client = new Faye.Client('//localhost:8000/');
 		webix.proxy.faye.clientId = webix.uid();
 
@@ -75,12 +62,12 @@ app.v_main_chat = (function () {
 					view: 'list', id: 'chat', gravity: 3,
 					//url: 'faye->/data', save: 'faye->/data',
 					type: {height: 'auto'},
-					ready: function() {
-						this.attachEvent('onAfterAdd', function (id) {
+					on: {
+						onAfterAdd: function(id) {
 							webix.delay(function () {
 								this.showItem(id);
 							}, this);
-						});
+						}
 					},
 					template: chat_template
 				},
@@ -99,25 +86,6 @@ app.v_main_chat = (function () {
 				}
 			]
 		};
-
-		//webix.dp($$('chat')).ignore(function () {
-		//	$$('chat').add({
-		//		user: 'System', value: 'Welcome to chat :)'
-		//	});
-		//	$$('chat').add({
-		//		user: 'System', value: 'Uset '/nick Name' to set a name'
-		//	});
-		//});
-
-		//$$('chat').attachEvent('onAfterAdd', function (id) {
-		//	webix.delay(function () {
-		//		this.showItem(id);
-		//	}, this);
-		//});
-
-
-		//webix.UIManager.addHotKey('Enter', send_message, $$('message'));
-		//webix.UIManager.setFocus($$('message'));
 	};
 
 	return {

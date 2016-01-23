@@ -8,65 +8,82 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, app, webix */
+/*global $, app, webix, $$ */
 
-app.v_login = (function () {
+var app = (function () {
 	'use strict';
 
 	var configMap = {
-			height: 400,
 			width: 300
 		},
 		stateMap = {
 			loginCompleted: false,
 			logoutCompleted: true
 		},
-		initModule, show,
-		loginWindow;
+		initModule, view;
 
-	show = function () {
-		if (stateMap.loginCompleted) {
-			alert('이미 로그인을 하였습니다');
-		} else {
-			loginWindow.show();
-		}
-	};
-
-	initModule = function () {
-		loginWindow = webix.ui({
-			id: 'login-window',
-			width: configMap.width,
-			height: configMap.height,
-			position: 'center',
-			head: '로그인',
-			view: 'window',
-			modal: true,
-			body: {
+	initModule = function (container) {
+		view = webix.ui({
+			id: 'login-container',
+			type: 'space',
+			css: 'login_container',
+			container: container,
+			borderless: true,
+			rows: [{
 				id: 'login-form',
 				view: 'form',
+				width: configMap.width,
+				hidden: false,
+				scroll: false,
 				elements: [
-					{view: 'text', label: 'Username'},
-					{view: 'text', type: 'password', label: 'Password'},
 					{
-						margin: 5, cols: [
-						{view: 'button', value: '로그인', type: 'form'},
-						{view: 'button', value: '가입', type: 'form'},
-						{
-							view: 'button', value: '닫기', on: {
-							onItemClick: function () {
-								loginWindow.hide();
+						id: 'email', view: 'text', type: 'email', label: '이메일', name: 'email', required: true,
+						on: {
+							onAfterRender: function () {
+								this.focus();
 							}
 						}
-						}
-					]
+					},
+					{
+						id: 'password', view: 'text', type: 'password', label: '비밀번호', name: 'password', required: true
+					},
+					{
+						margin: 5,
+						cols: [
+							{
+								view: 'button', value: '로그인', type: 'form',
+								click: function () {
+									$$('login-form').validate();
+								}
+							},
+							{view: 'button', value: '가입'}
+						]
 					}
-				]
-			}
+				],
+				rules: {
+					$obj: function (data) {
+						var emailKey = 'email', passwordKey = 'password', message;
+						if (!webix.rules.isNotEmpty(data[emailKey])) {
+							message = '이메일 주소가 비어있습니다';
+						} else if (!webix.rules.isEmail(data[emailKey])) {
+							message = '이메일 주소가 잘못 입력되었습니다';
+						} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
+							message = '패스워드가 비어있습니다';
+						}
+
+						if (message) {
+							webix.message(message);
+							return false;
+						}
+						return true;
+					}
+				}
+			}]
 		});
 	};
 
 	return {
 		initModule: initModule,
-		show: show
+		view: view
 	};
 }());

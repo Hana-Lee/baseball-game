@@ -4,10 +4,21 @@
 	<meta charset="UTF-8">
 	<title>Baseball Game</title>
 
-	<link rel="stylesheet" href="http://cdn.webix.com/edge/webix.css">
-	<script src="http://cdn.webix.com/edge/webix_debug.js"></script>
+	<link rel="stylesheet" href="bower_components/webix/codebase/skins/aircompact.css">
+
+	<link rel="stylesheet" href="styles/v_login.css">
+
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/webix/codebase/webix_debug.js"></script>
+
+	<script src="scripts/v_login.js"></script>
+	<script>
+		webix.ready(function () {
+			app.initModule('main-container');
+		});
+	</script>
 </head>
 <body>
-
+	<div id="main-container"></div>
 </body>
 </html>
