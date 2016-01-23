@@ -16,7 +16,19 @@ app.v_shell = (function () {
 	var configMap = {
 		width: 1024,
 		height: 750
-	}, initModule;
+	}, initModule, showGameRoom, showMainBoard;
+
+	showGameRoom = function(roomId) {
+		var mainLayout = $$('main-layout');
+		mainLayout.removeView('main-board');
+		mainLayout.addView(app.v_game_room.getView());
+	};
+
+	showMainBoard = function() {
+		var mainLayout = $$('main-layout');
+		mainLayout.removeView('game-room');
+		mainLayout.addView(app.v_main_board.getView());
+	};
 
 	initModule = function (container) {
 		webix.ui({
@@ -26,12 +38,15 @@ app.v_shell = (function () {
 			css: 'main-layout',
 			height: configMap.height,
 			width: configMap.width,
-			rows: app.v_main_board.getView()
-			//rows: app.v_game_room.getView()
+			rows: [
+				app.v_main_board.getView()
+			]
 		});
 	};
 
 	return {
-		initModule: initModule
+		initModule: initModule,
+		showGameRoom: showGameRoom,
+		showMainBoard: showMainBoard
 	};
 }());

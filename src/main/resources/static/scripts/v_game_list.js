@@ -24,11 +24,12 @@ app.v_game_list = (function () {
 		view = {
 			id: 'game-room-list',
 			view: 'dataview',
+			select: true,
 			type: {
 				height: 128,
 				//width: 215,
 				templateStart: '<div class="custom_item">',
-				template: '<div class="webix_strong">#name#</div>#user_count#/5, 횟수: #guess_num#, 갯수: #gen_num#<div>방장: #owner#</div><button style="float: right;">입장</button>',
+				template: '<div class="webix_strong">#name#</div>#user_count#/5, 횟수: #guess_num#, 갯수: #gen_num#<div>방장: #owner#</div><button class="join-room" data-room-id="#id#" style="float: right;">입장</button>',
 				templateEnd: '</div>'
 			},
 			data: [
@@ -42,7 +43,14 @@ app.v_game_list = (function () {
 				{id: 8, name: '게임룸8', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나8'},
 				{id: 9, name: '게임룸9', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나9'},
 				{id: 10, name: '게임룸10', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나10'}
-			]
+			],
+			ready: function() {
+				$('.join-room').click(function (evt) {
+					var target = evt.target, roomId;
+					roomId = target.getAttribute('data-room-id');
+					app.v_shell.showGameRoom(roomId);
+				});
+			}
 		};
 	};
 
