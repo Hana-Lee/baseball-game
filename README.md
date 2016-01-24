@@ -1,5 +1,5 @@
 # 야구 게임 [![Build Status](https://travis-ci.org/Hana-Lee/baseball-game.svg?branch=master)](https://travis-ci.org/Hana-Lee/baseball-game)
-자바를 공부하며 만들어 보는 야구 게임
+자바를 공부하며 만들어 보는 야구 게임 서버 및 클라이언트
 
 ## 야구게임 설계
 
