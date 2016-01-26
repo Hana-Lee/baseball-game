@@ -2,6 +2,13 @@
  * @author Hana Lee
  * @since 2016-01-17 19:35
  */
+#main-container {
+	background-image: url('../images/baseball_game_main_logo.png');
+	width: 100%;
+	height: 100%;
+	position: absolute;
+}
+
 .webix_view, .webix_el_box .webixtype_form {
 	font-family: 'PT Sans', Tahoma, 'Nanum Gothic', 'Malgun Gothic', serif;
 }

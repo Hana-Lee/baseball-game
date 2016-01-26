@@ -10,7 +10,7 @@
  */
 /*global $, app, webix, $$ */
 
-var app = (function () {
+app.v_login = (function () {
 	'use strict';
 
 	var configMap = {
@@ -20,10 +20,10 @@ var app = (function () {
 			loginCompleted: false,
 			logoutCompleted: true
 		},
-		initModule, view;
+		initModule;
 
 	initModule = function (container) {
-		view = webix.ui({
+		webix.ui({
 			id: 'login-container',
 			type: 'space',
 			css: 'login_container',
@@ -56,7 +56,12 @@ var app = (function () {
 									$$('login-form').validate();
 								}
 							},
-							{view: 'button', value: '가입'}
+							{
+								view: 'button', value: '가입',
+								click: function() {
+									app.v_shell.showSignUp('main-container');
+								}
+							}
 						]
 					}
 				],
@@ -83,7 +88,6 @@ var app = (function () {
 	};
 
 	return {
-		initModule: initModule,
-		view: view
+		initModule: initModule
 	};
 }());

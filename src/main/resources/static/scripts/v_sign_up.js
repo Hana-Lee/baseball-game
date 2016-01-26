@@ -15,18 +15,13 @@ app.v_sign_up = (function () {
 
 	var configMap = {
 			width: 400
-		}, getView, initModule,
-		view;
-
-	getView = function () {
-		return view;
-	};
+		}, initModule;
 
 	initModule = function (container) {
-		view = webix.ui({
-			id: 'login-container',
+		webix.ui({
+			id: 'sign-up-container',
 			type: 'space',
-			css: 'login_container',
+			css: 'sign_up_container',
 			container: container,
 			borderless: true,
 			rows: [{
@@ -105,7 +100,6 @@ app.v_sign_up = (function () {
 	};
 
 	return {
-		initModule: initModule,
-		getView: getView
+		initModule: initModule
 	};
 }());
