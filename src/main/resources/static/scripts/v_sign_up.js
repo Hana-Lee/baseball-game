@@ -10,12 +10,12 @@
  */
 /*global $, app, webix, $$ */
 
-app.v_sign_up = (function () {
+app.v_sign_up = function () {
 	'use strict';
 
 	var configMap = {
-			width: 400
-		}, initModule;
+		width: 400
+	}, initModule;
 
 	initModule = function (container) {
 		webix.ui({
@@ -25,6 +25,9 @@ app.v_sign_up = (function () {
 			container: container,
 			borderless: true,
 			rows: [{
+				type: 'header',
+				template: '회원가입'
+			}, {
 				id: 'sign-up-form',
 				view: 'form',
 				width: configMap.width,
@@ -34,40 +37,100 @@ app.v_sign_up = (function () {
 					{
 						cols: [
 							{
-								width: 130,
 								rows: [
 									{
-										id: 'avatar', view: 'uploader', label: '아바타사진 등록', name: 'avatar', required: false,
-										accept: 'image/png, image/gif, image/jpg', link: 'avatar-list'
+										id: 'avatar',
+										view: 'uploader',
+										label: '아바타사진 등록',
+										name: 'avatar',
+										required: false,
+										accept: 'image/png, image/gif, image/jpg',
+										link: 'avatar-preview',
+										click: function (id, evt) {
+											evt.preventDefault();
+
+											webix.alert({
+												title: '정보',
+												ok: '확인',
+												text: '아바타 설정은 준비중입니다'
+											});
+										}
 									},
-									{ id:'avatar-list', height: 200, view:'list', scroll:false, type:'uploader' }
+									{
+										id: 'avatar-preview',
+										template: '<img src="images/character.gif" height="100%" width="100%">',
+										width: 130,
+										height: 173
+									}
 								]
-							},{
+							},
+							{
+								width: 10
+							},
+							{
 								rows: [
+									{
+										height: 25
+									},
 									{
 										id: 'nickname', view: 'text', label: '닉네임', name: 'nickname', required: true,
 										on: {
-											onAfterRender: function() {
-												this.focus();
+											onAfterRender: function () {
+												$$('nickname').focus();
 											}
 										}
 									},
 									{
-										id: 'email', view: 'text', type: 'email', label: '이메일', name: 'email', required: true
+										height: 10
 									},
 									{
-										id: 'password', view: 'text', type: 'password', label: '비밀번호', name: 'password', required: true
+										id: 'email',
+										view: 'text',
+										type: 'email',
+										label: '이메일',
+										name: 'email',
+										required: true
 									},
 									{
-										id: 'sec-password', view: 'text', type: 'password', label: '비밀번호 확인', name: 'sec-password', required: true
+										height: 10
+									},
+									{
+										id: 'password',
+										view: 'text',
+										type: 'password',
+										label: '비번',
+										name: 'password',
+										required: true
+									},
+									{
+										height: 10
+									},
+									{
+										id: 'sec-password',
+										view: 'text',
+										type: 'password',
+										label: '비번 확인',
+										name: 'sec-password',
+										required: true
+									},
+									{
+										height: 10
 									},
 									{
 										margin: 5,
 										cols: [
 											{
-												view: 'button', value: '가입', type: 'form',
+												view: 'button', value: '가입', type: 'form', hotkey: 'enter',
 												click: function () {
-													$$('sign-up-form').validate();
+													var result = $$('sign-up-form').validate();
+
+													if (result) {
+														webix.alert({
+															title: '정보',
+															ok: '확인',
+															text: '가입이 완료 되었습니다'
+														});
+													}
 												}
 											}
 										]
@@ -79,13 +142,19 @@ app.v_sign_up = (function () {
 				],
 				rules: {
 					$obj: function (data) {
-						var emailKey = 'email', passwordKey = 'password', message;
-						if (!webix.rules.isNotEmpty(data[emailKey])) {
+						var nicknameKey = 'nickname', emailKey = 'email',
+							passwordKey = 'password', secPasswordKey = 'sec-password', message;
+
+						if (!webix.rules.isNotEmpty(data[nicknameKey])) {
+							message = '닉네임이 비어있습니다';
+						} else if (!webix.rules.isNotEmpty(data[emailKey])) {
 							message = '이메일 주소가 비어있습니다';
 						} else if (!webix.rules.isEmail(data[emailKey])) {
 							message = '이메일 주소가 잘못 입력되었습니다';
 						} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
 							message = '패스워드가 비어있습니다';
+						} else if (data[passwordKey] !== data[secPasswordKey]) {
+							message = '패스워드가 다릅니다<br/>다시 확인해주세요';
 						}
 
 						if (message) {
@@ -102,4 +171,4 @@ app.v_sign_up = (function () {
 	return {
 		initModule: initModule
 	};
-}());
+}();

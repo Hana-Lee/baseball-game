@@ -2,6 +2,10 @@
  * @author Hana Lee
  * @since 2016-01-17 19:35
  */
+body {
+	background: #D8E5C4;
+}
+
 #main-container {
 	background-image: url('../images/baseball_game_main_logo.png');
 	width: 100%;

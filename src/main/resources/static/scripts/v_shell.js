@@ -51,7 +51,8 @@ app.v_shell = (function () {
 				]
 			});
 		} else {
-			app.v_login.initModule(container);
+			app.v_sign_up.initModule(container);
+			//app.v_login.initModule(container);
 		}
 	};
 

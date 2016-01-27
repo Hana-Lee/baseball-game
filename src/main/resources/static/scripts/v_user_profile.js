@@ -25,7 +25,7 @@ app.v_user_profile = (function () {
 	initModule = function () {
 		view = {
 			id: 'user-profile-container',
-			height: 230,
+			height: 200,
 			rows: [
 				{template: '이하나님', type: 'header'},
 				{
