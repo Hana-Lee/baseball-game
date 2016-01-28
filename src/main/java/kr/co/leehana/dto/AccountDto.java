@@ -1,0 +1,58 @@
+package kr.co.leehana.dto;
+
+import kr.co.leehana.model.Level;
+import kr.co.leehana.model.MatchRecord;
+import kr.co.leehana.model.Rank;
+import lombok.Data;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Size;
+import java.util.Date;
+
+/**
+ * @author Hana Lee
+ * @since 2016-01-28 17:13
+ */
+public class AccountDto {
+
+	@Data
+	public static class Create {
+		@NotBlank
+		@Email
+		private String email;
+
+		@NotBlank
+		@Size(min = 2, max = 20)
+		private String nickname;
+
+		@NotBlank
+		@Size(min = 4, max = 41)
+		private String password;
+	}
+
+	@Data
+	public static class Response {
+		private Long id;
+		private String nickname;
+		private String email;
+		private Level level;
+		private Rank totalRank;
+		private MatchRecord matchRecord;
+		private Date joined;
+		private Date updated;
+	}
+
+	@Data
+	public static class Update {
+		private String password;
+		private String nickname;
+	}
+
+	@Data
+	public static class UpdateStatus {
+		private Level level;
+		private Rank totalRank;
+		private MatchRecord matchRecord;
+	}
+}

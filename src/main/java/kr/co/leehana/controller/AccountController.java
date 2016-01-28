@@ -1,0 +1,63 @@
+package kr.co.leehana.controller;
+
+import kr.co.leehana.dto.AccountDto;
+import kr.co.leehana.exception.ErrorResponse;
+import kr.co.leehana.model.Account;
+import kr.co.leehana.repository.AccountRepository;
+import kr.co.leehana.service.AccountService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author Hana Lee
+ * @since 2016-01-14 22-39
+ */
+@RestController
+public class AccountController {
+
+	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private AccountRepository accountRepository;
+
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@RequestMapping(value = {"/accounts"}, method = {RequestMethod.POST})
+	public ResponseEntity create(@RequestBody @Valid AccountDto.Create createDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setMessage(bindingResult.getFieldError().getDefaultMessage());
+			errorResponse.setErrorCode("bad.request");
+			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+		}
+
+		Account newAccount = accountService.create(createDto);
+		return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
+	}
+
+	@RequestMapping(value = {"/accounts"}, method = {RequestMethod.GET})
+	@ResponseStatus(code = HttpStatus.OK)
+	public PageImpl<AccountDto.Response> getAccounts(Pageable pageable) {
+		Page<Account> pages = accountRepository.findAll(pageable);
+		List<AccountDto.Response> content = pages.getContent().parallelStream().map(account -> modelMapper.map
+				(account, AccountDto.Response.class)).collect(Collectors.toList());
+		return new PageImpl<>(content, pageable, pages.getTotalElements());
+	}
+}
