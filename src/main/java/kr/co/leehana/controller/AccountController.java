@@ -2,6 +2,7 @@ package kr.co.leehana.controller;
 
 import kr.co.leehana.dto.AccountDto;
 import kr.co.leehana.exception.ErrorResponse;
+import kr.co.leehana.exception.UserDuplicatedException;
 import kr.co.leehana.model.Account;
 import kr.co.leehana.repository.AccountRepository;
 import kr.co.leehana.service.AccountService;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -59,5 +61,14 @@ public class AccountController {
 		List<AccountDto.Response> content = pages.getContent().parallelStream().map(account -> modelMapper.map
 				(account, AccountDto.Response.class)).collect(Collectors.toList());
 		return new PageImpl<>(content, pageable, pages.getTotalElements());
+	}
+
+	@ExceptionHandler(UserDuplicatedException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleUserDuplicatedException(UserDuplicatedException ex) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 e-mail 입니다.");
+		errorResponse.setErrorCode("duplicated.email.exception");
+		return errorResponse;
 	}
 }
