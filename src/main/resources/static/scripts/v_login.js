@@ -29,61 +29,72 @@ app.v_login = (function () {
 			css: 'login_container',
 			container: container,
 			borderless: true,
-			rows: [{
-				id: 'login-form',
-				view: 'form',
-				width: configMap.width,
-				hidden: false,
-				scroll: false,
-				elements: [
-					{
-						id: 'email', view: 'text', type: 'email', label: '이메일', name: 'email', required: true,
-						on: {
-							onAfterRender: function () {
-								this.focus();
-							}
-						}
-					},
-					{
-						id: 'password', view: 'text', type: 'password', label: '비밀번호', name: 'password', required: true
-					},
-					{
-						margin: 5,
-						cols: [
-							{
-								view: 'button', value: '로그인', type: 'form',
-								click: function () {
-									$$('login-form').validate();
-								}
-							},
-							{
-								view: 'button', value: '가입',
-								click: function() {
-									app.v_shell.showSignUp('main-container');
+			rows: [
+				{
+					type: 'header',
+					template: '로그인'
+				},
+				{
+					id: 'login-form',
+					view: 'form',
+					width: configMap.width,
+					hidden: false,
+					scroll: false,
+					elements: [
+						{
+							id: 'email', view: 'text', type: 'email', label: '이메일', name: 'email', required: true,
+							on: {
+								onAfterRender: function () {
+									this.focus();
 								}
 							}
-						]
-					}
-				],
-				rules: {
-					$obj: function (data) {
-						var emailKey = 'email', passwordKey = 'password', message;
-						if (!webix.rules.isNotEmpty(data[emailKey])) {
-							message = '이메일 주소가 비어있습니다';
-						} else if (!webix.rules.isEmail(data[emailKey])) {
-							message = '이메일 주소가 잘못 입력되었습니다';
-						} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
-							message = '패스워드가 비어있습니다';
+						},
+						{
+							id: 'password',
+							view: 'text',
+							type: 'password',
+							label: '비밀번호',
+							name: 'password',
+							required: true
+						},
+						{
+							margin: 5,
+							cols: [
+								{
+									view: 'button', value: '로그인', type: 'form',
+									click: function () {
+										$$('login-form').validate();
+									}
+								},
+								{
+									view: 'button', value: '가입',
+									click: function () {
+										app.v_shell.showSignUp('main-container');
+									}
+								}
+							]
 						}
+					],
+					rules: {
+						$obj: function (data) {
+							var emailKey = 'email', passwordKey = 'password', message;
+							if (!webix.rules.isNotEmpty(data[emailKey])) {
+								message = '이메일 주소가 비어있습니다';
+							} else if (!webix.rules.isEmail(data[emailKey])) {
+								message = '이메일 주소가 잘못 입력되었습니다';
+							} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
+								message = '패스워드가 비어있습니다';
+							}
 
-						if (message) {
-							webix.message(message);
-							return false;
+							if (message) {
+								webix.message(message);
+								return false;
+							}
+							return true;
 						}
-						return true;
 					}
 				}
-			}]
+			]
 		});
 	};
 
