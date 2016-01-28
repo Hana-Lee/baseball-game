@@ -1,5 +1,5 @@
 CREATE TABLE result (
-  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  email      INTEGER PRIMARY KEY AUTOINCREMENT,
   name    TEXT    NOT NULL,
   score   INTEGER NOT NULL,
   solved  char(1) NOT NULL,

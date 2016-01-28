@@ -133,7 +133,7 @@ public class ServerBackground {
 								final String gameRoomName = clientSendValues[0];
 								final String userId = clientSendValues[2];
 								final User ownerUser = clients.entrySet().stream().filter(entry -> entry.getKey()
-										.getId().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
+										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
 										.get(0);
 								final GameRoom newGameRoom = GameRoomMaker.make(gameRoomList, gameRoomName, ownerUser);
 								gameRoomList.add(newGameRoom);
@@ -148,14 +148,14 @@ public class ServerBackground {
 								final String userId = clientSendValues[2];
 								final String role = clientSendValues[4];
 								final User joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
-										.getId().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
+										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
 										.get(0);
 								joinedUser.setRole(new Role(RoleType.valueOf(role)));
 								GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
 
 								ErrorMessage errorMessage = new ErrorMessage();
-								if (gameRoom.getUsers().stream().filter(u -> u.getId().equals(joinedUser.getId()))
+								if (gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(joinedUser.getEmail()))
 										.count() > 0) {
 									errorMessage.setMessage(ErrorType.ALREADY_JOIN.getMessage());
 								} else {
@@ -177,7 +177,7 @@ public class ServerBackground {
 										(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[2];
-								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
+								final User user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
 										.findFirst().get();
 
 								resetUser(user);
@@ -217,7 +217,7 @@ public class ServerBackground {
 										(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[4];
-								final User user = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId))
+								final User user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
 										.findFirst().get();
 								user.setGuessNum(clientSendValues[0]);
 
@@ -328,8 +328,8 @@ public class ServerBackground {
 								User newUser = new User(value, null, new Score());
 								ErrorMessage errorMessage = new ErrorMessage();
 
-								if (clients.entrySet().stream().filter(entry -> entry.getKey().getId().equals(newUser
-										.getId())).count() > 0) {
+								if (clients.entrySet().stream().filter(entry -> entry.getKey().getEmail().equals(newUser
+										.getEmail())).count() > 0) {
 									errorMessage.setMessage(ErrorType.DUPLICATE_USER_ID.getMessage());
 								} else {
 									clients.put(newUser, dataOutputStream);
@@ -343,7 +343,7 @@ public class ServerBackground {
 						case LOGOUT:
 							if (value != null) {
 								final String userId = value;
-								User leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getId()
+								User leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getEmail()
 										.equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
 								clients.remove(leaveUser);
 								bgMessageClients.remove(leaveUser);
@@ -402,7 +402,7 @@ public class ServerBackground {
 								final String userId = clientSendValues[2];
 								final GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
-								final User depender = gameRoom.getUsers().stream().filter(u -> u.getId().equals(userId)).findFirst().get();
+								final User depender = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId)).findFirst().get();
 								final Score score = ScoreCalculator.calculation(depender, gameRoom);
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(score));
 							}

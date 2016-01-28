@@ -16,12 +16,16 @@ import lombok.ToString;
 @AllArgsConstructor
 @Getter
 @Setter
-@EqualsAndHashCode(of = { "id" })
+@EqualsAndHashCode(of = { "email" })
 @ToString
 public class User {
 
 	@Setter(AccessLevel.NONE)
-	private String id;
+	private String email;
+	private String nickname;
+	private Rank totalRank;
+	private MatchRecord matchRecord;
+	private Level level;
 	private Role role;
 	private Boolean ready = false;
 	private int guessCount = 0;
@@ -34,8 +38,8 @@ public class User {
 	private String guessNum;
 	private Score currentScore;
 
-	public User(String id, Role role, Score totalScore) {
-		this.id = id;
+	public User(String email, Role role, Score totalScore) {
+		this.email = email;
 		this.role = role;
 		this.totalScore = totalScore;
 	}

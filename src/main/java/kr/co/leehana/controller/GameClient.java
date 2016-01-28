@@ -40,7 +40,7 @@ public class GameClient {
 			boolean onlyOneAttacker = false;
 			if (s2.hasNextLine()) {
 				final String inputNum = s2.nextLine();
-				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getId());
+				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getEmail());
 
 				final String resultDtoJson = client.getServerMessage();
 				System.out.println("result dto json : " + resultDtoJson);
@@ -312,7 +312,7 @@ public class GameClient {
 	}
 
 	private boolean joiningGameRoom(long gameRoomId) throws IOException {
-		client.sendSocketData("JOIN," + gameRoomId + ":USER:" + user.getId() + ":ROLE:" +
+		client.sendSocketData("JOIN," + gameRoomId + ":USER:" + user.getEmail() + ":ROLE:" +
 				user.getRole().getRoleType().name());
 		final String errorMessageJson = client.getServerMessage();
 		final ErrorMessage errorMessage = objectMapper.readValue(errorMessageJson, ErrorMessage.class);
@@ -329,7 +329,7 @@ public class GameClient {
 	}
 
 	private void joinGameRoom(long gameRoomId) throws IOException, InterruptedException {
-		System.out.println("안녕하세요 " + user.getId() + "님, " + gameRoomId + "번 방에 입장하셨습니다");
+		System.out.println("안녕하세요 " + user.getEmail() + "님, " + gameRoomId + "번 방에 입장하셨습니다");
 
 		boolean gameRoomLeft = false;
 		while (!gameRoomLeft) {
@@ -338,11 +338,11 @@ public class GameClient {
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getId).collect(Collectors.joining
+			final String userList = joinedGameRoom.getUsers().stream().map(User::getEmail).collect(Collectors.joining
 					("," +
 					" " +
 					"" + ""));
-			System.out.println("방장 : " + joinedGameRoom.getOwner().getId());
+			System.out.println("방장 : " + joinedGameRoom.getOwner().getEmail());
 			System.out.println("접속 유저 : " + userList);
 			final Setting setting = fetchGameSetting(gameRoomId);
 			System.out.println("** 현재 설정 **");
@@ -352,7 +352,7 @@ public class GameClient {
 			System.out.println();
 			System.out.println("----- 메뉴 -----");
 			System.out.println("1. 준비");
-			if (joinedGameRoom.getOwner().getId().equals(user.getId())) {
+			if (joinedGameRoom.getOwner().getEmail().equals(user.getEmail())) {
 				System.out.println("2. 설정");
 			}
 			System.out.println("0. 게임룸 나가기");
@@ -367,7 +367,7 @@ public class GameClient {
 							generateNumber(gameRoomId);
 						}
 
-						client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getId());
+						client.sendSocketData("READY," + gameRoomId + ":USER_ID:" + user.getEmail());
 
 						boolean allUsersReady = false;
 						while (!allUsersReady) {
@@ -423,21 +423,21 @@ public class GameClient {
 					final int rankValue = i;
 					final User attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
 							.getRanking() == rankValue).findFirst().get();
-					System.out.println(attacker.getRank().getRanking() + "등 : " + attacker.getId() + ", 점수 : " +
+					System.out.println(attacker.getRank().getRanking() + "등 : " + attacker.getEmail() + ", 점수 : " +
 							attacker.getCurrentScore().getValue());
 				}
 
 				System.out.println("****************************************************");
-				client.sendSocketData("GET_DEPENDER_SCORE," + gameRoomId + ":USER_ID:" + user.getId());
+				client.sendSocketData("GET_DEPENDER_SCORE," + gameRoomId + ":USER_ID:" + user.getEmail());
 				final String dependerScoreJson = client.getServerMessage();
 				final Score dependerScore = objectMapper.readValue(dependerScoreJson, Score.class);
-				System.out.println("수비 " + user.getId() + "님의 점수는 : " + dependerScore.getValue() + "입니다.");
+				System.out.println("수비 " + user.getEmail() + "님의 점수는 : " + dependerScore.getValue() + "입니다.");
 				System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			} else {
 				if (resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
-					System.out.println(resultDto.getUser().getId() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
 					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
 							resultDto.getResult().getBall().getValue() + "볼");
 
@@ -449,7 +449,7 @@ public class GameClient {
 				} else {
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
-					System.out.println(resultDto.getUser().getId() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
 					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
 							resultDto.getResult().getBall().getValue() + "볼");
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
@@ -490,7 +490,7 @@ public class GameClient {
 	}
 
 	private GameRoom createGameRoom(String gameRoomName) throws IOException {
-		client.sendSocketData("CREATE_ROOM," + gameRoomName + ":USER_ID:" + user.getId());
+		client.sendSocketData("CREATE_ROOM," + gameRoomName + ":USER_ID:" + user.getEmail());
 		final String createdRoomJson = client.getServerMessage();
 		return objectMapper.readValue(createdRoomJson, GameRoom.class);
 	}
