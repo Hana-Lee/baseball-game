@@ -33,6 +33,7 @@ public class Account extends BasicModel implements Serializable {
 	@Column(unique = true)
 	private String email;
 
+	@Column(unique = true)
 	private String nickname;
 
 	@JsonIgnore

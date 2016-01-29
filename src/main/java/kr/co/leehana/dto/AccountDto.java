@@ -48,6 +48,7 @@ public class AccountDto {
 
 	@Data
 	public static class Update {
+		private String email;
 		private String password;
 		private String nickname;
 	}

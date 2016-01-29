@@ -3,6 +3,7 @@ package kr.co.leehana.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.App;
 import kr.co.leehana.dto.AccountDto;
+import kr.co.leehana.model.Account;
 import kr.co.leehana.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -24,6 +25,7 @@ import javax.servlet.Filter;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -42,16 +44,18 @@ public class AccountControllerTest {
 	private static final String TEST_URL = "/accounts";
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
+	private static final String TEST_UP_NICKNAME = "이두나";
 	private static final String TEST_PASSWORD = "password";
 	private static final String TEST_EMPTY_STR = " ";
 	private static final String DUP_ERROR_CODE = "duplicated.email.exception";
 	private static final String TEST_SHORT_NICK = "1";
 	private static final String TEST_LONG_NICK = "123456789012345678901";
-	private static final String TEST_LONG_PASS = "123456789012345678901234567890123456789012";
 	private static final String TEST_SHORT_PASS = "123";
+	private static final String TEST_LONG_PASS = "123456789012345678901234567890123456789012";
+	private static final String[] TEST_WRONG_EMAILS = {"a", "a@", "a@a", "a@2.컴"};
 	private static final String EMAIL_PATH = "$.email";
 	private static final String ERROR_CODE_PATH = "$.errorCode";
-	private static final String[] TEST_WRONG_EMAILS = {"a", "a@", "a@a", "a@2.컴"};
+	private static final String NICKNAME_PATH = "$.nickname";
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -158,6 +162,23 @@ public class AccountControllerTest {
 		ResultActions resultActions = mockMvc.perform(get(TEST_URL));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
+	}
+
+	@Test
+	public void updateAccount() throws Exception {
+		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_SHORT_PASS);
+		Account newAccount = accountService.create(createDto);
+
+		AccountDto.Update updateDto = new AccountDto.Update();
+		updateDto.setEmail(newAccount.getEmail());
+		updateDto.setNickname(TEST_UP_NICKNAME);
+		updateDto.setPassword(newAccount.getPassword());
+
+		ResultActions resultActions = mockMvc.perform(put(TEST_URL + "/" + newAccount.getId()).contentType(MediaType
+				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDto)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(NICKNAME_PATH, is(TEST_UP_NICKNAME)));
 	}
 
 	private AccountDto.Create accountCreateDtoFixture(String email, String nickname, String password) {

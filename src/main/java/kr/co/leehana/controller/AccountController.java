@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +33,9 @@ import java.util.stream.Collectors;
 @RestController
 public class AccountController {
 
+	private static final String URL_VALUE = "/accounts";
+	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
+
 	@Autowired
 	private AccountService accountService;
 
@@ -41,7 +45,7 @@ public class AccountController {
 	@Autowired
 	private ModelMapper modelMapper;
 
-	@RequestMapping(value = {"/accounts"}, method = {RequestMethod.POST})
+	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.POST})
 	public ResponseEntity create(@RequestBody @Valid AccountDto.Create createDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			ErrorResponse errorResponse = new ErrorResponse();
@@ -54,13 +58,24 @@ public class AccountController {
 		return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = {"/accounts"}, method = {RequestMethod.GET})
+	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
 	public PageImpl<AccountDto.Response> getAccounts(Pageable pageable) {
 		Page<Account> pages = accountRepository.findAll(pageable);
 		List<AccountDto.Response> content = pages.getContent().parallelStream().map(account -> modelMapper.map
 				(account, AccountDto.Response.class)).collect(Collectors.toList());
 		return new PageImpl<>(content, pageable, pages.getTotalElements());
+	}
+
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
+	public ResponseEntity update(@PathVariable long id, @RequestBody @Valid AccountDto.Update updateDto, BindingResult
+			bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		Account updatedAccount = accountService.update(id, updateDto);
+		return new ResponseEntity<>(modelMapper.map(updatedAccount, AccountDto.Response.class), HttpStatus.OK);
 	}
 
 	@ExceptionHandler(UserDuplicatedException.class)

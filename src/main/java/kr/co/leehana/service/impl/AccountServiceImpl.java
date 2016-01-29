@@ -79,7 +79,13 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public Account update(long id, AccountDto.Update updateDto) {
-		return null;
+		final Account account = get(id);
+		account.setEmail(updateDto.getEmail());
+		account.setNickname(updateDto.getNickname());
+		account.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+		account.setUpdated(new Date());
+
+		return accountRepository.save(account);
 	}
 
 	@Override
