@@ -30,6 +30,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.Filter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -210,6 +211,16 @@ public class AccountControllerTest {
 		resultActions.andExpect(jsonPath("$.matchRecord.win.count", is(1)));
 		resultActions.andExpect(jsonPath("$.matchRecord.lose.count", is(0)));
 		resultActions.andExpect(jsonPath("$.totalRank.value", is(1)));
+	}
+
+	@Test
+	public void deleteAccount() throws Exception {
+		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Account newAccount = accountService.create(createDto);
+
+		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + newAccount.getId()));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isNoContent());
 	}
 
 	private AccountDto.Create accountCreateDtoFixture(String email, String nickname, String password) {

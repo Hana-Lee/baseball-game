@@ -111,6 +111,6 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	public void delete(long id) {
-
+		accountRepository.delete(get(id));
 	}
 }
