@@ -4,11 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.App;
 import kr.co.leehana.dto.AccountDto;
 import kr.co.leehana.model.Account;
+import kr.co.leehana.model.Level;
+import kr.co.leehana.model.Lose;
+import kr.co.leehana.model.MatchRecord;
+import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.TotalGame;
+import kr.co.leehana.model.Win;
 import kr.co.leehana.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.internal.exceptions.ExceptionIncludingMockitoWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
@@ -42,6 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AccountControllerTest {
 
 	private static final String TEST_URL = "/accounts";
+	private static final String TEST_STATUS_URL = "/accounts/status";
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
 	private static final String TEST_UP_NICKNAME = "이두나";
@@ -61,13 +69,12 @@ public class AccountControllerTest {
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	private ObjectMapper objectMapper;
-
-	@Autowired
 	private AccountService accountService;
 
 	@Autowired
 	private Filter springSecurityFilterChain;
+
+	private ObjectMapper objectMapper = new ObjectMapper();
 
 	private MockMvc mockMvc;
 
@@ -166,7 +173,7 @@ public class AccountControllerTest {
 
 	@Test
 	public void updateAccount() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_SHORT_PASS);
+		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 		Account newAccount = accountService.create(createDto);
 
 		AccountDto.Update updateDto = new AccountDto.Update();
@@ -179,6 +186,30 @@ public class AccountControllerTest {
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath(NICKNAME_PATH, is(TEST_UP_NICKNAME)));
+	}
+
+	@Test
+	public void updateAccountStatus() throws Exception {
+		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Account newAccount = accountService.create(createDto);
+
+		AccountDto.UpdateStatus updateStatusDto = new AccountDto.UpdateStatus();
+		updateStatusDto.setLevel(new Level(2));
+
+		MatchRecord matchRecord = new MatchRecord(new TotalGame(1), new Win(1), new Lose(0));
+		updateStatusDto.setMatchRecord(matchRecord);
+		updateStatusDto.setTotalRank(new Rank(1));
+
+		ResultActions resultActions = mockMvc.perform(put(TEST_STATUS_URL + "/" + newAccount.getId()).contentType(MediaType
+				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateStatusDto)));
+
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath("$.level.value", is(2)));
+		resultActions.andExpect(jsonPath("$.matchRecord.totalGame.count", is(1)));
+		resultActions.andExpect(jsonPath("$.matchRecord.win.count", is(1)));
+		resultActions.andExpect(jsonPath("$.matchRecord.lose.count", is(0)));
+		resultActions.andExpect(jsonPath("$.totalRank.value", is(1)));
 	}
 
 	private AccountDto.Create accountCreateDtoFixture(String email, String nickname, String password) {

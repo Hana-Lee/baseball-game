@@ -70,7 +70,7 @@ public class GameClient {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
 					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType
 							().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank()
-							.getRanking() + "등 입니다.");
+							.getValue() + "등 입니다.");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점 입니다.");
 					System.out.println("누적 점수 : " + resultDto.getUser().getTotalScore().getValue() + "점 입니다.");
 					isGameOver = true;
@@ -422,8 +422,8 @@ public class GameClient {
 				for (int i = 1; i <= allUserCount; i++) {
 					final int rankValue = i;
 					final User attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
-							.getRanking() == rankValue).findFirst().get();
-					System.out.println(attacker.getRank().getRanking() + "등 : " + attacker.getEmail() + ", 점수 : " +
+							.getValue() == rankValue).findFirst().get();
+					System.out.println(attacker.getRank().getValue() + "등 : " + attacker.getEmail() + ", 점수 : " +
 							attacker.getCurrentScore().getValue());
 				}
 
@@ -443,7 +443,7 @@ public class GameClient {
 
 					System.out.println("등수 : " + resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
 							.getRoleType().equals(RoleType.ATTACKER)).count() + "명중 " + resultDto.getUser().getRank()
-							.getRanking() + "등");
+							.getValue() + "등");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점");
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 				} else {

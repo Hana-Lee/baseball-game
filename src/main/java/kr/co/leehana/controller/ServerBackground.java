@@ -240,7 +240,7 @@ public class ServerBackground {
 										user.setGameOver(true);
 
 										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() !=
-												null && u.getRank().getRanking() > 0).count() + 1);
+												null && u.getRank().getValue() > 0).count() + 1);
 
 										user.setRank(new Rank(ranking));
 									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom

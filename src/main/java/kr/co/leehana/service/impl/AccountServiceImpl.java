@@ -89,8 +89,14 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public Account updateStatus(long id, AccountDto.UpdateStatus updateDto) {
-		return null;
+	public Account updateStatus(long id, AccountDto.UpdateStatus updateStatusDto) {
+		final Account account = get(id);
+		account.setLevel(updateStatusDto.getLevel());
+		account.setMatchRecord(updateStatusDto.getMatchRecord());
+		account.setTotalRank(updateStatusDto.getTotalRank());
+		account.setUpdated(new Date());
+
+		return accountRepository.save(account);
 	}
 
 	@Override

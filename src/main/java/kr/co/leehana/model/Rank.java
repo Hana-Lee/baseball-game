@@ -19,9 +19,9 @@ public class Rank extends BasicModel implements Serializable {
 
 	private static final long serialVersionUID = -1100214892674326181L;
 
-	private int ranking;
+	private int value;
 
-	public Rank(int ranking) {
-		this.ranking = ranking;
+	public Rank(int value) {
+		this.value = value;
 	}
 }

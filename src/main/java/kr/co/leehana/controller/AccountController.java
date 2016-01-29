@@ -35,6 +35,7 @@ public class AccountController {
 
 	private static final String URL_VALUE = "/accounts";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
+	private static final String STATUS_URL_WITH_ID_VALUE = URL_VALUE + "/status/{id}";
 
 	@Autowired
 	private AccountService accountService;
@@ -75,6 +76,17 @@ public class AccountController {
 		}
 
 		Account updatedAccount = accountService.update(id, updateDto);
+		return new ResponseEntity<>(modelMapper.map(updatedAccount, AccountDto.Response.class), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = {STATUS_URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
+	public ResponseEntity update(@PathVariable long id, @RequestBody @Valid AccountDto.UpdateStatus updateStatusDto,
+	                             BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		Account updatedAccount = accountService.updateStatus(id, updateStatusDto);
 		return new ResponseEntity<>(modelMapper.map(updatedAccount, AccountDto.Response.class), HttpStatus.OK);
 	}
 

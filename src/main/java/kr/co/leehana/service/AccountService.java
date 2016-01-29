@@ -11,7 +11,7 @@ public interface AccountService {
 
 	Account create(AccountDto.Create dto);
 	Account update(long id, AccountDto.Update updateDto);
-	Account updateStatus(long id, AccountDto.UpdateStatus updateDto);
+	Account updateStatus(long id, AccountDto.UpdateStatus updateStatusDto);
 	Account get(long id);
 	void delete(long id);
 }

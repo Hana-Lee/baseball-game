@@ -120,11 +120,11 @@ public class ScoreCalculator {
 	}
 
 	private static long makeSuccessAttackerBaseScore(final User user, final GameRoom gameRoom) {
-		return ATTACKER_BASE * getAttackerCount(gameRoom) - ((user.getRank().getRanking() - 1) * ATTACKER_EACH_USER);
+		return ATTACKER_BASE * getAttackerCount(gameRoom) - ((user.getRank().getValue() - 1) * ATTACKER_EACH_USER);
 	}
 
 	private static boolean successGuess(final User user) {
-		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getRanking()
+		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getValue()
 				> 0;
 	}
 
