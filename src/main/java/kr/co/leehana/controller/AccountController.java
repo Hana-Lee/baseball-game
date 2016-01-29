@@ -1,6 +1,7 @@
 package kr.co.leehana.controller;
 
 import kr.co.leehana.dto.AccountDto;
+import kr.co.leehana.exception.AccountNotFoundException;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.UserDuplicatedException;
 import kr.co.leehana.model.Account;
@@ -103,6 +104,15 @@ public class AccountController {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 e-mail 입니다.");
 		errorResponse.setErrorCode("duplicated.email.exception");
+		return errorResponse;
+	}
+
+	@ExceptionHandler(AccountNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleAccountNotFoundException(AccountNotFoundException e) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage("[" + e.getId() + "] 에 해당하는 계정이 없습니다.");
+		errorResponse.setErrorCode("account.not.found.exception");
 		return errorResponse;
 	}
 }

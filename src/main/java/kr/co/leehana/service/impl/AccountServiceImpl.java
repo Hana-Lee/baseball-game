@@ -55,7 +55,8 @@ public class AccountServiceImpl implements AccountService {
 
 		fillInitData(account);
 
-		return accountRepository.save(account);
+		Account newAccount = accountRepository.save(account);
+		return newAccount;
 	}
 
 	private void fillInitData(Account account) {
