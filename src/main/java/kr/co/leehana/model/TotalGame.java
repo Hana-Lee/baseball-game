@@ -1,22 +1,27 @@
 package kr.co.leehana.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import java.io.Serializable;
 
 /**
  * @author Hana Lee
  * @since 2016-01-28 15:49
  */
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-public class TotalGame {
+@NoArgsConstructor
+public class TotalGame extends BasicModel implements Serializable {
 
-	@Id
-	@GeneratedValue
-	private long id;
+	private static final long serialVersionUID = -8212336561968512803L;
 
 	private int count;
+
+	public TotalGame(int count) {
+		this.count = count;
+	}
 }
