@@ -18,7 +18,7 @@ import lombok.ToString;
 @Setter
 @EqualsAndHashCode(of = { "email" })
 @ToString
-public class User {
+public class OldUser {
 
 	@Setter(AccessLevel.NONE)
 	private String email;
@@ -38,7 +38,7 @@ public class User {
 	private String guessNum;
 	private Score currentScore;
 
-	public User(String email, Role role, Score totalScore) {
+	public OldUser(String email, Role role, Score totalScore) {
 		this.email = email;
 		this.role = role;
 		this.totalScore = totalScore;

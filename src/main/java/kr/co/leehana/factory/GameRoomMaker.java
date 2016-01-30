@@ -1,8 +1,8 @@
 package kr.co.leehana.factory;
 
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.model.User;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class GameRoomMaker {
 
-	public static GameRoom make(List<GameRoom> gameRoomList, String roomName, User ownerUser) {
+	public static GameRoom make(List<GameRoom> gameRoomList, String roomName, OldUser ownerUser) {
 		final int LIMIT_USER_COUNT = 5;
 
 		final Long maxId = gameRoomList.isEmpty() ? 1L : gameRoomList.stream().map(GameRoom::getId).reduce(Long::max)

@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.factory.GameRoomMaker;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Result;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
-import kr.co.leehana.model.User;
 import kr.co.leehana.type.ErrorType;
 import kr.co.leehana.type.MessageType;
 import kr.co.leehana.type.RoleType;
@@ -33,8 +33,8 @@ public class ServerBackground {
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	private List<GameRoom> gameRoomList = new ArrayList<>();
-	private Map<User, DataOutputStream> clients = new HashMap<>();
-	private Map<User, DataOutputStream> bgMessageClients = new HashMap<>();
+	private Map<OldUser, DataOutputStream> clients = new HashMap<>();
+	private Map<OldUser, DataOutputStream> bgMessageClients = new HashMap<>();
 
 	public ServerBackground() {
 		Collections.synchronizedList(gameRoomList);
@@ -132,7 +132,7 @@ public class ServerBackground {
 								final String[] clientSendValues = value.split(":");
 								final String gameRoomName = clientSendValues[0];
 								final String userId = clientSendValues[2];
-								final User ownerUser = clients.entrySet().stream().filter(entry -> entry.getKey()
+								final OldUser ownerUser = clients.entrySet().stream().filter(entry -> entry.getKey()
 										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
 										.get(0);
 								final GameRoom newGameRoom = GameRoomMaker.make(gameRoomList, gameRoomName, ownerUser);
@@ -147,7 +147,7 @@ public class ServerBackground {
 								final long gameRoomId = Long.valueOf(clientSendValues[0]);
 								final String userId = clientSendValues[2];
 								final String role = clientSendValues[4];
-								final User joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
+								final OldUser joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
 										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
 										.get(0);
 								joinedUser.setRole(new Role(RoleType.valueOf(role)));
@@ -177,14 +177,14 @@ public class ServerBackground {
 										(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[2];
-								final User user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
+								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
 										.findFirst().get();
 
 								resetUser(user);
 
 								user.setReady(true);
 
-								final long readyCount = gameRoom.getUsers().stream().filter(User::getReady).count();
+								final long readyCount = gameRoom.getUsers().stream().filter(OldUser::getReady).count();
 								final int totalUserCount = gameRoom.getUsers().size();
 
 								if (readyCount < totalUserCount) {
@@ -217,7 +217,7 @@ public class ServerBackground {
 										(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[4];
-								final User user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
+								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
 										.findFirst().get();
 								user.setGuessNum(clientSendValues[0]);
 
@@ -271,7 +271,7 @@ public class ServerBackground {
 
 								user.setCurrentScore(score);
 
-								if (gameRoom.getUsers().stream().filter(User::getGameOver).count() == gameRoom
+								if (gameRoom.getUsers().stream().filter(OldUser::getGameOver).count() == gameRoom
 										.getUsers().size()) {
 									gameRoom.setGenerationNumbers(null);
 									gameRoom.getUsers().forEach(u -> u.setReady(false));
@@ -282,7 +282,7 @@ public class ServerBackground {
 								jsonResult = objectMapper.writeValueAsString(resultDto);
 								dataOutputStream.writeUTF(jsonResult);
 
-								final User depender = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType
+								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType
 										().equals(RoleType.DEPENDER)).findFirst().orElse(null);
 								if (depender != null) {
 									clients.get(depender).writeUTF(jsonResult);
@@ -325,7 +325,7 @@ public class ServerBackground {
 							break;
 						case LOGIN:
 							if (value != null) {
-								User newUser = new User(value, null, new Score());
+								OldUser newUser = new OldUser(value, null, new Score());
 								ErrorMessage errorMessage = new ErrorMessage();
 
 								if (clients.entrySet().stream().filter(entry -> entry.getKey().getEmail().equals(newUser
@@ -343,7 +343,7 @@ public class ServerBackground {
 						case LOGOUT:
 							if (value != null) {
 								final String userId = value;
-								User leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getEmail()
+								OldUser leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getEmail()
 										.equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
 								clients.remove(leaveUser);
 								bgMessageClients.remove(leaveUser);
@@ -402,7 +402,7 @@ public class ServerBackground {
 								final String userId = clientSendValues[2];
 								final GameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
-								final User depender = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId)).findFirst().get();
+								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId)).findFirst().get();
 								final Score score = ScoreCalculator.calculation(depender, gameRoom);
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(score));
 							}
@@ -423,7 +423,7 @@ public class ServerBackground {
 			boolean currentState = false;
 			switch (messageType) {
 				case GET_READY_STATE:
-					currentState = gameRoom.getUsers().stream().filter(User::getReady).count() == gameRoom.getUsers()
+					currentState = gameRoom.getUsers().stream().filter(OldUser::getReady).count() == gameRoom.getUsers()
 							.size();
 					break;
 				case ALL_USER_COMPLETED_GUESS:
@@ -438,7 +438,7 @@ public class ServerBackground {
 		}
 	}
 
-	private void resetUser(User user) {
+	private void resetUser(OldUser user) {
 		user.setGameOver(false);
 		user.setGuessCompleted(false);
 		user.setGuessCount(0);

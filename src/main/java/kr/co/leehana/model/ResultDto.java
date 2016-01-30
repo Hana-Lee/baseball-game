@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class ResultDto {
 
 	private Result result;
-	private User user;
+	private OldUser user;
 	private GameRoom gameRoom;
 	private Score score;
 	private ErrorMessage errorMessage;

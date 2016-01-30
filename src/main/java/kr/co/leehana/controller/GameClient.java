@@ -3,11 +3,11 @@ package kr.co.leehana.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.model.User;
 import kr.co.leehana.type.RoleType;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class GameClient {
 	private final ClientBackground client = new ClientBackground();
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	private User user;
+	private OldUser user;
 
 	public GameClient() {
 		client.connect();
@@ -275,7 +275,7 @@ public class GameClient {
 				if (errorMessage.getMessage() != null && !errorMessage.getMessage().isEmpty()) {
 					System.out.println(errorMessage.getMessage());
 				} else {
-					this.user = new User(userId, null, new Score());
+					this.user = new OldUser(userId, null, new Score());
 					loginCompleted = true;
 				}
 			}
@@ -338,7 +338,7 @@ public class GameClient {
 			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(User::getEmail).collect(Collectors.joining
+			final String userList = joinedGameRoom.getUsers().stream().map(OldUser::getEmail).collect(Collectors.joining
 					("," +
 					" " +
 					"" + ""));
@@ -421,7 +421,7 @@ public class GameClient {
 						.equals(RoleType.ATTACKER)).count();
 				for (int i = 1; i <= allUserCount; i++) {
 					final int rankValue = i;
-					final User attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
+					final OldUser attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
 							.getValue() == rankValue).findFirst().get();
 					System.out.println(attacker.getRank().getValue() + "등 : " + attacker.getEmail() + ", 점수 : " +
 							attacker.getCurrentScore().getValue());
