@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
  * @since 2016-01-14 22-40
  */
 @EnableWebSecurity
-@Profile(value = "dev")
+@Profile(value = {"dev", "test"})
 public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired

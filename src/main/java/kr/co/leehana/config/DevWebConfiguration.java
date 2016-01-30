@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile;
  * @since 2016-01-30 18:41
  */
 @Configuration
-@Profile(value = "dev")
+@Profile(value = {"dev", "test"})
 public class DevWebConfiguration {
 
 	@Bean

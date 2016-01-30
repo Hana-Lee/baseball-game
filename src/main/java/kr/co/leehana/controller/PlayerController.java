@@ -1,12 +1,12 @@
 package kr.co.leehana.controller;
 
-import kr.co.leehana.dto.AccountDto;
-import kr.co.leehana.exception.AccountNotFoundException;
+import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.exception.PlayerDuplicatedException;
+import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.exception.ErrorResponse;
-import kr.co.leehana.exception.UserDuplicatedException;
-import kr.co.leehana.model.Account;
-import kr.co.leehana.repository.AccountRepository;
-import kr.co.leehana.service.AccountService;
+import kr.co.leehana.model.Player;
+import kr.co.leehana.repository.PlayerRepository;
+import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -32,23 +32,23 @@ import java.util.stream.Collectors;
  * @since 2016-01-14 22-39
  */
 @RestController
-public class AccountController {
+public class PlayerController {
 
-	private static final String URL_VALUE = "/accounts";
+	private static final String URL_VALUE = "/players";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String STATUS_URL_WITH_ID_VALUE = URL_VALUE + "/status/{id}";
 
 	@Autowired
-	private AccountService accountService;
+	private PlayerService playerService;
 
 	@Autowired
-	private AccountRepository accountRepository;
+	private PlayerRepository playerRepository;
 
 	@Autowired
 	private ModelMapper modelMapper;
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.POST})
-	public ResponseEntity create(@RequestBody @Valid AccountDto.Create createDto, BindingResult bindingResult) {
+	public ResponseEntity create(@RequestBody @Valid PlayerDto.Create createDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setMessage(bindingResult.getFieldError().getDefaultMessage());
@@ -56,63 +56,63 @@ public class AccountController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		Account newAccount = accountService.create(createDto);
-		return new ResponseEntity<>(newAccount, HttpStatus.CREATED);
+		Player newPlayer = playerService.create(createDto);
+		return new ResponseEntity<>(newPlayer, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
-	public PageImpl<AccountDto.Response> getAccounts(Pageable pageable) {
-		Page<Account> pages = accountRepository.findAll(pageable);
-		List<AccountDto.Response> content = pages.getContent().parallelStream().map(account -> modelMapper.map
-				(account, AccountDto.Response.class)).collect(Collectors.toList());
+	public PageImpl<PlayerDto.Response> getPlayers(Pageable pageable) {
+		Page<Player> pages = playerRepository.findAll(pageable);
+		List<PlayerDto.Response> content = pages.getContent().parallelStream().map(player -> modelMapper.map
+				(player, PlayerDto.Response.class)).collect(Collectors.toList());
 		return new PageImpl<>(content, pageable, pages.getTotalElements());
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
-	public ResponseEntity update(@PathVariable long id, @RequestBody @Valid AccountDto.Update updateDto, BindingResult
+	public ResponseEntity update(@PathVariable long id, @RequestBody @Valid PlayerDto.Update updateDto, BindingResult
 			bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Account updatedAccount = accountService.update(id, updateDto);
-		return new ResponseEntity<>(modelMapper.map(updatedAccount, AccountDto.Response.class), HttpStatus.OK);
+		Player updatedPlayer = playerService.update(id, updateDto);
+		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = {STATUS_URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
-	public ResponseEntity updateStatus(@PathVariable long id, @RequestBody @Valid AccountDto.UpdateStatus
+	public ResponseEntity updateStatus(@PathVariable long id, @RequestBody @Valid PlayerDto.UpdateStatus
 			updateStatusDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Account updatedAccount = accountService.updateStatus(id, updateStatusDto);
-		return new ResponseEntity<>(modelMapper.map(updatedAccount, AccountDto.Response.class), HttpStatus.OK);
+		Player updatedPlayer = playerService.updateStatus(id, updateStatusDto);
+		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.DELETE})
 	public ResponseEntity delete(@PathVariable long id) {
-		accountService.delete(id);
+		playerService.delete(id);
 
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
 	}
 
-	@ExceptionHandler(UserDuplicatedException.class)
+	@ExceptionHandler(PlayerDuplicatedException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleUserDuplicatedException(UserDuplicatedException ex) {
+	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException ex) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 e-mail 입니다.");
 		errorResponse.setErrorCode("duplicated.email.exception");
 		return errorResponse;
 	}
 
-	@ExceptionHandler(AccountNotFoundException.class)
+	@ExceptionHandler(PlayerNotFoundException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	public ErrorResponse handleAccountNotFoundException(AccountNotFoundException e) {
+	public ErrorResponse handlePlayerNotFoundException(PlayerNotFoundException e) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setMessage("[" + e.getId() + "] 에 해당하는 계정이 없습니다.");
-		errorResponse.setErrorCode("account.not.found.exception");
+		errorResponse.setErrorCode("player.not.found.exception");
 		return errorResponse;
 	}
 }

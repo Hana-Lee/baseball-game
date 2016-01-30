@@ -2,17 +2,16 @@ package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.App;
-import kr.co.leehana.dto.AccountDto;
-import kr.co.leehana.model.Account;
+import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.TotalGame;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.Win;
-import kr.co.leehana.service.AccountService;
+import kr.co.leehana.service.PlayerService;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +44,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringApplicationConfiguration(classes = App.class)
 @WebAppConfiguration
 @Transactional
-public class AccountControllerTest {
+public class PlayerControllerTest {
 
-	private static final String TEST_URL = "/accounts";
-	private static final String TEST_STATUS_URL = "/accounts/status";
+	private static final String TEST_URL = "/players";
+	private static final String TEST_STATUS_URL = "/players/status";
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
 	private static final String TEST_UP_NICKNAME = "이두나";
@@ -68,7 +67,7 @@ public class AccountControllerTest {
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	private AccountService accountService;
+	private PlayerService playerService;
 
 	@Autowired
 	private Filter springSecurityFilterChain;
@@ -84,8 +83,8 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void createAccount() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+	public void createPlayer() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(MediaType.APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)));
@@ -96,8 +95,8 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void createAccountWithDupError() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+	public void createPlayerWithDupError() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(MediaType.APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)));
@@ -115,60 +114,60 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void createAccountEmptyEmailBadRequest() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMPTY_STR, TEST_NICKNAME, TEST_PASSWORD);
+	public void createPlayerEmptyEmailBadRequest() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMPTY_STR, TEST_NICKNAME, TEST_PASSWORD);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountWrongEmailBadRequest() throws Exception {
+	public void createPlayerWrongEmailBadRequest() throws Exception {
 		for (String wrongEmail : TEST_WRONG_EMAILS) {
-			AccountDto.Create createDto = accountCreateDtoFixture(wrongEmail, TEST_NICKNAME, TEST_PASSWORD);
+			PlayerDto.Create createDto = playerCreateDtoFixture(wrongEmail, TEST_NICKNAME, TEST_PASSWORD);
 			assertBadRequest(createDto);
 		}
 	}
 
 	@Test
-	public void createAccountEmptyNicknameBadRequest() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_EMPTY_STR, TEST_PASSWORD);
+	public void createPlayerEmptyNicknameBadRequest() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_EMPTY_STR, TEST_PASSWORD);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountShortNicknameBadRequest() throws Exception {
+	public void createPlayerShortNicknameBadRequest() throws Exception {
 		// min = 2
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_SHORT_NICK, TEST_PASSWORD);
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_SHORT_NICK, TEST_PASSWORD);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountLongNicknameBadRequest() throws Exception {
+	public void createPlayerLongNicknameBadRequest() throws Exception {
 		// max = 20
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_LONG_NICK, TEST_PASSWORD);
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_LONG_NICK, TEST_PASSWORD);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountEmptyPasswordBadRequest() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_EMPTY_STR);
+	public void createPlayerEmptyPasswordBadRequest() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_EMPTY_STR);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountShortPasswordBadRequest() throws Exception {
+	public void createPlayerShortPasswordBadRequest() throws Exception {
 		// min = 4
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_SHORT_PASS);
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_SHORT_PASS);
 		assertBadRequest(createDto);
 	}
 
 	@Test
-	public void createAccountLongPasswordBadRequest() throws Exception {
+	public void createPlayerLongPasswordBadRequest() throws Exception {
 		// max = 41
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_LONG_PASS);
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_LONG_PASS);
 		assertBadRequest(createDto);
 	}
 
-	private void assertBadRequest(AccountDto.Create createDto) throws Exception {
+	private void assertBadRequest(PlayerDto.Create createDto) throws Exception {
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(MediaType.APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)));
 		resultActions.andDo(print());
@@ -176,23 +175,23 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void getAccounts() throws Exception {
+	public void getPlayers() throws Exception {
 		ResultActions resultActions = mockMvc.perform(get(TEST_URL));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 	}
 
 	@Test
-	public void updateAccount() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Account newAccount = accountService.create(createDto);
+	public void updatePlayer() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Player newPlayer = playerService.create(createDto);
 
-		AccountDto.Update updateDto = new AccountDto.Update();
+		PlayerDto.Update updateDto = new PlayerDto.Update();
 		updateDto.setEmail(TEST_EMAIL);
 		updateDto.setNickname(TEST_UP_NICKNAME);
 		updateDto.setPassword(TEST_PASSWORD);
 
-		ResultActions resultActions = mockMvc.perform(put(TEST_URL + "/" + newAccount.getId()).contentType(MediaType
+		ResultActions resultActions = mockMvc.perform(put(TEST_URL + "/" + newPlayer.getId()).contentType(MediaType
 				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDto)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
@@ -200,18 +199,18 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void updateAccountStatus() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Account newAccount = accountService.create(createDto);
+	public void updatePlayerStatus() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Player newPlayer = playerService.create(createDto);
 
-		AccountDto.UpdateStatus updateStatusDto = new AccountDto.UpdateStatus();
+		PlayerDto.UpdateStatus updateStatusDto = new PlayerDto.UpdateStatus();
 		updateStatusDto.setLevel(new Level(2));
 
 		MatchRecord matchRecord = new MatchRecord(new TotalGame(1), new Win(1), new Lose(0));
 		updateStatusDto.setMatchRecord(matchRecord);
 		updateStatusDto.setTotalRank(new TotalRank(1));
 
-		ResultActions resultActions = mockMvc.perform(put(TEST_STATUS_URL + "/" + newAccount.getId()).contentType
+		ResultActions resultActions = mockMvc.perform(put(TEST_STATUS_URL + "/" + newPlayer.getId()).contentType
 				(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateStatusDto)));
 
 		resultActions.andDo(print());
@@ -224,17 +223,17 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	public void deleteAccount() throws Exception {
-		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Account newAccount = accountService.create(createDto);
+	public void deletePlayer() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Player newPlayer = playerService.create(createDto);
 
-		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + newAccount.getId()));
+		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + newPlayer.getId()));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isNoContent());
 	}
 
-	private AccountDto.Create accountCreateDtoFixture(String email, String nickname, String password) {
-		AccountDto.Create createDto = new AccountDto.Create();
+	private PlayerDto.Create playerCreateDtoFixture(String email, String nickname, String password) {
+		PlayerDto.Create createDto = new PlayerDto.Create();
 		createDto.setEmail(email);
 		createDto.setNickname(nickname);
 		createDto.setPassword(password);

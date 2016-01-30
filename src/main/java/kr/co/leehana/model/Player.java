@@ -34,13 +34,13 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @ToString
-public class Account implements Serializable {
+public class Player implements Serializable {
 
 	private static final long serialVersionUID = -1278003433728981977L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "account_id")
+	@Column(name = "player_id")
 	@Setter(AccessLevel.NONE)
 	private Long id;
 

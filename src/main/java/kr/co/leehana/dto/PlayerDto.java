@@ -15,7 +15,7 @@ import java.util.Date;
  * @author Hana Lee
  * @since 2016-01-28 17:13
  */
-public class AccountDto {
+public class PlayerDto {
 
 	@Data
 	public static class Create {

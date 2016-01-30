@@ -1,6 +1,6 @@
 package kr.co.leehana.repository;
 
-import kr.co.leehana.model.Account;
+import kr.co.leehana.model.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
  * @since 2016-01-28 17:25
  */
 @Repository
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-	Account findByEmail(String email);
+	Player findByEmail(String email);
 }
