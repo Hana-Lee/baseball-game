@@ -15,7 +15,7 @@ public class ResultDto {
 
 	private Result result;
 	private OldUser user;
-	private GameRoom gameRoom;
+	private OldGameRoom gameRoom;
 	private Score score;
 	private ErrorMessage errorMessage;
 }

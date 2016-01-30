@@ -1,7 +1,7 @@
 package kr.co.leehana;
 
 import kr.co.leehana.model.Ball;
-import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Result;
@@ -26,11 +26,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class ScoreCalculatorTest {
 
-	private GameRoom gameRoom;
+	private OldGameRoom gameRoom;
 
 	@Before
 	public void setUp() {
-		this.gameRoom = new GameRoom();
+		this.gameRoom = new OldGameRoom();
 		this.gameRoom.setName("루비");
 	}
 

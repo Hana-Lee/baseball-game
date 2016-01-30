@@ -2,7 +2,7 @@ package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.model.ErrorMessage;
-import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
@@ -108,10 +108,10 @@ public class GameClient {
 		return objectMapper.readValue(settingJson, Setting.class);
 	}
 
-	private List<GameRoom> fetchGameRoomList() throws IOException {
+	private List<OldGameRoom> fetchGameRoomList() throws IOException {
 		client.sendSocketData("GET_ROOM_LIST");
 		return objectMapper.readValue(client.getServerMessage(), objectMapper.getTypeFactory().constructCollectionType
-				(List.class, GameRoom.class));
+				(List.class, OldGameRoom.class));
 	}
 
 	private void showingGameRoomMenu(long gameRoomId) throws IOException {
@@ -199,11 +199,11 @@ public class GameClient {
 		System.out.println();
 		while (!gameTerminated) {
 			System.out.println("*** 게임룸 리스트 ***");
-			final List<GameRoom> gameRoomList = fetchGameRoomList();
+			final List<OldGameRoom> gameRoomList = fetchGameRoomList();
 			if (gameRoomList.isEmpty()) {
 				System.out.println("생성된 게임룸이 없습니다.");
 			} else {
-				for (GameRoom gameRoom : gameRoomList) {
+				for (OldGameRoom gameRoom : gameRoomList) {
 					final String roomName = gameRoom.getName();
 					final long roomId = gameRoom.getId();
 					final int userCountInRoom = gameRoom.getUsers().size();
@@ -229,7 +229,7 @@ public class GameClient {
 						Scanner gameRoomNameScanner = new Scanner(System.in);
 						if (gameRoomNameScanner.hasNextLine()) {
 							final String gameRoomName = gameRoomNameScanner.nextLine();
-							final GameRoom createdGameRoom = createGameRoom(gameRoomName);
+							final OldGameRoom createdGameRoom = createGameRoom(gameRoomName);
 
 							user.setRole(selectUserRole(createdGameRoom.getId()));
 
@@ -333,9 +333,9 @@ public class GameClient {
 
 		boolean gameRoomLeft = false;
 		while (!gameRoomLeft) {
-			final List<GameRoom> gameRoomList = fetchGameRoomList();
+			final List<OldGameRoom> gameRoomList = fetchGameRoomList();
 
-			final GameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
+			final OldGameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
 			final String userList = joinedGameRoom.getUsers().stream().map(OldUser::getEmail).collect(Collectors.joining
@@ -489,9 +489,9 @@ public class GameClient {
 		return setCompleted;
 	}
 
-	private GameRoom createGameRoom(String gameRoomName) throws IOException {
+	private OldGameRoom createGameRoom(String gameRoomName) throws IOException {
 		client.sendSocketData("CREATE_ROOM," + gameRoomName + ":USER_ID:" + user.getEmail());
 		final String createdRoomJson = client.getServerMessage();
-		return objectMapper.readValue(createdRoomJson, GameRoom.class);
+		return objectMapper.readValue(createdRoomJson, OldGameRoom.class);
 	}
 }
