@@ -6,14 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
 /**
  * @author Hana Lee
  * @since 2016-01-14 22-21
  */
 @SpringBootApplication
-@ActiveProfiles(value = {"dev"})
 public class App {
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
