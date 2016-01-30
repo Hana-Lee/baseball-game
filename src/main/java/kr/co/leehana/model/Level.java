@@ -34,12 +34,12 @@ public class Level implements Serializable {
 	@GeneratedValue
 	@Column(name = "level_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int value;
+	private Integer value;
 
-	public Level(int value) {
+	public Level(Integer value) {
 		this.value = value;
 	}
 }

@@ -34,12 +34,12 @@ public class Lose implements Serializable {
 	@GeneratedValue
 	@Column(name = "lose_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int count;
+	private Integer count;
 
-	public Lose(int count) {
+	public Lose(Integer count) {
 		this.count = count;
 	}
 }

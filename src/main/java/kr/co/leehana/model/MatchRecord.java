@@ -38,7 +38,7 @@ public class MatchRecord implements Serializable {
 	@GeneratedValue
 	@Column(name = "match_record_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "total_game_id")

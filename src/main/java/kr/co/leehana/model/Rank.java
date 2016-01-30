@@ -34,12 +34,12 @@ public class Rank implements Serializable {
 	@GeneratedValue
 	@Column(name = "rank_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int value;
+	private Integer value;
 
-	public Rank(int value) {
+	public Rank(Integer value) {
 		this.value = value;
 	}
 }

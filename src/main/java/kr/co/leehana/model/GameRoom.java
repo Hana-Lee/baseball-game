@@ -40,12 +40,12 @@ public class GameRoom implements Serializable {
 	@GeneratedValue
 	@Column(name = "game_room_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
 	private String name;
 
-	private int limit = 5;
+	private Integer limit = 5;
 
 	@NotNull
 	@Column(unique = true)
@@ -59,10 +59,10 @@ public class GameRoom implements Serializable {
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "setting_id")
 	private Setting setting;
-	private int gameCount = 0;
+	private Integer gameCount = 0;
 	private String generationNumbers;
 
-	public GameRoom(long id, String name, Player owner, int limit, Setting setting) {
+	public GameRoom(Long id, String name, Player owner, Integer limit, Setting setting) {
 		this.id = id;
 		this.name = name;
 		this.owner = owner;
@@ -70,7 +70,7 @@ public class GameRoom implements Serializable {
 		this.setting = setting;
 	}
 
-	public GameRoom(long id, String name, int limit, Setting setting) {
+	public GameRoom(Long id, String name, Integer limit, Setting setting) {
 		this.id = id;
 		this.name = name;
 		this.limit = limit;

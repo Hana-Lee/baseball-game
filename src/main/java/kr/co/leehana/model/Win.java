@@ -34,12 +34,12 @@ public class Win implements Serializable {
 	@GeneratedValue
 	@Column(name = "win_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int count;
+	private Integer count;
 
-	public Win(int count) {
+	public Win(Integer count) {
 		this.count = count;
 	}
 }

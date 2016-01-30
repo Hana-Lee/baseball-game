@@ -34,12 +34,12 @@ public class TotalRank implements Serializable {
 	@GeneratedValue
 	@Column(name = "total_rank_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int value;
+	private Integer value;
 
-	public TotalRank(int value) {
+	public TotalRank(Integer value) {
 		this.value = value;
 	}
 }

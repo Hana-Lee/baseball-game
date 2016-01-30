@@ -83,5 +83,5 @@ public class Player implements Serializable {
 	private Date updated;
 
 	@NotNull
-	private boolean admin;
+	private Boolean admin;
 }

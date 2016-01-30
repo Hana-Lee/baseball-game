@@ -34,12 +34,12 @@ public class TotalGame implements Serializable {
 	@GeneratedValue
 	@Column(name = "total_game_id")
 	@Setter(AccessLevel.NONE)
-	private long id;
+	private Long id;
 
 	@NotNull
-	private int count;
+	private Integer count;
 
-	public TotalGame(int count) {
+	public TotalGame(Integer count) {
 		this.count = count;
 	}
 }
