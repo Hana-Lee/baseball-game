@@ -16,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -41,14 +42,17 @@ public class MatchRecord implements Serializable {
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "total_game_id")
+	@NotNull
 	private TotalGame totalGame;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "win_id")
+	@NotNull
 	private Win win;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "lose_id")
+	@NotNull
 	private Lose lose;
 
 	public MatchRecord(TotalGame totalGame, Win win, Lose lose) {
