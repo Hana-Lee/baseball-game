@@ -7,8 +7,8 @@ import kr.co.leehana.model.Account;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
-import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.TotalGame;
+import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.Win;
 import kr.co.leehana.repository.AccountRepository;
 import kr.co.leehana.service.AccountService;
@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
 		matchRecord.setTotalGame(new TotalGame(0));
 
 		account.setMatchRecord(matchRecord);
-		account.setTotalRank(new Rank(0));
+		account.setTotalRank(new TotalRank(0));
 
 		final Date now = new Date();
 		account.setJoined(now);

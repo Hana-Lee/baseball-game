@@ -1,17 +1,23 @@
 package kr.co.leehana.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.io.Serializable;
@@ -26,9 +32,17 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Account extends BasicModel implements Serializable {
+@EqualsAndHashCode(of = {"id"})
+@ToString
+public class Account implements Serializable {
 
 	private static final long serialVersionUID = -1278003433728981977L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "account_id")
+	@Setter(AccessLevel.NONE)
+	private Long id;
 
 	@Column(unique = true)
 	private String email;
@@ -40,15 +54,15 @@ public class Account extends BasicModel implements Serializable {
 	private String password;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
-	@PrimaryKeyJoinColumn
+	@JoinColumn(name = "level_id")
 	private Level level;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
-	@PrimaryKeyJoinColumn
-	private Rank totalRank;
+	@JoinColumn(name = "total_rank_id")
+	private TotalRank totalRank;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
-	@PrimaryKeyJoinColumn
+	@JoinColumn(name = "match_record_id")
 	private MatchRecord matchRecord;
 
 	@Temporal(TemporalType.TIMESTAMP)

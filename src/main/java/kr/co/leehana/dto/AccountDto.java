@@ -3,6 +3,7 @@ package kr.co.leehana.dto;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.TotalRank;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -56,7 +57,7 @@ public class AccountDto {
 	@Data
 	public static class UpdateStatus {
 		private Level level;
-		private Rank totalRank;
+		private TotalRank totalRank;
 		private MatchRecord matchRecord;
 	}
 }

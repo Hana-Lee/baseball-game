@@ -1,10 +1,17 @@
 package kr.co.leehana.model;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.io.Serializable;
 
 /**
@@ -12,12 +19,21 @@ import java.io.Serializable;
  * @since 2016-01-28 15:51
  */
 @Entity
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-public class Level extends BasicModel implements Serializable {
+@AllArgsConstructor
+@EqualsAndHashCode(of = {"id"})
+@ToString
+public class Level implements Serializable {
 
 	private static final long serialVersionUID = 9042217050310930942L;
+
+	@Id
+	@GeneratedValue
+	@Column(name = "level_id")
+	@Setter(AccessLevel.NONE)
+	private long id;
 
 	private int value;
 

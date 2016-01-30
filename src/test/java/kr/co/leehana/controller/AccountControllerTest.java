@@ -7,8 +7,8 @@ import kr.co.leehana.model.Account;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
-import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.TotalGame;
+import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.Win;
 import kr.co.leehana.service.AccountService;
 import org.junit.Before;
@@ -84,7 +84,6 @@ public class AccountControllerTest {
 	}
 
 	@Test
-//	@Ignore
 	public void createAccount() throws Exception {
 		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 
@@ -97,9 +96,7 @@ public class AccountControllerTest {
 	}
 
 	@Test
-	@Ignore
 	public void createAccountWithDupError() throws Exception {
-		// TODO : SqlExceptionHelper: SQL Error: 23506, SQLState: 23506 오류 해결하기
 		AccountDto.Create createDto = accountCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(MediaType.APPLICATION_JSON).content
@@ -212,7 +209,7 @@ public class AccountControllerTest {
 
 		MatchRecord matchRecord = new MatchRecord(new TotalGame(1), new Win(1), new Lose(0));
 		updateStatusDto.setMatchRecord(matchRecord);
-		updateStatusDto.setTotalRank(new Rank(1));
+		updateStatusDto.setTotalRank(new TotalRank(1));
 
 		ResultActions resultActions = mockMvc.perform(put(TEST_STATUS_URL + "/" + newAccount.getId()).contentType
 				(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateStatusDto)));

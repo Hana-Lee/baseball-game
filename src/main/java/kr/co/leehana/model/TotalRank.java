@@ -16,28 +16,28 @@ import java.io.Serializable;
 
 /**
  * @author Hana Lee
- * @since 2016-01-28 15:49
+ * @since 2016-01-30 17:15
  */
 @Entity
-@Getter
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @ToString
-public class TotalGame implements Serializable {
+public class TotalRank implements Serializable {
 
-	private static final long serialVersionUID = -8212336561968512803L;
+	private static final long serialVersionUID = 7794090430292206635L;
 
 	@Id
 	@GeneratedValue
-	@Column(name = "total_game_id")
+	@Column(name = "total_rank_id")
 	@Setter(AccessLevel.NONE)
 	private long id;
 
-	private int count;
+	private int value;
 
-	public TotalGame(int count) {
-		this.count = count;
+	public TotalRank(int value) {
+		this.value = value;
 	}
 }
