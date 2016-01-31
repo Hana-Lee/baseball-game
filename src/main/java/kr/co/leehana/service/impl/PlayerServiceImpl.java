@@ -3,6 +3,8 @@ package kr.co.leehana.service.impl;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.exception.PlayerDuplicatedException;
+import kr.co.leehana.model.AttackerRoleCount;
+import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
@@ -72,35 +74,49 @@ public class PlayerServiceImpl implements PlayerService {
 		player.setMatchRecord(matchRecord);
 		player.setTotalRank(new TotalRank(0));
 
+		player.setAttackerRoleCount(new AttackerRoleCount(0));
+		player.setDefenderRoleCount(new DefenderRoleCount(0));
+
 		final Date now = new Date();
 		player.setJoined(now);
 		player.setUpdated(now);
 	}
 
 	@Override
-	public Player update(long id, PlayerDto.Update updateDto) {
+	public Player update(Long id, PlayerDto.Update updateDto) {
 		final Player player = get(id);
-		player.setEmail(updateDto.getEmail());
-		player.setNickname(updateDto.getNickname());
-		player.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+
+		if (updateDto.getEmail() != null)
+			player.setEmail(updateDto.getEmail());
+
+		if (updateDto.getNickname() != null)
+			player.setNickname(updateDto.getNickname());
+
+		if (updateDto.getPassword() != null)
+			player.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+
+		if (updateDto.getLevel() != null)
+			player.setLevel(updateDto.getLevel());
+
+		if (updateDto.getMatchRecord() != null)
+			player.setMatchRecord(updateDto.getMatchRecord());
+
+		if (updateDto.getTotalRank() != null)
+			player.setTotalRank(updateDto.getTotalRank());
+
+		if (updateDto.getAttackerRoleCount() != null)
+			player.setAttackerRoleCount(updateDto.getAttackerRoleCount());
+
+		if (updateDto.getDefenderRoleCount() != null)
+			player.setDefenderRoleCount(updateDto.getDefenderRoleCount());
+
 		player.setUpdated(new Date());
 
 		return playerRepository.save(player);
 	}
 
 	@Override
-	public Player updateStatus(long id, PlayerDto.UpdateStatus updateStatusDto) {
-		final Player player = get(id);
-		player.setLevel(updateStatusDto.getLevel());
-		player.setMatchRecord(updateStatusDto.getMatchRecord());
-		player.setTotalRank(updateStatusDto.getTotalRank());
-		player.setUpdated(new Date());
-
-		return playerRepository.save(player);
-	}
-
-	@Override
-	public Player get(long id) {
+	public Player get(Long id) {
 		Player player = playerRepository.findOne(id);
 		if (player == null) {
 			throw new PlayerNotFoundException(id);
@@ -110,7 +126,7 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	public void delete(long id) {
+	public void delete(Long id) {
 		playerRepository.delete(get(id));
 	}
 }

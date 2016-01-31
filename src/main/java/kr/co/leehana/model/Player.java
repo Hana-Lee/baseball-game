@@ -74,6 +74,16 @@ public class Player implements Serializable {
 	@NotNull
 	private MatchRecord matchRecord;
 
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "attacker_role_count_id")
+	@NotNull
+	private AttackerRoleCount attackerRoleCount;
+
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "defender_role_count_id")
+	@NotNull
+	private DefenderRoleCount defenderRoleCount;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull
 	private Date joined;

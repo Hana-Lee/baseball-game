@@ -11,11 +11,9 @@ public interface PlayerService {
 
 	Player create(PlayerDto.Create createDto);
 
-	Player update(long id, PlayerDto.Update updateDto);
+	Player update(Long id, PlayerDto.Update updateDto);
 
-	Player updateStatus(long id, PlayerDto.UpdateStatus updateStatusDto);
+	Player get(Long id);
 
-	Player get(long id);
-
-	void delete(long id);
+	void delete(Long id);
 }

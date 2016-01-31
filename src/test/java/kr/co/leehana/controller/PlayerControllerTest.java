@@ -212,30 +212,17 @@ public class PlayerControllerTest {
 		updateDto.setNickname(TEST_UP_NICKNAME);
 		updateDto.setPassword(TEST_PASSWORD);
 
+		updateDto.setLevel(new Level(2));
+
+		MatchRecord matchRecord = new MatchRecord(new TotalGame(1), new Win(1), new Lose(0));
+		updateDto.setMatchRecord(matchRecord);
+		updateDto.setTotalRank(new TotalRank(1));
+
 		ResultActions resultActions = mockMvc.perform(put(TEST_URL + "/" + newPlayer.getId()).contentType(MediaType
 				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDto)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath(NICKNAME_PATH, is(TEST_UP_NICKNAME)));
-	}
-
-	@Test
-	public void updatePlayerStatus() throws Exception {
-		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Player newPlayer = playerService.create(createDto);
-
-		PlayerDto.UpdateStatus updateStatusDto = new PlayerDto.UpdateStatus();
-		updateStatusDto.setLevel(new Level(2));
-
-		MatchRecord matchRecord = new MatchRecord(new TotalGame(1), new Win(1), new Lose(0));
-		updateStatusDto.setMatchRecord(matchRecord);
-		updateStatusDto.setTotalRank(new TotalRank(1));
-
-		ResultActions resultActions = mockMvc.perform(put(TEST_STATUS_URL + "/" + newPlayer.getId()).contentType
-				(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateStatusDto)));
-
-		resultActions.andDo(print());
-		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath("$.level.value", is(2)));
 		resultActions.andExpect(jsonPath("$.matchRecord.totalGame.count", is(1)));
 		resultActions.andExpect(jsonPath("$.matchRecord.win.count", is(1)));

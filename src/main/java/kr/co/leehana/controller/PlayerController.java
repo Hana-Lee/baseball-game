@@ -36,7 +36,6 @@ public class PlayerController {
 
 	private static final String URL_VALUE = "/players";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
-	private static final String STATUS_URL_WITH_ID_VALUE = URL_VALUE + "/status/{id}";
 
 	@Autowired
 	private PlayerService playerService;
@@ -83,17 +82,6 @@ public class PlayerController {
 		}
 
 		Player updatedPlayer = playerService.update(id, updateDto);
-		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), HttpStatus.OK);
-	}
-
-	@RequestMapping(value = {STATUS_URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
-	public ResponseEntity updateStatus(@PathVariable Long id, @RequestBody @Valid PlayerDto.UpdateStatus
-			updateStatusDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-
-		Player updatedPlayer = playerService.updateStatus(id, updateStatusDto);
 		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), HttpStatus.OK);
 	}
 
