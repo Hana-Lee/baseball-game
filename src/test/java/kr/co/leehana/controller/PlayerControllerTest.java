@@ -54,6 +54,7 @@ public class PlayerControllerTest {
 	private static final String TEST_PASSWORD = "password";
 	private static final String TEST_EMPTY_STR = " ";
 	private static final String DUP_ERROR_CODE = "duplicated.email.exception";
+	private static final String PLAYER_NOT_FOUND_ERROR_CODE = "player.not.found.exception";
 	private static final String TEST_SHORT_NICK = "1";
 	private static final String TEST_LONG_NICK = "123456789012345678901";
 	private static final String TEST_SHORT_PASS = "123";
@@ -179,6 +180,26 @@ public class PlayerControllerTest {
 		ResultActions resultActions = mockMvc.perform(get(TEST_URL));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
+	}
+
+	@Test
+	public void getPlayer() throws Exception {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Player newPlayer = playerService.create(createDto);
+
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/" + newPlayer.getId()));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));
+		resultActions.andExpect(jsonPath(NICKNAME_PATH, is(TEST_NICKNAME)));
+	}
+
+	@Test
+	public void notExistPlayerGet() throws Exception {
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/1"));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isBadRequest());
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(PLAYER_NOT_FOUND_ERROR_CODE)));
 	}
 
 	@Test

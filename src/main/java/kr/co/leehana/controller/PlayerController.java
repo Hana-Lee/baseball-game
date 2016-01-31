@@ -1,9 +1,9 @@
 package kr.co.leehana.controller;
 
 import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
-import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.repository.PlayerRepository;
 import kr.co.leehana.service.PlayerService;
@@ -64,13 +64,19 @@ public class PlayerController {
 	@ResponseStatus(code = HttpStatus.OK)
 	public PageImpl<PlayerDto.Response> getPlayers(Pageable pageable) {
 		Page<Player> pages = playerRepository.findAll(pageable);
-		List<PlayerDto.Response> content = pages.getContent().parallelStream().map(player -> modelMapper.map
-				(player, PlayerDto.Response.class)).collect(Collectors.toList());
+		List<PlayerDto.Response> content = pages.getContent().parallelStream().map(player -> modelMapper.map(player,
+				PlayerDto.Response.class)).collect(Collectors.toList());
 		return new PageImpl<>(content, pageable, pages.getTotalElements());
 	}
 
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.GET})
+	@ResponseStatus(code = HttpStatus.OK)
+	public PlayerDto.Response getPlayer(@PathVariable Long id) {
+		return modelMapper.map(playerService.get(id), PlayerDto.Response.class);
+	}
+
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
-	public ResponseEntity update(@PathVariable long id, @RequestBody @Valid PlayerDto.Update updateDto, BindingResult
+	public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid PlayerDto.Update updateDto, BindingResult
 			bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -81,7 +87,7 @@ public class PlayerController {
 	}
 
 	@RequestMapping(value = {STATUS_URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
-	public ResponseEntity updateStatus(@PathVariable long id, @RequestBody @Valid PlayerDto.UpdateStatus
+	public ResponseEntity updateStatus(@PathVariable Long id, @RequestBody @Valid PlayerDto.UpdateStatus
 			updateStatusDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -92,7 +98,7 @@ public class PlayerController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.DELETE})
-	public ResponseEntity delete(@PathVariable long id) {
+	public ResponseEntity delete(@PathVariable Long id) {
 		playerService.delete(id);
 
 		return new ResponseEntity(HttpStatus.NO_CONTENT);
