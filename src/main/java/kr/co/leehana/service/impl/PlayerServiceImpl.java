@@ -78,7 +78,7 @@ public class PlayerServiceImpl implements PlayerService {
 		player.setDefenderRoleCount(new DefenderRoleCount(0));
 
 		final Date now = new Date();
-		player.setJoined(now);
+		player.setCreated(now);
 		player.setUpdated(now);
 	}
 
