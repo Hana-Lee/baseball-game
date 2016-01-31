@@ -3,10 +3,10 @@ package kr.co.leehana.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.App;
 import kr.co.leehana.dto.PlayerDto;
-import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
+import kr.co.leehana.model.Player;
 import kr.co.leehana.model.TotalGame;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.Win;
@@ -47,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PlayerControllerTest {
 
 	private static final String TEST_URL = "/players";
-	private static final String TEST_STATUS_URL = "/players/status";
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
 	private static final String TEST_UP_NICKNAME = "이두나";
