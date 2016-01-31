@@ -86,7 +86,7 @@ public class Player implements Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull
-	private Date joined;
+	private Date created;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull
