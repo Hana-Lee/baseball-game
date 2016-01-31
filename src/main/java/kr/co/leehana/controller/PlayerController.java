@@ -37,14 +37,18 @@ public class PlayerController {
 	private static final String URL_VALUE = "/players";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 
-	@Autowired
 	private PlayerService playerService;
 
-	@Autowired
 	private PlayerRepository playerRepository;
 
-	@Autowired
 	private ModelMapper modelMapper;
+
+	@Autowired
+	public PlayerController(PlayerService playerService, PlayerRepository playerRepository, ModelMapper modelMapper) {
+		this.playerService = playerService;
+		this.playerRepository = playerRepository;
+		this.modelMapper = modelMapper;
+	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.POST})
 	public ResponseEntity create(@RequestBody @Valid PlayerDto.Create createDto, BindingResult bindingResult) {
