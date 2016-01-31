@@ -90,7 +90,6 @@ public class PlayerControllerTest {
 				(objectMapper.writeValueAsString(createDto)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isCreated());
-		//{"id":1,"username":"voyaging","email":null,"fullName":null,"joined":1444821003172,"updated":1444821003172}
 		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));
 	}
 
@@ -102,14 +101,12 @@ public class PlayerControllerTest {
 				(objectMapper.writeValueAsString(createDto)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isCreated());
-		//{"id":1,"username":"voyaging","email":null,"fullName":null,"joined":1444821003172,"updated":1444821003172}
 		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));
 
 		resultActions = mockMvc.perform(post(TEST_URL).contentType(MediaType.APPLICATION_JSON).content(objectMapper
 				.writeValueAsString(createDto)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
-		//{"message":"[voyaging] 중복된 username 입니다.","errorCode":"duplicated.username.exception","errors":null}
 		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(DUP_ERROR_CODE)));
 	}
 
