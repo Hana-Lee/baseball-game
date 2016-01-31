@@ -8,24 +8,36 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.FetchType;
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.REFRESH;
+import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.FetchType.EAGER;
 
 /**
  * @author Hana Lee
  * @since 2016-01-30 20:48
  */
-//@Entity
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -43,37 +55,47 @@ public class GameRoom implements Serializable {
 	private Long id;
 
 	@NotNull
-	private String name;
-
-	private Integer limit = 5;
+	private Integer number;
 
 	@NotNull
-	@Column(unique = true)
-	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = false)
-	@JoinColumn(name = "player_id")
+	private String name;
+
+	private Integer limitPlayerCount = 5;
+
+	@NotNull
+	@OneToOne(cascade = {MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = false)
+	@JoinColumn(name = "owner_id")
 	private Player owner;
 
-	@OneToMany(cascade = {CascadeType.ALL}, targetEntity = Player.class, fetch = FetchType.EAGER, orphanRemoval = true)
-	private Set<Player> users = new LinkedHashSet<>();
+	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
+	@JoinColumn(name = "joined_room_id")
+	private Set<Player> players = new LinkedHashSet<>();
 
-	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+//	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
+//	@JoinColumn(name = "attacker_ids")
+//	private Set<Player> attackers = new LinkedHashSet<>();
+//
+//	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+//	@JoinColumn(name = "defender_id")
+//	private Player defender;
+
+	@OneToOne(cascade = {PERSIST, MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = true)
 	@JoinColumn(name = "setting_id")
 	private Setting setting;
+
 	private Integer gameCount = 0;
+
 	private String generationNumbers;
 
-	public GameRoom(Long id, String name, Player owner, Integer limit, Setting setting) {
-		this.id = id;
-		this.name = name;
-		this.owner = owner;
-		this.limit = limit;
-		this.setting = setting;
-	}
+	@OneToMany(cascade = {PERSIST, MERGE, REMOVE, REFRESH, DETACH})
+	@MapKeyColumn(name = "player_rank")
+	private Map<Integer, Player> playerRankMap = new HashMap<>();
 
-	public GameRoom(Long id, String name, Integer limit, Setting setting) {
-		this.id = id;
-		this.name = name;
-		this.limit = limit;
-		this.setting = setting;
-	}
+	@Temporal(TemporalType.TIMESTAMP)
+	@NotNull
+	private Date created;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@NotNull
+	private Date updated;
 }
