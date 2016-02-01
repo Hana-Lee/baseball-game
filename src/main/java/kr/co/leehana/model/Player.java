@@ -1,6 +1,7 @@
 package kr.co.leehana.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.co.leehana.type.GameRole;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -13,6 +14,8 @@ import org.hibernate.validator.constraints.Email;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -83,6 +86,9 @@ public class Player implements Serializable {
 	@JoinColumn(name = "defender_role_count_id")
 	@NotNull
 	private DefenderRoleCount defenderRoleCount;
+
+	@Enumerated(EnumType.STRING)
+	private GameRole gameRole;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull

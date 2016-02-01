@@ -5,6 +5,7 @@ import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.TotalRank;
+import kr.co.leehana.type.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -46,6 +47,7 @@ public class PlayerDto {
 		private MatchRecord matchRecord;
 		private DefenderRoleCount defenderRoleCount;
 		private AttackerRoleCount attackerRoleCount;
+		private GameRole gameRole;
 		private Date joined;
 		private Date updated;
 	}
@@ -60,5 +62,6 @@ public class PlayerDto {
 		private MatchRecord matchRecord;
 		private DefenderRoleCount defenderRoleCount;
 		private AttackerRoleCount attackerRoleCount;
+		private GameRole gameRole;
 	}
 }

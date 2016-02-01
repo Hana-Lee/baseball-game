@@ -27,11 +27,10 @@ public class GameRoomDto {
 		private Player owner;
 
 		@NotNull
-		private Setting setting;
-
-//		private Player defender;
-
 		private Set<Player> players;
+
+		@NotNull
+		private Setting setting;
 	}
 
 	@Data

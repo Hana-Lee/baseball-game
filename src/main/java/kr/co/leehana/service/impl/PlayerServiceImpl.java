@@ -110,6 +110,9 @@ public class PlayerServiceImpl implements PlayerService {
 		if (updateDto.getDefenderRoleCount() != null)
 			player.setDefenderRoleCount(updateDto.getDefenderRoleCount());
 
+		if (updateDto.getGameRole() != null)
+			player.setGameRole(updateDto.getGameRole());
+
 		player.setUpdated(new Date());
 
 		return playerRepository.save(player);

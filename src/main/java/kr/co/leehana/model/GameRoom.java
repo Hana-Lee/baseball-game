@@ -63,21 +63,13 @@ public class GameRoom implements Serializable {
 	private Integer limitPlayerCount = 5;
 
 	@NotNull
-	@OneToOne(cascade = {MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = false)
+	@OneToOne(cascade = {MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = true)
 	@JoinColumn(name = "owner_id")
 	private Player owner;
 
 	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
 	@JoinColumn(name = "joined_room_id")
 	private Set<Player> players = new LinkedHashSet<>();
-
-//	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
-//	@JoinColumn(name = "attacker_ids")
-//	private Set<Player> attackers = new LinkedHashSet<>();
-//
-//	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
-//	@JoinColumn(name = "defender_id")
-//	private Player defender;
 
 	@OneToOne(cascade = {PERSIST, MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = true)
 	@JoinColumn(name = "setting_id")
