@@ -67,7 +67,7 @@ public class GameRoom implements Serializable {
 	@JoinColumn(name = "owner_id")
 	private Player owner;
 
-	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
+	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = true)
 	@JoinColumn(name = "joined_room_id")
 	private Set<Player> players = new LinkedHashSet<>();
 
@@ -79,7 +79,7 @@ public class GameRoom implements Serializable {
 
 	private String generationNumbers;
 
-	@OneToMany(cascade = {PERSIST, MERGE, REMOVE, REFRESH, DETACH})
+	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = true)
 	@MapKeyColumn(name = "player_rank")
 	private Map<Integer, Player> playerRankMap = new HashMap<>();
 

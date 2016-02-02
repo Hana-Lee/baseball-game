@@ -53,6 +53,9 @@ public class GameRoomServiceImpl implements GameRoomService {
 	private void fillInitData(GameRoom gameRoom) {
 		gameRoom.setNumber(0);
 
+		gameRoom.getPlayers().add(gameRoom.getOwner());
+		gameRoom.getPlayerRankMap().put(1, gameRoom.getOwner());
+
 		Date now = new Date();
 		gameRoom.setCreated(now);
 		gameRoom.setUpdated(now);

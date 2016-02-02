@@ -6,6 +6,7 @@ import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.Player;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
@@ -49,6 +50,23 @@ public class GameRoomController {
 		this.playerService = playerService;
 	}
 
+	/*
+		요청 셈플
+		{
+		    "name": "루비",
+		    "owner": {
+		      "id": 1,
+		      "email": "i@leehana.co.kr",
+		      "nickname": "이하나",
+		      "gameRole": "ATTACKER"
+		    },
+		    "setting": {
+		        "limitWrongInputCount": 5,
+		        "limitGuessInputCount": 10,
+		        "generationNumberCount": 3
+		    }
+		}
+	 */
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -59,16 +77,17 @@ public class GameRoomController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		updatePlayerStatus(createDto);
+		Player updatedPlayer = updatePlayerStatus(createDto);
+		createDto.setOwner(updatedPlayer);
 
 		GameRoom newGameRoom = gameRoomService.create(createDto);
 
 		return new ResponseEntity<>(newGameRoom, HttpStatus.CREATED);
 	}
 
-	private void updatePlayerStatus(GameRoomDto.Create createDto) {
+	private Player updatePlayerStatus(GameRoomDto.Create createDto) {
 		PlayerDto.Update playerUpdateDto = modelMapper.map(createDto.getOwner(), PlayerDto.Update.class);
-		playerService.update(createDto.getOwner().getId(), playerUpdateDto);
+		return playerService.update(createDto.getOwner().getId(), playerUpdateDto);
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})

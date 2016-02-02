@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,9 +28,6 @@ public class GameRoomDto {
 		private Player owner;
 
 		@NotNull
-		private Set<Player> players;
-
-		@NotNull
 		private Setting setting;
 	}
 
@@ -37,9 +35,10 @@ public class GameRoomDto {
 	public static class Update {
 		private String name;
 		private Player owner;
+		private Set<Player> players;
 		private Setting setting;
-		private Set<Player> attacker;
-		private Player defender;
+		private Integer gameCount;
+		private Map<Integer, Player> playerRankMap;
 	}
 
 	@Data
@@ -48,10 +47,11 @@ public class GameRoomDto {
 		private String name;
 		private Integer limitPlayerCount;
 		private Player owner;
-		private Set<Player> attackers;
-		private Player defender;
+		private Set<Player> players;
 		private Setting setting;
 		private Integer gameCount;
 		private Map<Integer, Player> playerRankMap;
+		private Date created;
+		private Date updated;
 	}
 }
