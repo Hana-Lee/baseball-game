@@ -1,12 +1,10 @@
 package kr.co.leehana.service.impl;
 
 import kr.co.leehana.dto.GameRoomDto;
-import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.repository.GameRoomRepository;
 import kr.co.leehana.service.GameRoomService;
-import kr.co.leehana.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +29,10 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	private final ModelMapper modelMapper;
 
-	private final PlayerService playerService;
-
 	@Autowired
-	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper, PlayerService playerService) {
+	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper) {
 		this.gameRoomRepository = gameRoomRepository;
 		this.modelMapper = modelMapper;
-		this.playerService = playerService;
 	}
 
 	@Override
@@ -49,9 +44,6 @@ public class GameRoomServiceImpl implements GameRoomService {
 					.getNickname());
 			throw new OwnerDuplicatedException(createDto.getOwner());
 		}
-
-		PlayerDto.Update playerUpdateDto = modelMapper.map(createDto.getOwner(), PlayerDto.Update.class);
-		playerService.update(createDto.getOwner().getId(), playerUpdateDto);
 
 		fillInitData(gameRoom);
 

@@ -1,9 +1,13 @@
 package kr.co.leehana.controller;
 
 import kr.co.leehana.dto.GameRoomDto;
+import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
+import kr.co.leehana.exception.OwnerDuplicatedException;
+import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.service.GameRoomService;
+import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,13 +38,15 @@ public class GameRoomController {
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 
 	private final GameRoomService gameRoomService;
+	private final PlayerService playerService;
 
 	private ModelMapper modelMapper;
 
 	@Autowired
-	public GameRoomController(GameRoomService gameRoomService, ModelMapper modelMapper) {
+	public GameRoomController(GameRoomService gameRoomService, ModelMapper modelMapper, PlayerService playerService) {
 		this.gameRoomService = gameRoomService;
 		this.modelMapper = modelMapper;
+		this.playerService = playerService;
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.POST})
@@ -52,9 +59,16 @@ public class GameRoomController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 
+		updatePlayerStatus(createDto);
+
 		GameRoom newGameRoom = gameRoomService.create(createDto);
 
 		return new ResponseEntity<>(newGameRoom, HttpStatus.CREATED);
+	}
+
+	private void updatePlayerStatus(GameRoomDto.Create createDto) {
+		PlayerDto.Update playerUpdateDto = modelMapper.map(createDto.getOwner(), PlayerDto.Update.class);
+		playerService.update(createDto.getOwner().getId(), playerUpdateDto);
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})
@@ -66,5 +80,14 @@ public class GameRoomController {
 				(gameRoom, GameRoomDto.Response.class)).collect(Collectors.toList());
 
 		return new PageImpl<>(content, pageable, gameRooms.getTotalElements());
+	}
+
+	@ExceptionHandler(OwnerDuplicatedException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleOwnerDuplicatedException(PlayerDuplicatedException ex) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 Owner 입니다.");
+		errorResponse.setErrorCode("duplicated.owner.exception");
+		return errorResponse;
 	}
 }
