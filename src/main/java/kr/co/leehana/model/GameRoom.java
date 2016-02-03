@@ -63,11 +63,11 @@ public class GameRoom implements Serializable {
 	private Integer limitPlayerCount = 5;
 
 	@NotNull
-	@OneToOne(cascade = {MERGE, REMOVE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = true)
+	@OneToOne(cascade = {MERGE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = false)
 	@JoinColumn(name = "owner_id")
 	private Player owner;
 
-	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = true)
+	@OneToMany(cascade = {MERGE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
 	@JoinColumn(name = "joined_room_id")
 	private Set<Player> players = new LinkedHashSet<>();
 
@@ -79,7 +79,7 @@ public class GameRoom implements Serializable {
 
 	private String generationNumbers;
 
-	@OneToMany(cascade = {MERGE, REMOVE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = true)
+	@OneToMany(cascade = {MERGE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
 	@MapKeyColumn(name = "player_rank")
 	private Map<Integer, Player> playerRankMap = new HashMap<>();
 

@@ -21,7 +21,7 @@ public interface GameRoomService {
 
 	Page<GameRoom> getAll(Pageable pageable);
 
-	GameRoom update(GameRoomDto.Update updateDto);
+	GameRoom update(Long id, GameRoomDto.Update updateDto);
 
 	void delete(Long id);
 }

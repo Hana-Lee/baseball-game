@@ -37,8 +37,8 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	@Override
-	public GameRoom create(GameRoomDto.Create createDto) {
-		GameRoom gameRoom = modelMapper.map(createDto, GameRoom.class);
+	public GameRoom create(final GameRoomDto.Create createDto) {
+		final GameRoom gameRoom = modelMapper.map(createDto, GameRoom.class);
 
 		if (gameRoomRepository.findByOwner(createDto.getOwner()) != null) {
 			log.error("owner duplicated exception. {} : {}", createDto.getOwner().getId(), createDto.getOwner()
@@ -51,20 +51,20 @@ public class GameRoomServiceImpl implements GameRoomService {
 		return gameRoomRepository.save(gameRoom);
 	}
 
-	private void fillInitData(GameRoom gameRoom) {
+	private void fillInitData(final GameRoom gameRoom) {
 		gameRoom.setNumber(0);
 
 		gameRoom.getPlayers().add(gameRoom.getOwner());
 		gameRoom.getPlayerRankMap().put(1, gameRoom.getOwner());
 
-		Date now = new Date();
+		final Date now = new Date();
 		gameRoom.setCreated(now);
 		gameRoom.setUpdated(now);
 	}
 
 	@Override
-	public GameRoom get(Long id) {
-		GameRoom gameRoom = gameRoomRepository.findOne(id);
+	public GameRoom get(final Long id) {
+		final GameRoom gameRoom = gameRoomRepository.findOne(id);
 		if (gameRoom == null) {
 			throw new GameRoomNotFoundException(id);
 		}
@@ -74,7 +74,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	@Override
 	public List<GameRoom> getAll() {
-		return null;
+		return gameRoomRepository.findAll();
 	}
 
 	@Override
@@ -83,12 +83,42 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	@Override
-	public GameRoom update(GameRoomDto.Update updateDto) {
-		return null;
+	public GameRoom update(Long id, GameRoomDto.Update updateDto) {
+		final GameRoom gameRoom = get(id);
+
+		if (updateDto.getName() != null && !updateDto.getName().isEmpty()) {
+			gameRoom.setName(updateDto.getName());
+		}
+
+		if (updateDto.getOwner() != null) {
+			gameRoom.setOwner(updateDto.getOwner());
+		}
+
+		if (updateDto.getPlayers() != null) {
+			gameRoom.getPlayers().clear();
+			gameRoom.setPlayers(updateDto.getPlayers());
+		}
+
+		if (updateDto.getSetting() != null) {
+			gameRoom.setSetting(updateDto.getSetting());
+		}
+
+		if (updateDto.getGameCount() != null) {
+			updateDto.setGameCount(updateDto.getGameCount());
+		}
+
+		if (updateDto.getPlayerRankMap() != null) {
+			gameRoom.getPlayerRankMap().clear();
+			gameRoom.setPlayerRankMap(updateDto.getPlayerRankMap());
+		}
+
+		gameRoom.setUpdated(new Date());
+
+		return gameRoomRepository.save(gameRoom);
 	}
 
 	@Override
 	public void delete(Long id) {
-
+		gameRoomRepository.delete(id);
 	}
 }

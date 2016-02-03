@@ -111,11 +111,29 @@ public class GameRoomController {
 		return modelMapper.map(gameRoomService.get(id), GameRoomDto.Response.class);
 	}
 
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})
+	public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Update updateDto,
+	                             BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
+		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
+		return new ResponseEntity<>(modelMapper.map(updatedGameRoom, GameRoomDto.Response.class), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.DELETE})
+	public ResponseEntity delete(@PathVariable Long id) {
+		gameRoomService.delete(id);
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
 	@ExceptionHandler(OwnerDuplicatedException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handleOwnerDuplicatedException(PlayerDuplicatedException ex) {
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 Owner 입니다.");
+		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 방장 입니다.");
 		errorResponse.setErrorCode("duplicated.owner.exception");
 		return errorResponse;
 	}
