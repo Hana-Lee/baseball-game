@@ -41,6 +41,7 @@ public class GameRoomController {
 	private static final String URL_VALUE = "/gameroom";
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
+	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
@@ -127,6 +128,12 @@ public class GameRoomController {
 		gameRoomService.delete(id);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@RequestMapping(value = {URL_JOIN_VALUE}, method = {RequestMethod.POST})
+	public GameRoomDto.Response join(@PathVariable Long id) {
+		// TODO : 게임룸 입장 기능 만들기
+		return null;
 	}
 
 	@ExceptionHandler(OwnerDuplicatedException.class)
