@@ -3,8 +3,10 @@ package kr.co.leehana.controller;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
+import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.exception.PlayerDuplicatedException;
+import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.service.GameRoomService;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,7 +38,8 @@ import java.util.stream.Collectors;
 @RestController
 public class GameRoomController {
 
-	private static final String URL_VALUE = "/game_room";
+	private static final String URL_VALUE = "/gameroom";
+	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 
 	private final GameRoomService gameRoomService;
@@ -90,7 +94,7 @@ public class GameRoomController {
 		return playerService.update(createDto.getOwner().getId(), playerUpdateDto);
 	}
 
-	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})
+	@RequestMapping(value = {URL_ALL_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
 	public PageImpl<GameRoomDto.Response> getGameRooms(Pageable pageable) {
 		Page<GameRoom> gameRooms = gameRoomService.getAll(pageable);
@@ -101,12 +105,27 @@ public class GameRoomController {
 		return new PageImpl<>(content, pageable, gameRooms.getTotalElements());
 	}
 
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.GET})
+	@ResponseStatus(HttpStatus.OK)
+	public GameRoomDto.Response getGameRoom(@PathVariable Long id) {
+		return modelMapper.map(gameRoomService.get(id), GameRoomDto.Response.class);
+	}
+
 	@ExceptionHandler(OwnerDuplicatedException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ErrorResponse handleOwnerDuplicatedException(PlayerDuplicatedException ex) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 Owner 입니다.");
 		errorResponse.setErrorCode("duplicated.owner.exception");
+		return errorResponse;
+	}
+
+	@ExceptionHandler(GameRoomNotFoundException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleGameRoomNotFoundException(PlayerNotFoundException e) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage("[" + e.getId() + "] 에 해당하는 게임룸이 없습니다.");
+		errorResponse.setErrorCode("gameroom.not.found.exception");
 		return errorResponse;
 	}
 }

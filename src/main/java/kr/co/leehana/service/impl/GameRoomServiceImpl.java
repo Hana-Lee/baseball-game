@@ -1,6 +1,7 @@
 package kr.co.leehana.service.impl;
 
 import kr.co.leehana.dto.GameRoomDto;
+import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.repository.GameRoomRepository;
@@ -63,7 +64,12 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	@Override
 	public GameRoom get(Long id) {
-		return null;
+		GameRoom gameRoom = gameRoomRepository.findOne(id);
+		if (gameRoom == null) {
+			throw new GameRoomNotFoundException(id);
+		}
+
+		return gameRoom;
 	}
 
 	@Override

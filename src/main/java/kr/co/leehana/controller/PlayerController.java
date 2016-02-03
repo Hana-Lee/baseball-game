@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 @RestController
 public class PlayerController {
 
-	private static final String URL_VALUE = "/players";
+	private static final String URL_VALUE = "/player";
+	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 
 	private PlayerService playerService;
@@ -63,7 +64,7 @@ public class PlayerController {
 		return new ResponseEntity<>(newPlayer, HttpStatus.CREATED);
 	}
 
-	@RequestMapping(value = {URL_VALUE}, method = {RequestMethod.GET})
+	@RequestMapping(value = {URL_ALL_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
 	public PageImpl<PlayerDto.Response> getPlayers(Pageable pageable) {
 		Page<Player> pages = playerRepository.findAll(pageable);

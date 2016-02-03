@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class PlayerControllerTest {
 
-	private static final String TEST_URL = "/players";
+	private static final String TEST_URL = "/player";
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
 	private static final String TEST_UP_NICKNAME = "이두나";
@@ -173,7 +173,7 @@ public class PlayerControllerTest {
 
 	@Test
 	public void getPlayers() throws Exception {
-		ResultActions resultActions = mockMvc.perform(get(TEST_URL));
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/all"));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 	}
