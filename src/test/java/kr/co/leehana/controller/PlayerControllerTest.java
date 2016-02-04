@@ -241,6 +241,7 @@ public class PlayerControllerTest {
 		createDto.setEmail(email);
 		createDto.setNickname(nickname);
 		createDto.setPassword(password);
+		createDto.setMatchingPassword(password);
 		return createDto;
 	}
 }

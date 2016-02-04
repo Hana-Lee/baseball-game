@@ -1,5 +1,7 @@
 package kr.co.leehana.dto;
 
+import kr.co.leehana.annotation.PasswordMatches;
+import kr.co.leehana.annotation.ValidEmail;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Level;
@@ -9,7 +11,6 @@ import kr.co.leehana.type.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
@@ -19,13 +20,14 @@ import java.util.Date;
  */
 public class PlayerDto {
 
+	@PasswordMatches
 	@Data
 	public static class Create {
-		private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*" +
-				"@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+
 
 		@NotBlank
-		@Pattern(regexp = EMAIL_PATTERN)
+//		@Pattern(regexp = EMAIL_PATTERN)
+		@ValidEmail
 		private String email;
 
 		@NotBlank
@@ -35,6 +37,7 @@ public class PlayerDto {
 		@NotBlank
 		@Size(min = 4, max = 41)
 		private String password;
+		private String matchingPassword;
 	}
 
 	@Data
