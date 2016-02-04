@@ -63,7 +63,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	@Override
-	public GameRoom get(final Long id) {
+	public GameRoom getById(final Long id) {
 		final GameRoom gameRoom = gameRoomRepository.findOne(id);
 		if (gameRoom == null) {
 			throw new GameRoomNotFoundException(id);
@@ -84,7 +84,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	@Override
 	public GameRoom update(Long id, GameRoomDto.Update updateDto) {
-		final GameRoom gameRoom = get(id);
+		final GameRoom gameRoom = getById(id);
 
 		if (updateDto.getName() != null && !updateDto.getName().isEmpty()) {
 			gameRoom.setName(updateDto.getName());

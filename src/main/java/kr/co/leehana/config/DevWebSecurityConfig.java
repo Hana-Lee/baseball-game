@@ -1,10 +1,14 @@
 package kr.co.leehana.config;
 
+import kr.co.leehana.controller.PlayerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
@@ -18,15 +22,24 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private UserDetailsService userDetailsService;
+
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
+	}
+
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
-//		http.csrf().disable();
-//		http.httpBasic();
-//		http.authorizeRequests().anyRequest().permitAll();
+		httpSecurity.authorizeRequests()
+				.antMatchers("/console/**").hasRole("USER")
+				.antMatchers(HttpMethod.DELETE, PlayerController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.GET, PlayerController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.PUT, PlayerController.URL_VALUE + "/**").hasRole("USER")
+				.anyRequest().permitAll();
 
-		httpSecurity.authorizeRequests().antMatchers("/").permitAll().and()
-				.authorizeRequests().antMatchers("/console/**").permitAll();
-
+		httpSecurity.httpBasic();
 		httpSecurity.csrf().disable();
 		httpSecurity.headers().frameOptions().disable();
 	}

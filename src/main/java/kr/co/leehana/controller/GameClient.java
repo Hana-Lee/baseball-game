@@ -8,7 +8,7 @@ import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.type.RoleType;
+import kr.co.leehana.type.GameRole;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,7 +48,7 @@ public class GameClient {
 				System.out.println("Result : " + resultDto);
 
 				onlyOneAttacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
-						.equals(RoleType.ATTACKER)).count() == 1;
+						.equals(GameRole.ATTACKER)).count() == 1;
 
 				if (resultDto.getErrorMessage() != null && resultDto.getErrorMessage().getMessage() != null &&
 						!resultDto.getErrorMessage().getMessage().isEmpty()) {
@@ -69,7 +69,7 @@ public class GameClient {
 				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().isSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
 					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType
-							().equals(RoleType.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank()
+							().equals(GameRole.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank()
 							.getValue() + "등 입니다.");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점 입니다.");
 					System.out.println("누적 점수 : " + resultDto.getUser().getTotalScore().getValue() + "점 입니다.");
@@ -308,7 +308,7 @@ public class GameClient {
 			}
 		}
 
-		return new Role(RoleType.valueOf(userRole));
+		return new Role(GameRole.valueOf(userRole));
 	}
 
 	private boolean joiningGameRoom(long gameRoomId) throws IOException {
@@ -363,7 +363,7 @@ public class GameClient {
 				final int selectedMenu = Integer.valueOf(roomMenuScanner.nextLine());
 				switch (selectedMenu) {
 					case 1:
-						if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+						if (user.getRole().getRoleType().equals(GameRole.DEFENDER)) {
 							generateNumber(gameRoomId);
 						}
 
@@ -383,7 +383,7 @@ public class GameClient {
 							Thread.sleep(500);
 						}
 
-						if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+						if (user.getRole().getRoleType().equals(GameRole.DEFENDER)) {
 							monitoringGame(gameRoomId);
 						} else {
 							runningGame(gameRoomId);
@@ -410,15 +410,15 @@ public class GameClient {
 			final ResultDto resultDto = objectMapper.readValue(resultDtoJson, ResultDto.class);
 
 			allUsersResolved = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
-					.equals(RoleType.ATTACKER) && u.getGameOver()).count() == resultDto.getGameRoom().getUsers()
-					.stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
+					.equals(GameRole.ATTACKER) && u.getGameOver()).count() == resultDto.getGameRoom().getUsers()
+					.stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER)).count();
 
 			if (allUsersResolved) {
 				System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 				System.out.println("모든 유저가 게임을 마쳤습니다");
 				System.out.println("게임 결과");
 				long allUserCount = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType()
-						.equals(RoleType.ATTACKER)).count();
+						.equals(GameRole.ATTACKER)).count();
 				for (int i = 1; i <= allUserCount; i++) {
 					final int rankValue = i;
 					final OldUser attacker = resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRank()
@@ -442,7 +442,7 @@ public class GameClient {
 							resultDto.getResult().getBall().getValue() + "볼");
 
 					System.out.println("등수 : " + resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole()
-							.getRoleType().equals(RoleType.ATTACKER)).count() + "명중 " + resultDto.getUser().getRank()
+							.getRoleType().equals(GameRole.ATTACKER)).count() + "명중 " + resultDto.getUser().getRank()
 							.getValue() + "등");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점");
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");

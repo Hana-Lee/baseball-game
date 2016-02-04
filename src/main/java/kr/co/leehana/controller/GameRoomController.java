@@ -109,7 +109,7 @@ public class GameRoomController {
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(HttpStatus.OK)
 	public GameRoomDto.Response getGameRoom(@PathVariable Long id) {
-		return modelMapper.map(gameRoomService.get(id), GameRoomDto.Response.class);
+		return modelMapper.map(gameRoomService.getById(id), GameRoomDto.Response.class);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})

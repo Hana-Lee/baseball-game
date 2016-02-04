@@ -6,14 +6,23 @@ package kr.co.leehana.exception;
  */
 public class PlayerNotFoundException extends RuntimeException {
 
-	private long id;
+	private Long id;
+	private String email;
 
-	public PlayerNotFoundException(long id) {
+	public PlayerNotFoundException(Long id) {
 		this.id = id;
 	}
 
-	public long getId() {
+	public PlayerNotFoundException(String email) {
+		this.email = email;
+	}
+
+	public Long getId() {
 		return id;
+	}
+
+	public String getEmail() {
+		return email;
 	}
 }
 

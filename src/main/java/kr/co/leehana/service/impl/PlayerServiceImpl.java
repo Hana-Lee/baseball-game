@@ -17,11 +17,14 @@ import kr.co.leehana.service.PlayerService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Hana Lee
@@ -84,7 +87,7 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	public Player update(Long id, PlayerDto.Update updateDto) {
-		final Player player = get(id);
+		final Player player = getById(id);
 
 		if (updateDto.getEmail() != null)
 			player.setEmail(updateDto.getEmail());
@@ -119,7 +122,7 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	public Player get(Long id) {
+	public Player getById(Long id) {
 		Player player = playerRepository.findOne(id);
 		if (player == null) {
 			throw new PlayerNotFoundException(id);
@@ -129,7 +132,27 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
+	public Player getByEmail(String email) {
+		Player player = playerRepository.findByEmail(email);
+		if (player == null) {
+			throw new PlayerNotFoundException(email);
+		}
+
+		return player;
+	}
+
+	@Override
+	public Page<Player> getAll(Pageable pageable) {
+		return playerRepository.findAll(pageable);
+	}
+
+	@Override
+	public List<Player> getAll() {
+		return playerRepository.findAll();
+	}
+
+	@Override
 	public void delete(Long id) {
-		playerRepository.delete(get(id));
+		playerRepository.delete(getById(id));
 	}
 }

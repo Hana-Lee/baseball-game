@@ -1,5 +1,6 @@
 package kr.co.leehana;
 
+import kr.co.leehana.controller.ScoreCalculator;
 import kr.co.leehana.model.Ball;
 import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
@@ -7,11 +8,10 @@ import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Result;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
-import kr.co.leehana.controller.ScoreCalculator;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
-import kr.co.leehana.type.RoleType;
+import kr.co.leehana.type.GameRole;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -146,12 +146,12 @@ public class ScoreCalculatorTest {
 		this.gameRoom.getUsers().clear();
 		this.gameRoom.setSetting(new Setting(5, guessLevel, generationLevel));
 
-		OldUser user = new OldUser("이하나", new Role(RoleType.DEPENDER), new Score());
+		OldUser user = new OldUser("이하나", new Role(GameRole.DEFENDER), new Score());
 		this.gameRoom.getUsers().add(user);
 
 		int count = 0;
 		for (int i = 1; i <= attackUserCount; i++) {
-			OldUser newUser = new OldUser("이하나" + i, new Role(RoleType.ATTACKER), new Score());
+			OldUser newUser = new OldUser("이하나" + i, new Role(GameRole.ATTACKER), new Score());
 			if (count < solvedUserCount) {
 				newUser.setResult(new Result(new Settlement(true), new Strike(2), new Ball(0)));
 			} else {
@@ -164,14 +164,14 @@ public class ScoreCalculatorTest {
 	}
 
 	private OldUser findDepender() {
-		return this.gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.DEPENDER)).findFirst().get();
+		return this.gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.DEFENDER)).findFirst().get();
 	}
 
 	@Test
 	public void testAllUserFocusedDependerScoreCalculation() {
 		this.gameRoom.setSetting(new Setting());
-		final OldUser depender = new OldUser("이하나", new Role(RoleType.DEPENDER), new Score());
-		final OldUser attacker = new OldUser("이두나", new Role(RoleType.ATTACKER), new Score());
+		final OldUser depender = new OldUser("이하나", new Role(GameRole.DEFENDER), new Score());
+		final OldUser attacker = new OldUser("이두나", new Role(GameRole.ATTACKER), new Score());
 		attacker.setGameOver(true);
 		attacker.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
 
@@ -279,7 +279,7 @@ public class ScoreCalculatorTest {
 		final Result result = new Result(new Settlement(true), new Strike(3), new Ball(0));
 		this.gameRoom.setSetting(setting);
 		// 총 1명
-		final OldUser newUser = new OldUser(userId, new Role(RoleType.ATTACKER), new Score());
+		final OldUser newUser = new OldUser(userId, new Role(GameRole.ATTACKER), new Score());
 		newUser.setRank(rank);
 		newUser.setResult(result);
 		this.gameRoom.getUsers().add(newUser);
@@ -347,7 +347,7 @@ public class ScoreCalculatorTest {
 		final Setting setting = new Setting(5, guessLevel, generationLevel);
 		gameRoom.setSetting(setting);
 
-		final OldUser user = new OldUser("이하나", new Role(RoleType.ATTACKER), new Score());
+		final OldUser user = new OldUser("이하나", new Role(GameRole.ATTACKER), new Score());
 		user.setRank(new Rank(0));
 		user.setGuessCount(guessLevel);
 		user.setResult(result);
@@ -363,7 +363,7 @@ public class ScoreCalculatorTest {
 	// 잘못된 입력 초과시 점수 계산 테스트
 	@Test
 	public void testWrongNumberScoreCalculation() {
-		final OldUser user = new OldUser("이하나", new Role(RoleType.ATTACKER), new Score());
+		final OldUser user = new OldUser("이하나", new Role(GameRole.ATTACKER), new Score());
 		user.setResult(new Result(new Settlement(false), new Strike(0), new Ball(0)));
 		user.setGuessCount(0);
 		user.setWrongCount(5);
@@ -379,7 +379,7 @@ public class ScoreCalculatorTest {
 
 	@Test
 	public void testTotalScoreCalculation() {
-		final OldUser user = new OldUser("이하나", new Role(RoleType.ATTACKER), new Score());
+		final OldUser user = new OldUser("이하나", new Role(GameRole.ATTACKER), new Score());
 		user.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
 		user.setGuessCount(2);
 		user.setRank(new Rank(1));
@@ -393,7 +393,7 @@ public class ScoreCalculatorTest {
 		user.getTotalScore().setValue(user.getTotalScore().getValue() + firstScore.getValue());
 		assertEquals("기본 설정, 1명중 1등은 40점이여야 합니다.", 40, firstScore.getValue());
 
-		final OldUser secUser = new OldUser("이두나", new Role(RoleType.ATTACKER), new Score());
+		final OldUser secUser = new OldUser("이두나", new Role(GameRole.ATTACKER), new Score());
 		secUser.setRank(new Rank(1));
 		gameRoom.getUsers().add(secUser);
 

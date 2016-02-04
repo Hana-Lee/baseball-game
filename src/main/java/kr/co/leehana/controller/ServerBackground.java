@@ -11,8 +11,8 @@ import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.type.ErrorType;
+import kr.co.leehana.type.GameRole;
 import kr.co.leehana.type.MessageType;
-import kr.co.leehana.type.RoleType;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -150,7 +150,7 @@ public class ServerBackground {
 								final OldUser joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
 										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
 										.get(0);
-								joinedUser.setRole(new Role(RoleType.valueOf(role)));
+								joinedUser.setRole(new Role(GameRole.valueOf(role)));
 								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
 
@@ -283,7 +283,7 @@ public class ServerBackground {
 								dataOutputStream.writeUTF(jsonResult);
 
 								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType
-										().equals(RoleType.DEPENDER)).findFirst().orElse(null);
+										().equals(GameRole.DEFENDER)).findFirst().orElse(null);
 								if (depender != null) {
 									clients.get(depender).writeUTF(jsonResult);
 								}
@@ -390,8 +390,8 @@ public class ServerBackground {
 								final long gameRoomId = Long.parseLong(value);
 								final OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 										(Collectors.toList()).get(0);
-								boolean dependerAlreadyExist = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType
-										.DEPENDER)).count() > 0;
+								boolean dependerAlreadyExist = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole
+										.DEFENDER)).count() > 0;
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(dependerAlreadyExist));
 							}
 							break;
@@ -427,9 +427,9 @@ public class ServerBackground {
 							.size();
 					break;
 				case ALL_USER_COMPLETED_GUESS:
-					currentState = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType
+					currentState = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole
 							.ATTACKER) && u.isGuessCompleted()).count() == gameRoom.getUsers().stream().filter(u -> u
-							.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
+							.getRole().getRoleType().equals(GameRole.ATTACKER)).count();
 					break;
 			}
 

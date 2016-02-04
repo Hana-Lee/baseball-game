@@ -6,5 +6,15 @@ package kr.co.leehana.type;
  */
 public enum RoleType {
 
-	ATTACKER, DEPENDER
+	USER("ROLE_USER"), ADMIN("ROLE_ADMIN");
+
+	private String roleName;
+
+	RoleType(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
 }

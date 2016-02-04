@@ -5,7 +5,6 @@ import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.Player;
-import kr.co.leehana.repository.PlayerRepository;
 import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,20 +33,17 @@ import java.util.stream.Collectors;
 @RestController
 public class PlayerController {
 
-	private static final String URL_VALUE = "/player";
+	public static final String URL_VALUE = "/player";
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 
 	private PlayerService playerService;
 
-	private PlayerRepository playerRepository;
-
 	private ModelMapper modelMapper;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, PlayerRepository playerRepository, ModelMapper modelMapper) {
+	public PlayerController(PlayerService playerService, ModelMapper modelMapper) {
 		this.playerService = playerService;
-		this.playerRepository = playerRepository;
 		this.modelMapper = modelMapper;
 	}
 
@@ -67,7 +63,7 @@ public class PlayerController {
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
 	public PageImpl<PlayerDto.Response> getPlayers(Pageable pageable) {
-		Page<Player> pages = playerRepository.findAll(pageable);
+		Page<Player> pages = playerService.getAll(pageable);
 		List<PlayerDto.Response> content = pages.getContent().parallelStream().map(player -> modelMapper.map(player,
 				PlayerDto.Response.class)).collect(Collectors.toList());
 		return new PageImpl<>(content, pageable, pages.getTotalElements());
@@ -76,7 +72,7 @@ public class PlayerController {
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.GET})
 	@ResponseStatus(code = HttpStatus.OK)
 	public PlayerDto.Response getPlayer(@PathVariable Long id) {
-		return modelMapper.map(playerService.get(id), PlayerDto.Response.class);
+		return modelMapper.map(playerService.getById(id), PlayerDto.Response.class);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {RequestMethod.PUT})

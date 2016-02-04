@@ -4,7 +4,7 @@ import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.type.RoleType;
+import kr.co.leehana.type.GameRole;
 
 public class ScoreCalculator {
 
@@ -17,7 +17,7 @@ public class ScoreCalculator {
 	}
 
 	public static Score calculation(final OldUser user, final OldGameRoom gameRoom) {
-		if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
+		if (user.getRole().getRoleType().equals(GameRole.ATTACKER)) {
 			return attackerScore(user, gameRoom);
 		} else {
 			return dependerScore(user, gameRoom);
@@ -40,12 +40,12 @@ public class ScoreCalculator {
 	}
 
 	private static long getSolvedUserCount(final OldGameRoom gameRoom) {
-		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER) && u
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER) && u
 				.getResult().getSettlement().isSolved()).count();
 	}
 
 	private static long getAttackerCount(final OldGameRoom gameRoom) {
-		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER)).count();
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER)).count();
 	}
 
 	/**
@@ -71,9 +71,9 @@ public class ScoreCalculator {
 	}
 
 	private static float makeBaseScore(final OldUser user, final OldGameRoom gameRoom, final Setting setting) {
-		if (user.getRole().getRoleType().equals(RoleType.ATTACKER)) {
+		if (user.getRole().getRoleType().equals(GameRole.ATTACKER)) {
 			return makeAttackerBaseScore(user, gameRoom, setting);
-		} else if (user.getRole().getRoleType().equals(RoleType.DEPENDER)) {
+		} else if (user.getRole().getRoleType().equals(GameRole.DEFENDER)) {
 			return makeDependerBaseScore(gameRoom);
 		}
 
@@ -89,9 +89,9 @@ public class ScoreCalculator {
 	}
 
 	private static boolean allUserFocusedNumber(final OldGameRoom gameRoom) {
-		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(RoleType.ATTACKER) && u
+		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER) && u
 				.getResult().getSettlement().isSolved()).count() == gameRoom.getUsers().stream().filter(u -> u.getRole
-				().getRoleType().equals(RoleType.ATTACKER)).count();
+				().getRoleType().equals(GameRole.ATTACKER)).count();
 	}
 
 	private static float makeAttackerBaseScore(final OldUser user, final OldGameRoom gameRoom, final Setting setting) {
@@ -145,7 +145,7 @@ public class ScoreCalculator {
 	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final OldUser
 			user) {
 		float numberCountScoreValue;
-		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
+		final boolean isAttacker = user.getRole().getRoleType().equals(GameRole.ATTACKER);
 		switch (generationNumberCount) {
 			case 2:
 				if (isAttacker) {
@@ -180,7 +180,7 @@ public class ScoreCalculator {
 
 	private static float getGuessScoreValue(final int guessInputCount, final float baseScore, final OldUser user) {
 		float guessScoreValue;
-		final boolean isAttacker = user.getRole().getRoleType().equals(RoleType.ATTACKER);
+		final boolean isAttacker = user.getRole().getRoleType().equals(GameRole.ATTACKER);
 		switch (guessInputCount) {
 			case 20:
 				if (isAttacker) {

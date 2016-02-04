@@ -15,7 +15,7 @@ public interface GameRoomService {
 
 	GameRoom create(GameRoomDto.Create createDto);
 
-	GameRoom get(Long id);
+	GameRoom getById(Long id);
 
 	List<GameRoom> getAll();
 

@@ -1,6 +1,6 @@
 package kr.co.leehana.model;
 
-import kr.co.leehana.type.RoleType;
+import kr.co.leehana.type.GameRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Role {
 
-	private RoleType roleType = RoleType.ATTACKER;
+	private GameRole roleType = GameRole.ATTACKER;
 }
