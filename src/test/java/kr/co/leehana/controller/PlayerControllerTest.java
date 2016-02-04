@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.Filter;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -173,17 +174,18 @@ public class PlayerControllerTest {
 
 	@Test
 	public void getPlayers() throws Exception {
-		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/all"));
+		createTestPlayer();
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/all").with(httpBasic(TEST_EMAIL,
+				TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 	}
 
 	@Test
 	public void getPlayer() throws Exception {
-		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Player newPlayer = playerService.create(createDto);
-
-		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/" + newPlayer.getId()));
+		Player newPlayer = createTestPlayer();
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/" + newPlayer.getId()).with(httpBasic
+				(TEST_EMAIL, TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));
@@ -192,7 +194,8 @@ public class PlayerControllerTest {
 
 	@Test
 	public void notExistPlayerGet() throws Exception {
-		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/1"));
+		createTestPlayer();
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/2").with(httpBasic(TEST_EMAIL, TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
 		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(PLAYER_NOT_FOUND_ERROR_CODE)));
@@ -200,9 +203,7 @@ public class PlayerControllerTest {
 
 	@Test
 	public void updatePlayer() throws Exception {
-		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Player newPlayer = playerService.create(createDto);
-
+		Player newPlayer = createTestPlayer();
 		PlayerDto.Update updateDto = new PlayerDto.Update();
 		updateDto.setEmail(TEST_EMAIL);
 		updateDto.setNickname(TEST_UP_NICKNAME);
@@ -215,7 +216,8 @@ public class PlayerControllerTest {
 		updateDto.setTotalRank(new TotalRank(1));
 
 		ResultActions resultActions = mockMvc.perform(put(TEST_URL + "/" + newPlayer.getId()).contentType(MediaType
-				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDto)));
+				.APPLICATION_JSON).content(objectMapper.writeValueAsString(updateDto)).with(httpBasic(TEST_EMAIL,
+				TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath(NICKNAME_PATH, is(TEST_UP_NICKNAME)));
@@ -228,12 +230,17 @@ public class PlayerControllerTest {
 
 	@Test
 	public void deletePlayer() throws Exception {
-		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		Player newPlayer = playerService.create(createDto);
+		Player newPlayer = createTestPlayer();
 
-		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + newPlayer.getId()));
+		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + newPlayer.getId()).with(httpBasic
+				(TEST_EMAIL, TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isNoContent());
+	}
+
+	private Player createTestPlayer() {
+		PlayerDto.Create createDto = playerCreateDtoFixture(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		return playerService.create(createDto);
 	}
 
 	private PlayerDto.Create playerCreateDtoFixture(String email, String nickname, String password) {
