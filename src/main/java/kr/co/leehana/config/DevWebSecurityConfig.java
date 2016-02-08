@@ -1,5 +1,6 @@
 package kr.co.leehana.config;
 
+import kr.co.leehana.controller.GameRoomController;
 import kr.co.leehana.controller.PlayerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -37,6 +38,10 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.DELETE, PlayerController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.GET, PlayerController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.PUT, PlayerController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.DELETE, GameRoomController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.GET, GameRoomController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.PUT, GameRoomController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.POST, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.anyRequest().permitAll();
 
 		httpSecurity.httpBasic();

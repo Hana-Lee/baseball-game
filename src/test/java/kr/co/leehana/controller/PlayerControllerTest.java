@@ -12,6 +12,7 @@ import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.Win;
 import kr.co.leehana.service.PlayerService;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

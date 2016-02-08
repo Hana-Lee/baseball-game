@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @RestController
 public class GameRoomController {
 
-	private static final String URL_VALUE = "/gameroom";
+	public static final String URL_VALUE = "/gameroom";
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
