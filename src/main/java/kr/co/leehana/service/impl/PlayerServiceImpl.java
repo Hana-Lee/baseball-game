@@ -86,9 +86,20 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
-	public Player update(Long id, PlayerDto.Update updateDto) {
+	public Player updateById(Long id, PlayerDto.Update updateDto) {
 		final Player player = getById(id);
 
+		return update(updateDto, player);
+	}
+
+	@Override
+	public Player updateByEmail(String email, PlayerDto.Update updateDto) {
+		final Player player = getByEmail(email);
+
+		return update(updateDto, player);
+	}
+
+	private Player update(PlayerDto.Update updateDto, Player player) {
 		if (updateDto.getEmail() != null)
 			player.setEmail(updateDto.getEmail());
 

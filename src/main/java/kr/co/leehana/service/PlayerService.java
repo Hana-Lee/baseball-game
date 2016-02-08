@@ -15,7 +15,9 @@ public interface PlayerService {
 
 	Player create(PlayerDto.Create createDto);
 
-	Player update(Long id, PlayerDto.Update updateDto);
+	Player updateById(Long id, PlayerDto.Update updateDto);
+
+	Player updateByEmail(String email, PlayerDto.Update updateDto);
 
 	Player getById(Long id);
 

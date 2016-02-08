@@ -2,6 +2,7 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
+import kr.co.leehana.type.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -25,6 +26,8 @@ public class GameRoomDto {
 		private String name;
 
 		@NotNull
+		private GameRole gameRole;
+
 		private Player owner;
 
 		@NotNull

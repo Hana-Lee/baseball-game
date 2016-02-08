@@ -9,6 +9,7 @@ import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
+import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,12 +61,7 @@ public class GameRoomController {
 		요청 셈플
 		{
 		    "name": "루비",
-		    "owner": {
-		      "id": 1,
-		      "email": "i@leehana.co.kr",
-		      "nickname": "이하나",
-		      "gameRole": "ATTACKER"
-		    },
+		    "gameRole": "ATTACKER",
 		    "setting": {
 		        "limitWrongInputCount": 5,
 		        "limitGuessInputCount": 10,
@@ -82,7 +79,7 @@ public class GameRoomController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		Player updatedPlayer = updatePlayerStatus(createDto);
+		Player updatedPlayer = ownerSetting(createDto);
 		createDto.setOwner(updatedPlayer);
 
 		GameRoom newGameRoom = gameRoomService.create(createDto);
@@ -90,9 +87,12 @@ public class GameRoomController {
 		return new ResponseEntity<>(newGameRoom, HttpStatus.CREATED);
 	}
 
-	private Player updatePlayerStatus(GameRoomDto.Create createDto) {
-		PlayerDto.Update playerUpdateDto = modelMapper.map(createDto.getOwner(), PlayerDto.Update.class);
-		return playerService.update(createDto.getOwner().getId(), playerUpdateDto);
+	private Player ownerSetting(GameRoomDto.Create createDto) {
+		UserDetailsImpl owner = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+		PlayerDto.Update playerUpdateDto = new PlayerDto.Update();
+		playerUpdateDto.setGameRole(createDto.getGameRole());
+		return playerService.updateByEmail(owner.getUsername(), playerUpdateDto);
 	}
 
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {RequestMethod.GET})

@@ -82,7 +82,7 @@ public class PlayerController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		Player updatedPlayer = playerService.update(id, updateDto);
+		Player updatedPlayer = playerService.updateById(id, updateDto);
 		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), HttpStatus.OK);
 	}
 
