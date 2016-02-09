@@ -95,7 +95,7 @@ public class GameRoomController {
 				.getPrincipal();
 		PlayerDto.Update playerUpdateDto = new PlayerDto.Update();
 		playerUpdateDto.setGameRole(createDto.getGameRole());
-		createDto.setOwner(playerService.updateByEmail(owner.getUsername(), playerUpdateDto));
+		createDto.setOwner(playerService.updateByEmail(owner.getEmail(), playerUpdateDto));
 	}
 
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {GET})
@@ -156,7 +156,7 @@ public class GameRoomController {
 
 		UserDetailsImpl joinPlayerImpl = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
-		Player joinPlayer = playerService.getByEmail(joinPlayerImpl.getUsername());
+		Player joinPlayer = playerService.getByEmail(joinPlayerImpl.getEmail());
 		joinPlayer.setGameRole(joinDto.getGameRole());
 
 		gameRoom.getPlayers().add(joinPlayer);

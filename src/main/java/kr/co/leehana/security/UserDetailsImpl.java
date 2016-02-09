@@ -30,4 +30,8 @@ public class UserDetailsImpl extends User {
 
 		return authorities;
 	}
+
+	public String getEmail() {
+		return super.getUsername();
+	}
 }
