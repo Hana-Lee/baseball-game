@@ -57,4 +57,9 @@ public class GameRoomDto {
 		private Date created;
 		private Date updated;
 	}
+
+	@Data
+	public static class Join {
+		private GameRole gameRole;
+	}
 }

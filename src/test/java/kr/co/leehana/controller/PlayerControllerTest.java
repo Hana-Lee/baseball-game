@@ -28,6 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 
+import static kr.co.leehana.utils.CommonsTestConstant.ERROR_CODE_PATH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -62,7 +63,6 @@ public class PlayerControllerTest {
 	private static final String TEST_LONG_PASS = "123456789012345678901234567890123456789012";
 	private static final String[] TEST_WRONG_EMAILS = {"a", "a@", "a@a", "a@2.컴"};
 	private static final String EMAIL_PATH = "$.email";
-	private static final String ERROR_CODE_PATH = "$.errorCode";
 	private static final String NICKNAME_PATH = "$.nickname";
 
 	@Autowired
