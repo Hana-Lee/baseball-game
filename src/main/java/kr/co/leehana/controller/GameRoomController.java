@@ -8,7 +8,6 @@ import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.GameRoom;
-import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
@@ -79,20 +78,19 @@ public class GameRoomController {
 			return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 		}
 
-		Player updatedPlayer = ownerSetting(createDto);
-		createDto.setOwner(updatedPlayer);
+		ownerSetting(createDto);
 
 		GameRoom newGameRoom = gameRoomService.create(createDto);
 
 		return new ResponseEntity<>(newGameRoom, HttpStatus.CREATED);
 	}
 
-	private Player ownerSetting(GameRoomDto.Create createDto) {
+	private void ownerSetting(GameRoomDto.Create createDto) {
 		UserDetailsImpl owner = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
 				.getPrincipal();
 		PlayerDto.Update playerUpdateDto = new PlayerDto.Update();
 		playerUpdateDto.setGameRole(createDto.getGameRole());
-		return playerService.updateByEmail(owner.getUsername(), playerUpdateDto);
+		createDto.setOwner(playerService.updateByEmail(owner.getUsername(), playerUpdateDto));
 	}
 
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {RequestMethod.GET})
