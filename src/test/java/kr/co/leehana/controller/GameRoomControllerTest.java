@@ -25,6 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 
+import static kr.co.leehana.type.GameRole.ATTACKER;
+import static kr.co.leehana.type.GameRole.DEFENDER;
 import static kr.co.leehana.utils.CommonsTestConstant.ERROR_CODE_PATH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -87,7 +89,7 @@ public class GameRoomControllerTest {
 		GameRoomDto.Create createDto = new GameRoomDto.Create();
 		createDto.setName(TEST_ROOM_NAME);
 		createDto.setSetting(setting);
-		createDto.setGameRole(GameRole.ATTACKER);
+		createDto.setGameRole(ATTACKER);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
@@ -96,7 +98,7 @@ public class GameRoomControllerTest {
 		resultActions.andExpect(status().isCreated());
 		resultActions.andExpect(jsonPath("$.name", is(TEST_ROOM_NAME)));
 		resultActions.andExpect(jsonPath("$.owner.email", is(player.getEmail())));
-		resultActions.andExpect(jsonPath("$.owner.gameRole", is(GameRole.ATTACKER.name())));
+		resultActions.andExpect(jsonPath("$.owner.gameRole", is(ATTACKER.name())));
 		resultActions.andExpect(jsonPath("$.players[0].email", is(player.getEmail())));
 	}
 
@@ -106,7 +108,7 @@ public class GameRoomControllerTest {
 		GameRoomDto.Create createDto = new GameRoomDto.Create();
 		createDto.setName(TEST_ROOM_NAME);
 		createDto.setSetting(setting);
-		createDto.setGameRole(GameRole.ATTACKER);
+		createDto.setGameRole(ATTACKER);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
@@ -129,7 +131,7 @@ public class GameRoomControllerTest {
 		GameRoomDto.Create createDto = new GameRoomDto.Create();
 		createDto.setName(TEST_ROOM_NAME);
 		createDto.setSetting(setting);
-		createDto.setGameRole(GameRole.ATTACKER);
+		createDto.setGameRole(ATTACKER);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
@@ -144,7 +146,7 @@ public class GameRoomControllerTest {
 		creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
 
 		GameRoomDto.Join joinDto = new GameRoomDto.Join();
-		joinDto.setGameRole(GameRole.ATTACKER);
+		joinDto.setGameRole(ATTACKER);
 
 		resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType(APPLICATION_JSON).content(objectMapper
 				.writeValueAsString(joinDto)).with(httpBasic(TEST_SEC_EMAIL, TEST_SEC_PASS)));
@@ -159,7 +161,7 @@ public class GameRoomControllerTest {
 		GameRoomDto.Create createDto = new GameRoomDto.Create();
 		createDto.setName(TEST_ROOM_NAME);
 		createDto.setSetting(setting);
-		createDto.setGameRole(GameRole.DEFENDER);
+		createDto.setGameRole(DEFENDER);
 
 		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
 				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
@@ -173,7 +175,7 @@ public class GameRoomControllerTest {
 		creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
 
 		GameRoomDto.Join joinDto = new GameRoomDto.Join();
-		joinDto.setGameRole(GameRole.DEFENDER);
+		joinDto.setGameRole(DEFENDER);
 
 		resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(joinDto)).with(httpBasic(TEST_SEC_EMAIL, TEST_SEC_PASS)));
