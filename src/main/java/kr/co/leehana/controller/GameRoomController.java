@@ -13,6 +13,7 @@ import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import kr.co.leehana.type.GameRole;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,6 +39,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -80,7 +82,7 @@ public class GameRoomController {
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return createBadRequestResponseEntity(bindingResult);
+			return createErrorResponseEntity(bindingResult);
 		}
 
 		ownerSetting(createDto);
@@ -100,19 +102,18 @@ public class GameRoomController {
 
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {GET})
 	@ResponseStatus(code = OK)
-	public PageImpl<GameRoomDto.Response> getGameRooms(Pageable pageable) {
+	public PageImpl<GameRoom> getGameRooms(Pageable pageable) {
 		Page<GameRoom> gameRooms = gameRoomService.getAll(pageable);
 
-		List<GameRoomDto.Response> content = gameRooms.getContent().parallelStream().map(gameRoom -> modelMapper.map
-				(gameRoom, GameRoomDto.Response.class)).collect(Collectors.toList());
+		List<GameRoom> content = gameRooms.getContent().parallelStream().collect(Collectors.toList());
 
 		return new PageImpl<>(content, pageable, gameRooms.getTotalElements());
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {GET})
 	@ResponseStatus(OK)
-	public GameRoomDto.Response getGameRoom(@PathVariable Long id) {
-		return modelMapper.map(gameRoomService.getById(id), GameRoomDto.Response.class);
+	public GameRoom getGameRoom(@PathVariable Long id) {
+		return gameRoomService.getById(id);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PUT})
@@ -123,7 +124,7 @@ public class GameRoomController {
 		}
 
 		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
-		return new ResponseEntity<>(modelMapper.map(updatedGameRoom, GameRoomDto.Response.class), OK);
+		return new ResponseEntity<>(updatedGameRoom, OK);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {DELETE})
@@ -137,7 +138,7 @@ public class GameRoomController {
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return createBadRequestResponseEntity(bindingResult);
+			return createErrorResponseEntity(bindingResult);
 		}
 
 		GameRoom gameRoom = gameRoomService.getById(id);
@@ -146,11 +147,7 @@ public class GameRoomController {
 			Long defenderCount = gameRoom.getPlayers().stream().filter(p -> p.getGameRole().equals(GameRole.DEFENDER))
 					.count();
 			if (defenderCount > 0) {
-				ErrorResponse errorResponse = new ErrorResponse();
-				errorResponse.setMessage(new GameRoleDuplicatedException(joinDto.getGameRole()).getMessage());
-				errorResponse.setErrorCode("duplicated.gameRole.exception");
-
-				return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+				throw new GameRoleDuplicatedException(GameRole.DEFENDER);
 			}
 		}
 
@@ -161,15 +158,49 @@ public class GameRoomController {
 
 		gameRoom.getPlayers().add(joinPlayer);
 
-		return new ResponseEntity<>(modelMapper.map(gameRoom, GameRoomDto.Response.class), OK);
+		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	private ResponseEntity createBadRequestResponseEntity(BindingResult bindingResult) {
+	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PATCH})
+	public ResponseEntity changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
+			changeOwnerDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return createErrorResponseEntity(bindingResult);
+		}
+
+		if (changeOwnerDto.getNewOwnerId().equals(changeOwnerDto.getOldOwnerId())) {
+			return createErrorResponseEntity(bindingResult);
+		}
+
+		GameRoom gameRoom = gameRoomService.getById(id);
+		Player newOwner = playerService.getById(changeOwnerDto.getNewOwnerId());
+		gameRoom.setOwner(newOwner);
+		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
+		return createErrorResponseEntity(bindingResult.getFieldError().getDefaultMessage(), null);
+	}
+
+	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
+		if (StringUtils.isBlank(errorCode)) {
+			errorCode = "gameRoom.bad.request";
+		}
+
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(bindingResult.getFieldError().getDefaultMessage());
-		errorResponse.setErrorCode("gameRoom.bad.request");
+		errorResponse.setMessage(message);
+		errorResponse.setErrorCode(errorCode);
 
 		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+	}
+
+	@ExceptionHandler(GameRoleDuplicatedException.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handleGameRoleDuplicatedException(GameRoleDuplicatedException ex) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage(ex.getMessage());
+		errorResponse.setErrorCode(ex.getErrorCode());
+		return errorResponse;
 	}
 
 	@ExceptionHandler(OwnerDuplicatedException.class)

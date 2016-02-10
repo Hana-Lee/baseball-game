@@ -30,10 +30,10 @@ import static kr.co.leehana.type.GameRole.DEFENDER;
 import static kr.co.leehana.utils.CommonsTestConstant.ERROR_CODE_PATH;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,13 +50,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GameRoomControllerTest {
 
 	private static final String TEST_URL = "/gameroom";
-	private static final String TEST_JOIN_URL = "/gameroom/join/";
+	private static final String TEST_JOIN_URL = TEST_URL + "/join/";
 	private static final String TEST_ROOM_NAME = "루비";
 	private static final String DUP_ERROR_CODE = "duplicated.owner.exception";
 	private static final String DUP_GAME_ROLE_CODE = "duplicated.gameRole.exception";
 	private static final String TEST_SEC_EMAIL = "i2@leehana.co.kr";
 	private static final String TEST_SEC_NICK = "이하나2";
 	private static final String TEST_SEC_PASS = "dlgksk";
+	private static final String OWNER_EMAIL_PATH = "$.owner.email";
+	private static final String SEC_PLAYER_EMAIL_PATH = "$.players[?(@.email == 'i2@leehana.co.kr')]";
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -72,7 +74,6 @@ public class GameRoomControllerTest {
 
 	@Autowired
 	private TestPlayerCreator creator;
-
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private MockMvc mockMvc;
 	private Setting setting = new Setting();
@@ -97,7 +98,7 @@ public class GameRoomControllerTest {
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isCreated());
 		resultActions.andExpect(jsonPath("$.name", is(TEST_ROOM_NAME)));
-		resultActions.andExpect(jsonPath("$.owner.email", is(player.getEmail())));
+		resultActions.andExpect(jsonPath(OWNER_EMAIL_PATH, is(player.getEmail())));
 		resultActions.andExpect(jsonPath("$.owner.gameRole", is(ATTACKER.name())));
 		resultActions.andExpect(jsonPath("$.players[0].email", is(player.getEmail())));
 	}
@@ -128,59 +129,94 @@ public class GameRoomControllerTest {
 	@Test
 	public void joinGameRoom() throws Exception {
 		Player player = creator.createTestPlayer();
-		GameRoomDto.Create createDto = new GameRoomDto.Create();
-		createDto.setName(TEST_ROOM_NAME);
-		createDto.setSetting(setting);
-		createDto.setGameRole(ATTACKER);
+		GameRoom createdGameRoom = createTestGameRoom(player, ATTACKER);
 
-		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
-				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
-				.DEFAULT_TEST_PASS)));
-
-		resultActions.andDo(print());
-		resultActions.andExpect(status().isCreated());
-
-		String result = resultActions.andReturn().getResponse().getContentAsString();
-		GameRoom createdGameRoom = objectMapper.readValue(result, GameRoom.class);
-
-		creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
 
 		GameRoomDto.Join joinDto = new GameRoomDto.Join();
 		joinDto.setGameRole(ATTACKER);
 
-		resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType(APPLICATION_JSON).content(objectMapper
-				.writeValueAsString(joinDto)).with(httpBasic(TEST_SEC_EMAIL, TEST_SEC_PASS)));
+		// Second player join game room
+		ResultActions resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType
+				(APPLICATION_JSON).content(objectMapper.writeValueAsString(joinDto)).with(httpBasic(secPlayer.getEmail
+				(), TEST_SEC_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
-		resultActions.andExpect(jsonPath("$.players[?(@.email == 'i2@leehana.co.kr')]", is(not(empty()))));
+		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_PATH, is(not(empty()))));
 	}
 
 	@Test
 	public void joinGameRoomWithDupGameRoleException() throws Exception {
 		Player player = creator.createTestPlayer();
-		GameRoomDto.Create createDto = new GameRoomDto.Create();
-		createDto.setName(TEST_ROOM_NAME);
-		createDto.setSetting(setting);
-		createDto.setGameRole(DEFENDER);
+		GameRoom createdGameRoom = createTestGameRoom(player, DEFENDER);
 
-		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
-				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
-				.DEFAULT_TEST_PASS)));
-		resultActions.andDo(print());
-		resultActions.andExpect(status().isCreated());
-
-		String result = resultActions.andReturn().getResponse().getContentAsString();
-		GameRoom createdGameRoom = objectMapper.readValue(result, GameRoom.class);
-
-		creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
 
 		GameRoomDto.Join joinDto = new GameRoomDto.Join();
 		joinDto.setGameRole(DEFENDER);
 
-		resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(joinDto)).with(httpBasic(TEST_SEC_EMAIL, TEST_SEC_PASS)));
+		// Second player join game room
+		ResultActions resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType
+				(APPLICATION_JSON).content(objectMapper.writeValueAsString(joinDto)).with(httpBasic(secPlayer.getEmail
+				(), TEST_SEC_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
 		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(DUP_GAME_ROLE_CODE)));
+	}
+
+	@Test
+	public void ownerChange() throws Exception {
+		Player player = creator.createTestPlayer();
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+
+		GameRoom createdGameRoom = createTestGameRoomAndJoinGameRoom(player, secPlayer);
+
+		GameRoomDto.ChangeOwner changeOwnerDto = new GameRoomDto.ChangeOwner();
+		changeOwnerDto.setNewOwnerId(secPlayer.getId());
+		changeOwnerDto.setOldOwnerId(player.getId());
+
+		// Change game room owner (Change owner action's permit only current owner.)
+		ResultActions resultActions = mockMvc.perform(patch(TEST_URL + "/" + createdGameRoom.getId()).contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(changeOwnerDto)).with(httpBasic(player.getEmail(),
+						TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(OWNER_EMAIL_PATH, is(secPlayer.getEmail())));
+	}
+
+	private GameRoom createTestGameRoom(Player player) throws Exception {
+		return createTestGameRoom(player, ATTACKER);
+	}
+
+	private GameRoom createTestGameRoom(Player player, GameRole gameRole) throws Exception {
+		GameRoomDto.Create createDto = new GameRoomDto.Create();
+		createDto.setName(TEST_ROOM_NAME);
+		createDto.setSetting(setting);
+		createDto.setGameRole(gameRole);
+
+		// Create new game room
+		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
+				(objectMapper.writeValueAsString(createDto)).with(httpBasic(player.getEmail(), TestPlayerCreator
+				.DEFAULT_TEST_PASS)));
+
+		resultActions.andDo(print());
+		String result = resultActions.andReturn().getResponse().getContentAsString();
+		return objectMapper.readValue(result, GameRoom.class);
+	}
+
+	private GameRoom createTestGameRoomAndJoinGameRoom(Player player, Player secPlayer) throws Exception {
+		GameRoom createdGameRoom = createTestGameRoom(player);
+
+		GameRoomDto.Join joinDto = new GameRoomDto.Join();
+		joinDto.setGameRole(ATTACKER);
+
+		// Second player join game room
+		ResultActions resultActions = mockMvc.perform(post(TEST_JOIN_URL + createdGameRoom.getId()).contentType
+				(APPLICATION_JSON).content(objectMapper.writeValueAsString(joinDto)).with(httpBasic(secPlayer.getEmail
+				(), TEST_SEC_PASS)));
+		resultActions.andDo(print());
+
+		String result = resultActions.andReturn().getResponse().getContentAsString();
+		return objectMapper.readValue(result, GameRoom.class);
 	}
 }

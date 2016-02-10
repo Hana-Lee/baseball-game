@@ -15,6 +15,9 @@ public class GameRoleDuplicatedException extends RuntimeException {
 	@Getter
 	private String message = "Defender must not be duplicated";
 
+	@Getter
+	private String errorCode = "duplicated.gameRole.exception";
+
 	public GameRoleDuplicatedException(GameRole gameRole) {
 		this.gameRole = gameRole;
 	}

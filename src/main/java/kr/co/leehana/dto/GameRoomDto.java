@@ -62,4 +62,10 @@ public class GameRoomDto {
 	public static class Join {
 		private GameRole gameRole;
 	}
+
+	@Data
+	public static class ChangeOwner {
+		private Long oldOwnerId;
+		private Long newOwnerId;
+	}
 }
