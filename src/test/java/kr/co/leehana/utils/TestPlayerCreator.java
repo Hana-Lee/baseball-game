@@ -25,11 +25,19 @@ public class TestPlayerCreator {
 		this.playerService = playerService;
 	}
 
+	public Player createTestAdminPlayer() {
+		return createTestPlayer(null, null, null, Boolean.TRUE);
+	}
+
 	public Player createTestPlayer() {
-		return createTestPlayer(null, null, null);
+		return createTestPlayer(null, null, null, null);
 	}
 
 	public Player createTestPlayer(String email, String nickname, String password) {
+		return createTestPlayer(email, nickname, password, null);
+	}
+
+	public Player createTestPlayer(String email, String nickname, String password, Boolean isAdmin) {
 		if (StringUtils.isBlank(email)) {
 			email = DEFAULT_TEST_EMAIL;
 		}
@@ -40,16 +48,25 @@ public class TestPlayerCreator {
 			password = DEFAULT_TEST_PASS;
 		}
 
-		PlayerDto.Create createDto = playerCreateDtoFixture(email, nickname, password);
+		if (isAdmin == null) {
+			isAdmin = Boolean.FALSE;
+		}
+
+		PlayerDto.Create createDto = playerCreateDtoFixture(email, nickname, password, isAdmin);
 		return playerService.create(createDto);
 	}
 
 	public PlayerDto.Create playerCreateDtoFixture(String email, String nickname, String password) {
+		return playerCreateDtoFixture(email, nickname, password, Boolean.FALSE);
+	}
+
+	public PlayerDto.Create playerCreateDtoFixture(String email, String nickname, String password, Boolean isAdmin) {
 		PlayerDto.Create createDto = new PlayerDto.Create();
 		createDto.setEmail(email);
 		createDto.setNickname(nickname);
 		createDto.setPassword(password);
 		createDto.setMatchingPassword(password);
+		createDto.setAdmin(isAdmin);
 		return createDto;
 	}
 }

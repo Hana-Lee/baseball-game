@@ -38,6 +38,8 @@ public class PlayerDto {
 		@Size(min = 4, max = 41)
 		private String password;
 		private String matchingPassword;
+
+		private Boolean admin;
 	}
 
 	@Data

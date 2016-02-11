@@ -5,6 +5,7 @@ import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
+import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.GameRoom;
@@ -14,7 +15,6 @@ import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import kr.co.leehana.type.GameRole;
 import org.apache.commons.lang3.StringUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -54,16 +54,14 @@ public class GameRoomController {
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
+	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
 
-	private ModelMapper modelMapper;
-
 	@Autowired
-	public GameRoomController(GameRoomService gameRoomService, ModelMapper modelMapper, PlayerService playerService) {
+	public GameRoomController(GameRoomService gameRoomService, PlayerService playerService) {
 		this.gameRoomService = gameRoomService;
-		this.modelMapper = modelMapper;
 		this.playerService = playerService;
 	}
 
@@ -161,7 +159,7 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PATCH})
+	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
 	public ResponseEntity changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
 			changeOwnerDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -172,10 +170,23 @@ public class GameRoomController {
 			return createErrorResponseEntity(bindingResult);
 		}
 
+
 		GameRoom gameRoom = gameRoomService.getById(id);
+
+		checkCurrentPlayerIsOwner(gameRoom);
+
 		Player newOwner = playerService.getById(changeOwnerDto.getNewOwnerId());
 		gameRoom.setOwner(newOwner);
 		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	private void checkCurrentPlayerIsOwner(GameRoom gameRoom) {
+		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Player currentPlayer = playerService.getByEmail(userDetails.getEmail());
+
+		if (!gameRoom.getOwner().getEmail().equals(currentPlayer.getEmail())) {
+			throw new OwnerChangeException(currentPlayer.getNickname() + " is not game room owner.");
+		}
 	}
 
 	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
@@ -214,10 +225,19 @@ public class GameRoomController {
 
 	@ExceptionHandler(GameRoomNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomNotFoundException(PlayerNotFoundException e) {
+	public ErrorResponse handleGameRoomNotFoundException(PlayerNotFoundException ex) {
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + e.getId() + "] 에 해당하는 게임룸이 없습니다.");
+		errorResponse.setMessage("[" + ex.getId() + "] 에 해당하는 게임룸이 없습니다.");
 		errorResponse.setErrorCode("gameroom.not.found.exception");
+		return errorResponse;
+	}
+
+	@ExceptionHandler(OwnerChangeException.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handleOwnerChangeException(OwnerChangeException ex) {
+		ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setMessage(ex.getMessage());
+		errorResponse.setErrorCode(ex.getErrorCode());
 		return errorResponse;
 	}
 }
