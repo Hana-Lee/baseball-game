@@ -33,6 +33,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.empty;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -216,6 +217,17 @@ public class GameRoomControllerTest {
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
 		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is("owner.change.exception")));
+	}
+
+	@Test
+	public void nonAdminRoleDeleteGameRoomWithGameRoomDeleteException() throws Exception {
+		Player player = creator.createTestPlayer();
+		GameRoom gameRoom = createTestGameRoom(player);
+
+		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + gameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isForbidden());
 	}
 
 	private GameRoom createTestGameRoom(Player player) throws Exception {
