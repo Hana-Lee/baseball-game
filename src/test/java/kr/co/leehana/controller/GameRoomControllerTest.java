@@ -230,6 +230,17 @@ public class GameRoomControllerTest {
 		resultActions.andExpect(status().isForbidden());
 	}
 
+	@Test
+	public void deleteGameRoom() throws Exception {
+		Player player = creator.createTestAdminPlayer();
+		GameRoom gameRoom = createTestGameRoom(player);
+
+		ResultActions resultActions = mockMvc.perform(delete(TEST_URL + "/" + gameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isNoContent());
+	}
+
 	private GameRoom createTestGameRoom(Player player) throws Exception {
 		return createTestGameRoom(player, ATTACKER);
 	}

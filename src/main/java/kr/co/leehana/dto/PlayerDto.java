@@ -24,9 +24,7 @@ public class PlayerDto {
 	@Data
 	public static class Create {
 
-
 		@NotBlank
-//		@Pattern(regexp = EMAIL_PATTERN)
 		@ValidEmail
 		private String email;
 

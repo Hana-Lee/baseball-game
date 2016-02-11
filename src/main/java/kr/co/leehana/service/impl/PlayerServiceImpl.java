@@ -66,7 +66,10 @@ public class PlayerServiceImpl implements PlayerService {
 	private void fillInitData(Player player) {
 		player.setPassword(passwordEncoder.encode(player.getPassword()));
 
-		player.setAdmin(false);
+		if (player.getAdmin() == null) {
+			player.setAdmin(false);
+		}
+
 		player.setLevel(new Level(1));
 
 		final MatchRecord matchRecord = new MatchRecord();
