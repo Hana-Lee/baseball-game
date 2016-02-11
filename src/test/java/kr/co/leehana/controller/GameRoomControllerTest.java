@@ -86,6 +86,19 @@ public class GameRoomControllerTest {
 	}
 
 	@Test
+	public void noLoginCreateGameRoomWithException() throws Exception {
+		GameRoomDto.Create createDto = new GameRoomDto.Create();
+		createDto.setName(TEST_ROOM_NAME);
+		createDto.setSetting(setting);
+		createDto.setGameRole(ATTACKER);
+
+		ResultActions resultActions = mockMvc.perform(post(TEST_URL).contentType(APPLICATION_JSON).content
+				(objectMapper.writeValueAsString(createDto)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isUnauthorized());
+	}
+
+	@Test
 	public void createGameRoom() throws Exception {
 		Player player = creator.createTestPlayer();
 		GameRoomDto.Create createDto = new GameRoomDto.Create();
