@@ -34,6 +34,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -67,7 +68,8 @@ public class GameRoomControllerTest {
 	private static final String TEST_SEC_PASS = "dlgksk";
 
 	private static final String OWNER_EMAIL_PATH = "$.owner.email";
-	private static final String SEC_PLAYER_EMAIL_PATH = "$.players[?(@.email == 'i2@leehana.co.kr')]";
+	private static final String PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == 'i@leehana.co.kr')]";
+	private static final String SEC_PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == 'i2@leehana.co.kr')]";
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -164,7 +166,7 @@ public class GameRoomControllerTest {
 				(), TEST_SEC_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
-		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_PATH, is(not(empty()))));
+		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
 	}
 
 	@Test
@@ -273,6 +275,61 @@ public class GameRoomControllerTest {
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
 		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_PLAYER_NOT_FOUND_CODE)));
+	}
+
+	@Test
+	public void leaveGameRoom() throws Exception {
+		Player player = creator.createTestPlayer();
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+
+		GameRoom gameRoom = createTestGameRoomAndJoinGameRoom(player, secPlayer);
+
+		ResultActions resultActions = mockMvc.perform(post(TEST_LEAVE_URL + gameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(empty())));
+	}
+
+	@Test
+	public void ownerLeaveGameRoomAndChangeOwner() throws Exception {
+		Player player = creator.createTestPlayer();
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+
+		GameRoom gameRoom = createTestGameRoomAndJoinGameRoom(player, secPlayer);
+
+		ResultActions resultActions = mockMvc.perform(post(TEST_LEAVE_URL + gameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(empty())));
+		resultActions.andExpect(jsonPath(OWNER_EMAIL_PATH, is(secPlayer.getEmail())));
+	}
+
+	@Test
+	public void allPlayerLeaveGameRoomAndNotExistGameRoom() throws Exception {
+		Player player = creator.createTestPlayer();
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+
+		GameRoom gameRoom = createTestGameRoomAndJoinGameRoom(player, secPlayer);
+
+		// First player leave the game room
+		ResultActions resultActions = mockMvc.perform(post(TEST_LEAVE_URL + gameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+
+		// Second player leave the game room
+		resultActions = mockMvc.perform(post(TEST_LEAVE_URL + gameRoom.getId()).with(httpBasic(secPlayer
+				.getEmail(), TEST_SEC_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isNoContent());
+
+		// All players leave the game room then game room not found
+		resultActions = mockMvc.perform(get(TEST_URL + "/" + gameRoom.getId()).with(httpBasic(secPlayer.getEmail(),
+				TEST_SEC_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isBadRequest());
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_NOT_FOUND_CODE)));
 	}
 
 	private GameRoom createTestGameRoom(Player player) throws Exception {

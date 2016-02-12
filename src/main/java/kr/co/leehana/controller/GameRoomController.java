@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -192,6 +193,12 @@ public class GameRoomController {
 
 		gameRoom.getPlayers().remove(player);
 
+		if (gameRoom.getPlayers().isEmpty()) {
+			gameRoomService.delete(id);
+
+			return new ResponseEntity<>(NO_CONTENT);
+		}
+
 		Integer playerRankKey = null;
 		for (Integer key : gameRoom.getPlayerRankMap().keySet()) {
 			if (gameRoom.getPlayerRankMap().get(key).equals(player)) {
@@ -203,7 +210,7 @@ public class GameRoomController {
 			gameRoom.getPlayerRankMap().remove(playerRankKey);
 		}
 
-		if (gameRoom.getOwner().equals(player) && !gameRoom.getPlayers().isEmpty()) {
+		if (gameRoom.getOwner().equals(player)) {
 			gameRoom.setOwner(gameRoom.getPlayers().iterator().next());
 		}
 
