@@ -5,6 +5,7 @@ import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
+import kr.co.leehana.exception.GameRoomPlayerNotFoundException;
 import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
@@ -184,6 +185,11 @@ public class GameRoomController {
 	public ResponseEntity leave(@PathVariable Long id) {
 		GameRoom gameRoom = gameRoomService.getById(id);
 		Player player = getCurrentPlayer();
+
+		if (!gameRoom.getPlayers().contains(player)) {
+			throw new GameRoomPlayerNotFoundException(gameRoom, player);
+		}
+
 		gameRoom.getPlayers().remove(player);
 
 		Integer playerRankKey = null;
@@ -229,46 +235,43 @@ public class GameRoomController {
 			errorCode = "gameRoom.bad.request";
 		}
 
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(message);
-		errorResponse.setErrorCode(errorCode);
-
-		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
+		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
 	}
 
 	@ExceptionHandler(GameRoleDuplicatedException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoleDuplicatedException(GameRoleDuplicatedException ex) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(ex.getMessage());
-		errorResponse.setErrorCode(ex.getErrorCode());
-		return errorResponse;
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
 	}
 
 	@ExceptionHandler(OwnerDuplicatedException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleOwnerDuplicatedException(OwnerDuplicatedException ex) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + ex.getOwner().getEmail() + "] 중복된 방장 입니다.");
-		errorResponse.setErrorCode("duplicated.owner.exception");
-		return errorResponse;
+		return createErrorResponse("[" + ex.getOwner().getEmail() + "] 중복된 방장 입니다.", "duplicated.owner.exception");
 	}
 
 	@ExceptionHandler(GameRoomNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoomNotFoundException(GameRoomNotFoundException ex) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + ex.getId() + "] 에 해당하는 게임룸이 없습니다.");
-		errorResponse.setErrorCode("gameroom.not.found.exception");
-		return errorResponse;
+		return createErrorResponse("[" + ex.getId() + "] 에 해당하는 게임룸이 없습니다.", "gameroom.not.found.exception");
 	}
 
 	@ExceptionHandler(OwnerChangeException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleOwnerChangeException(OwnerChangeException ex) {
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
+	}
+
+	@ExceptionHandler(GameRoomPlayerNotFoundException.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handleGameRoomPlayerNotFoundException(GameRoomPlayerNotFoundException ex) {
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
+	}
+
+	private ErrorResponse createErrorResponse(String message, String errorCode) {
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(ex.getMessage());
-		errorResponse.setErrorCode(ex.getErrorCode());
+		errorResponse.setMessage(message);
+		errorResponse.setErrorCode(errorCode);
 		return errorResponse;
 	}
 }

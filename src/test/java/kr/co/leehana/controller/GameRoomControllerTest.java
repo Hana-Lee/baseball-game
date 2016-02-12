@@ -54,12 +54,18 @@ public class GameRoomControllerTest {
 	private static final String TEST_CHANGE_OWNER_URL = TEST_URL + "/change/owner/";
 	private static final String TEST_JOIN_URL = TEST_URL + "/join/";
 	private static final String TEST_LEAVE_URL = TEST_URL + "/leave/";
+
 	private static final String TEST_ROOM_NAME = "루비";
+
 	private static final String DUP_ERROR_CODE = "duplicated.owner.exception";
 	private static final String DUP_GAME_ROLE_CODE = "duplicated.gameRole.exception";
+	private static final String GAMEROOM_PLAYER_NOT_FOUND_CODE = "gameroom.player.not.found.exception";
+	private static final String GAMEROOM_NOT_FOUND_CODE = "gameroom.not.found.exception";
+
 	private static final String TEST_SEC_EMAIL = "i2@leehana.co.kr";
 	private static final String TEST_SEC_NICK = "이하나2";
 	private static final String TEST_SEC_PASS = "dlgksk";
+
 	private static final String OWNER_EMAIL_PATH = "$.owner.email";
 	private static final String SEC_PLAYER_EMAIL_PATH = "$.players[?(@.email == 'i2@leehana.co.kr')]";
 
@@ -251,7 +257,22 @@ public class GameRoomControllerTest {
 				(player.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
-		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is("gameroom.not.found.exception")));
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_NOT_FOUND_CODE)));
+	}
+
+	@Test
+	public void leaveGameRoomWithGameRoomPlayerNotFoundException() throws Exception {
+		Player player = creator.createTestPlayer();
+		createTestGameRoom(player);
+
+		Player secPlayer = creator.createTestPlayer(TEST_SEC_EMAIL, TEST_SEC_NICK, TEST_SEC_PASS);
+		GameRoom secGameRoom = createTestGameRoom(secPlayer);
+
+		ResultActions resultActions = mockMvc.perform(post(TEST_LEAVE_URL + secGameRoom.getId()).with(httpBasic(player
+				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isBadRequest());
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_PLAYER_NOT_FOUND_CODE)));
 	}
 
 	private GameRoom createTestGameRoom(Player player) throws Exception {
