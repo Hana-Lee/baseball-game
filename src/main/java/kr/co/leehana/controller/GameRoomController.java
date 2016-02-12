@@ -7,7 +7,6 @@ import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
-import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
@@ -55,6 +54,7 @@ public class GameRoomController {
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
 	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
+	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
@@ -180,6 +180,37 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
+	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {POST})
+	public ResponseEntity leave(@PathVariable Long id) {
+		GameRoom gameRoom = gameRoomService.getById(id);
+		Player player = getCurrentPlayer();
+		gameRoom.getPlayers().remove(player);
+
+		Integer playerRankKey = null;
+		for (Integer key : gameRoom.getPlayerRankMap().keySet()) {
+			if (gameRoom.getPlayerRankMap().get(key).equals(player)) {
+				playerRankKey = key;
+			}
+		}
+
+		if (playerRankKey != null) {
+			gameRoom.getPlayerRankMap().remove(playerRankKey);
+		}
+
+		if (gameRoom.getOwner().equals(player) && !gameRoom.getPlayers().isEmpty()) {
+			gameRoom.setOwner(gameRoom.getPlayers().iterator().next());
+		}
+
+		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	private Player getCurrentPlayer() {
+		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		return playerService.getByEmail(userDetails.getEmail());
+	}
+
 	private void checkCurrentPlayerIsOwner(GameRoom gameRoom) {
 		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Player currentPlayer = playerService.getByEmail(userDetails.getEmail());
@@ -225,7 +256,7 @@ public class GameRoomController {
 
 	@ExceptionHandler(GameRoomNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomNotFoundException(PlayerNotFoundException ex) {
+	public ErrorResponse handleGameRoomNotFoundException(GameRoomNotFoundException ex) {
 		ErrorResponse errorResponse = new ErrorResponse();
 		errorResponse.setMessage("[" + ex.getId() + "] 에 해당하는 게임룸이 없습니다.");
 		errorResponse.setErrorCode("gameroom.not.found.exception");

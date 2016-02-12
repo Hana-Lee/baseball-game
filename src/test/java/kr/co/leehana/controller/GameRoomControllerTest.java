@@ -53,6 +53,7 @@ public class GameRoomControllerTest {
 	private static final String TEST_URL = "/gameroom";
 	private static final String TEST_CHANGE_OWNER_URL = TEST_URL + "/change/owner/";
 	private static final String TEST_JOIN_URL = TEST_URL + "/join/";
+	private static final String TEST_LEAVE_URL = TEST_URL + "/leave/";
 	private static final String TEST_ROOM_NAME = "루비";
 	private static final String DUP_ERROR_CODE = "duplicated.owner.exception";
 	private static final String DUP_GAME_ROLE_CODE = "duplicated.gameRole.exception";
@@ -239,6 +240,18 @@ public class GameRoomControllerTest {
 				.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isNoContent());
+	}
+
+	@Test
+	public void leaveGameRoomWithGameRoomNotFoundException() throws Exception {
+		Player player = creator.createTestPlayer();
+		GameRoom gameRoom = createTestGameRoom(player);
+
+		ResultActions resultActions = mockMvc.perform(post(TEST_LEAVE_URL + (gameRoom.getId() + 1L)).with(httpBasic
+				(player.getEmail(), TestPlayerCreator.DEFAULT_TEST_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isBadRequest());
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is("gameroom.not.found.exception")));
 	}
 
 	private GameRoom createTestGameRoom(Player player) throws Exception {
