@@ -90,10 +90,6 @@ public class GameRoomServiceImpl implements GameRoomService {
 			gameRoom.setName(updateDto.getName());
 		}
 
-		if (updateDto.getOwner() != null) {
-			gameRoom.setOwner(updateDto.getOwner());
-		}
-
 		if (updateDto.getPlayers() != null) {
 			gameRoom.getPlayers().clear();
 			gameRoom.setPlayers(updateDto.getPlayers());

@@ -37,7 +37,6 @@ public class GameRoomDto {
 	@Data
 	public static class Update {
 		private String name;
-		private Player owner;
 		private Set<Player> players;
 		private Setting setting;
 		private Integer gameCount;
@@ -60,12 +59,17 @@ public class GameRoomDto {
 
 	@Data
 	public static class Join {
+		@NotNull
 		private GameRole gameRole;
 	}
 
 	@Data
 	public static class ChangeOwner {
+
+		@NotNull
 		private Long oldOwnerId;
+
+		@NotNull
 		private Long newOwnerId;
 	}
 }

@@ -117,14 +117,18 @@ public class GameRoomController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PUT})
-	public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Update updateDto,
-	                             BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return new ResponseEntity<>(BAD_REQUEST);
+	public ResponseEntity update(@PathVariable Long id, @RequestBody GameRoomDto.Update updateDto) {
+		if (updateDtoHasAllFieldNullValue(updateDto)) {
+			return createErrorResponseEntity("Update fields are must not be null", null);
 		}
 
 		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
 		return new ResponseEntity<>(updatedGameRoom, OK);
+	}
+
+	private boolean updateDtoHasAllFieldNullValue(GameRoomDto.Update updateDto) {
+		return updateDto == null || (updateDto.getGameCount() == null && updateDto.getName() == null && updateDto
+				.getPlayerRankMap() == null && updateDto.getPlayers() == null && updateDto.getSetting() == null);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {DELETE})
@@ -169,9 +173,9 @@ public class GameRoomController {
 		}
 
 		if (changeOwnerDto.getNewOwnerId().equals(changeOwnerDto.getOldOwnerId())) {
-			return createErrorResponseEntity(bindingResult);
+			throw new OwnerChangeException("New owner ID and old owner ID is not allow same ID [ " + changeOwnerDto
+					.getNewOwnerId() + ":" + changeOwnerDto.getOldOwnerId() + " ]");
 		}
-
 
 		GameRoom gameRoom = gameRoomService.getById(id);
 
@@ -225,7 +229,8 @@ public class GameRoomController {
 	}
 
 	private void checkCurrentPlayerIsOwner(GameRoom gameRoom) {
-		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
 		Player currentPlayer = playerService.getByEmail(userDetails.getEmail());
 
 		if (!gameRoom.getOwner().getEmail().equals(currentPlayer.getEmail())) {
@@ -239,7 +244,7 @@ public class GameRoomController {
 
 	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
 		if (StringUtils.isBlank(errorCode)) {
-			errorCode = "gameRoom.bad.request";
+			errorCode = "gameroom.bad.request";
 		}
 
 		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
