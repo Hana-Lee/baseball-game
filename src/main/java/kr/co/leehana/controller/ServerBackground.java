@@ -10,9 +10,9 @@ import kr.co.leehana.model.Result;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
-import kr.co.leehana.type.ErrorType;
-import kr.co.leehana.type.GameRole;
-import kr.co.leehana.type.MessageType;
+import kr.co.leehana.enums.ErrorType;
+import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.enums.MessageType;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

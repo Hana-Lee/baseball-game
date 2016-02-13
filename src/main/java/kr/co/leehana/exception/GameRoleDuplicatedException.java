@@ -1,6 +1,6 @@
 package kr.co.leehana.exception;
 
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import lombok.Getter;
 
 /**

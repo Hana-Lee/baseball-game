@@ -1,7 +1,7 @@
 package kr.co.leehana.security;
 
 import kr.co.leehana.model.Player;
-import kr.co.leehana.type.RoleType;
+import kr.co.leehana.enums.PlayerRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -22,10 +22,10 @@ public class UserDetailsImpl extends User {
 
 	private static Collection<? extends GrantedAuthority> makeAuthorities(final Player player) {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(RoleType.USER.getRoleName()));
+		authorities.add(new SimpleGrantedAuthority(PlayerRole.USER.getRoleName()));
 
 		if (player.getAdmin() != null && player.getAdmin()) {
-			authorities.add(new SimpleGrantedAuthority(RoleType.ADMIN.getRoleName()));
+			authorities.add(new SimpleGrantedAuthority(PlayerRole.ADMIN.getRoleName()));
 		}
 
 		return authorities;

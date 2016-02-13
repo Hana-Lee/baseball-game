@@ -7,7 +7,7 @@ import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.TotalRank;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 

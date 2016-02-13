@@ -11,7 +11,7 @@ import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import org.junit.Before;
 import org.junit.Test;
 

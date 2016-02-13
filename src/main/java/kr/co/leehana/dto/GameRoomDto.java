@@ -2,7 +2,7 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 

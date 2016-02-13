@@ -4,7 +4,7 @@ import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 
 public class ScoreCalculator {
 

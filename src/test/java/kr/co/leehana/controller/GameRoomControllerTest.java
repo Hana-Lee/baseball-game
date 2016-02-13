@@ -8,7 +8,7 @@ import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.utils.TestPlayerCreator;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +25,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.Filter;
 
-import static kr.co.leehana.type.GameRole.ATTACKER;
-import static kr.co.leehana.type.GameRole.DEFENDER;
+import static kr.co.leehana.enums.GameRole.ATTACKER;
+import static kr.co.leehana.enums.GameRole.DEFENDER;
 import static kr.co.leehana.utils.CommonsTestConstant.ERROR_CODE_PATH;
 import static kr.co.leehana.utils.TestPlayerCreator.DEFAULT_TEST_PASS;
 import static org.hamcrest.CoreMatchers.is;

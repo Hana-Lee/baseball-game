@@ -8,7 +8,7 @@ import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 
 import java.io.IOException;
 import java.util.List;

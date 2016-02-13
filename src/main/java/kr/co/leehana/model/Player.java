@@ -1,7 +1,7 @@
 package kr.co.leehana.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

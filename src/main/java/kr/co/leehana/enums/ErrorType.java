@@ -1,4 +1,4 @@
-package kr.co.leehana.type;
+package kr.co.leehana.enums;
 
 import lombok.Getter;
 

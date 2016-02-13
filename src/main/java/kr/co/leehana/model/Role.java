@@ -1,6 +1,6 @@
 package kr.co.leehana.model;
 
-import kr.co.leehana.type.GameRole;
+import kr.co.leehana.enums.GameRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
