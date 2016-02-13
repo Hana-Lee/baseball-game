@@ -176,14 +176,22 @@ public class GameRoomController {
 		Player player = getCurrentPlayer();
 		player.setGameRole(joinDto.getGameRole());
 
+		GameRoom selectedGameRoom;
 		List<GameRoom> gameRooms = gameRoomService.getAll();
-		Random random = new Random();
-		int randomInteger = random.nextInt(gameRooms.size());
+		if (gameRooms.size() > 1) {
+			Random random = new Random();
+			int randomInteger = random.nextInt(gameRooms.size());
 
-		GameRoom randomChoiceGameRoom = gameRooms.get(randomInteger);
-		randomChoiceGameRoom.getPlayers().add(player);
+			selectedGameRoom = gameRooms.get(randomInteger);
+		} else if (gameRooms.size() == 1){
+			selectedGameRoom = gameRooms.get(0);
+		} else {
+			throw new GameRoomNotFoundException("게임룸이 존재 하지 않습니다.");
+		}
 
-		return new ResponseEntity<>(randomChoiceGameRoom, OK);
+		selectedGameRoom.getPlayers().add(player);
+
+		return new ResponseEntity<>(selectedGameRoom, OK);
 	}
 
 	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
@@ -286,7 +294,7 @@ public class GameRoomController {
 	@ExceptionHandler(GameRoomNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoomNotFoundException(GameRoomNotFoundException ex) {
-		return createErrorResponse("[" + ex.getId() + "] 에 해당하는 게임룸이 없습니다.", "gameroom.not.found.exception");
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
 	}
 
 	@ExceptionHandler(OwnerChangeException.class)

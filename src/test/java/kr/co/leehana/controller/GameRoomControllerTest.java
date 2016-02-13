@@ -303,6 +303,19 @@ public class GameRoomControllerTest {
 	}
 
 	@Test
+	public void quickJoinGameRoomWithGameRoomNotFoundException() throws Exception {
+		Player thirdPlayer = creator.createTestPlayer(THIRD_EMAIL, THIRD_NICK, THIRD_PASSWORD);
+		GameRoomDto.Join joinDto = new GameRoomDto.Join();
+		joinDto.setGameRole(ATTACKER);
+
+		ResultActions resultActions = mockMvc.perform(post(QUICK_JOIN_URL).contentType(APPLICATION_JSON).content
+				(objectMapper.writeValueAsString(joinDto)).with(httpBasic(thirdPlayer.getEmail(), THIRD_PASSWORD)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isBadRequest());
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_NOT_FOUND_CODE)));
+	}
+
+	@Test
 	public void ownerChange() throws Exception {
 		Player player = creator.createTestPlayer();
 		Player secPlayer = creator.createTestPlayer(SEC_EMAIL, SEC_NICK, SEC_PASS);

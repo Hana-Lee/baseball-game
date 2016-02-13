@@ -1,18 +1,20 @@
 package kr.co.leehana.exception;
 
+import lombok.Getter;
+
 /**
  * @author Hana Lee
  * @since 2016-02-03 18:24
  */
 public class GameRoomNotFoundException extends RuntimeException {
 
-	private Long id;
+	@Getter
+	private String message;
 
-	public GameRoomNotFoundException(Long id) {
-		this.id = id;
-	}
+	@Getter
+	private String errorCode = "gameroom.not.found.exception";
 
-	public Long getId() {
-		return id;
+	public GameRoomNotFoundException(String message) {
+		this.message = message;
 	}
 }

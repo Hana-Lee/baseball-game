@@ -66,7 +66,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 	public GameRoom getById(final Long id) {
 		final GameRoom gameRoom = gameRoomRepository.findOne(id);
 		if (gameRoom == null) {
-			throw new GameRoomNotFoundException(id);
+			throw new GameRoomNotFoundException("[" + id + "] 에 해당하는 게임룸이 없습니다.");
 		}
 
 		return gameRoom;
