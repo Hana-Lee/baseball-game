@@ -17,7 +17,7 @@ app.v_shell = (function () {
 			width: 1024,
 			height: 750
 		}, stateMap = {
-			loggedIn: false
+			loggedIn: true
 		}, showSignUp, showGameRoom, showMainBoard, initModule;
 
 	showSignUp = function (container) {
