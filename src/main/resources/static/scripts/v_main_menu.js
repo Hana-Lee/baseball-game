@@ -138,6 +138,7 @@ app.v_main_menu = (function () {
 					}
 				},
 				{id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width},
+				{id: 'game-room-admin', view: 'button', label: '관리', type: 'form', width: configMap.button_width},
 				{
 					width: 409
 				},
