@@ -96,6 +96,7 @@ public class GameRoomControllerTest {
 
 	@Autowired
 	private TestPlayerCreator creator;
+
 	private ObjectMapper objectMapper = new ObjectMapper();
 	private MockMvc mockMvc;
 	private Setting setting = new Setting();
