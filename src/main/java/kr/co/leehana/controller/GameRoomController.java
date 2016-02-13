@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -55,6 +56,7 @@ public class GameRoomController {
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
+	private static final String URL_QUICK_JOIN_VALUE = URL_VALUE + "/join/quick";
 	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
 
@@ -163,6 +165,25 @@ public class GameRoomController {
 		gameRoom.getPlayers().add(joinPlayer);
 
 		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	@RequestMapping(value = {URL_QUICK_JOIN_VALUE}, method = {POST})
+	public ResponseEntity quickJoin(@RequestBody @Valid GameRoomDto.Join joinDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return createErrorResponseEntity(bindingResult);
+		}
+
+		Player player = getCurrentPlayer();
+		player.setGameRole(joinDto.getGameRole());
+
+		List<GameRoom> gameRooms = gameRoomService.getAll();
+		Random random = new Random();
+		int randomInteger = random.nextInt(gameRooms.size());
+
+		GameRoom randomChoiceGameRoom = gameRooms.get(randomInteger);
+		randomChoiceGameRoom.getPlayers().add(player);
+
+		return new ResponseEntity<>(randomChoiceGameRoom, OK);
 	}
 
 	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
