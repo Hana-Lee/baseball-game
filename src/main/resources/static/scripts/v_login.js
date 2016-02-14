@@ -17,17 +17,20 @@ app.v_login = (function () {
 			width: 300
 		},
 		stateMap = {
+			container: '',
 			loginCompleted: false,
 			logoutCompleted: true
 		},
 		initModule;
 
 	initModule = function (container) {
+		stateMap.container = container;
+
 		webix.ui({
 			id: 'login-container',
 			type: 'space',
 			css: 'login_container',
-			container: container,
+			container: stateMap.container,
 			borderless: true,
 			rows: [
 				{
@@ -69,7 +72,7 @@ app.v_login = (function () {
 								{
 									view: 'button', value: '가입',
 									click: function () {
-										app.v_shell.showSignUp('main-container');
+										app.v_shell.showSignUp();
 									}
 								}
 							]

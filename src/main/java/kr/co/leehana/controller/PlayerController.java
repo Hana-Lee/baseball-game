@@ -58,7 +58,15 @@ public class PlayerController {
 	public ResponseEntity create(@RequestBody @Valid PlayerDto.Create createDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setMessage(bindingResult.getFieldError().getDefaultMessage());
+			String message;
+			if (bindingResult.getFieldError() != null) {
+				message = bindingResult.getFieldError().getDefaultMessage();
+			} else if (bindingResult.getGlobalError() != null) {
+				message = bindingResult.getGlobalError().getDefaultMessage();
+			} else {
+				message = "DTO Object binding error";
+			}
+			errorResponse.setMessage(message);
 			errorResponse.setErrorCode("bad.request");
 			return new ResponseEntity<>(errorResponse, BAD_REQUEST);
 		}

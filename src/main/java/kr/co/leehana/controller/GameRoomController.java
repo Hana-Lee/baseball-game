@@ -268,7 +268,15 @@ public class GameRoomController {
 	}
 
 	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
-		return createErrorResponseEntity(bindingResult.getFieldError().getDefaultMessage(), null);
+		String message;
+		if (bindingResult.getFieldError() != null) {
+			message = bindingResult.getFieldError().getDefaultMessage();
+		} else if (bindingResult.getGlobalError() != null) {
+			message = bindingResult.getGlobalError().getDefaultMessage();
+		} else {
+			message = "Binding error";
+		}
+		return createErrorResponseEntity(message, null);
 	}
 
 	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {

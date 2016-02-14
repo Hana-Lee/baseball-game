@@ -10,19 +10,23 @@
  */
 /*global $, app, webix, $$ */
 
-app.v_sign_up = function () {
+app.v_sign_up = (function () {
 	'use strict';
 
 	var configMap = {
-		width: 400
-	}, initModule;
+			width: 400
+		},
+		stateMap = {
+			container: ''
+		}, initModule;
 
 	initModule = function (container) {
+		stateMap.container = container;
 		webix.ui({
 			id: 'sign-up-container',
 			type: 'space',
 			css: 'sign_up_container',
-			container: container,
+			container: stateMap.container,
 			borderless: true,
 			rows: [{
 				type: 'header',
@@ -58,7 +62,7 @@ app.v_sign_up = function () {
 									},
 									{
 										id: 'avatar-preview',
-										template: '<img src="images/character.gif" height="100%" width="100%">',
+										template: '<img src="images/blank_character_2.gif" height="100%" width="100%">',
 										width: 130,
 										height: 173
 									}
@@ -73,10 +77,15 @@ app.v_sign_up = function () {
 										height: 25
 									},
 									{
-										id: 'nickname', view: 'text', label: '닉네임', name: 'nickname', required: true,
+										id: 'email',
+										view: 'text',
+										type: 'email',
+										label: '이메일',
+										name: 'email',
+										required: true,
 										on: {
 											onAfterRender: function () {
-												$$('nickname').focus();
+												$$('email').focus();
 											}
 										}
 									},
@@ -84,12 +93,7 @@ app.v_sign_up = function () {
 										height: 10
 									},
 									{
-										id: 'email',
-										view: 'text',
-										type: 'email',
-										label: '이메일',
-										name: 'email',
-										required: true
+										id: 'nickname', view: 'text', label: '닉네임', name: 'nickname', required: true
 									},
 									{
 										height: 10
@@ -106,11 +110,11 @@ app.v_sign_up = function () {
 										height: 10
 									},
 									{
-										id: 'sec-password',
+										id: 'matching-password',
 										view: 'text',
 										type: 'password',
 										label: '비번 확인',
-										name: 'sec-password',
+										name: 'matchingPassword',
 										required: true
 									},
 									{
@@ -125,12 +129,38 @@ app.v_sign_up = function () {
 													var result = $$('sign-up-form').validate();
 
 													if (result) {
-														webix.alert({
-															title: '정보',
-															ok: '확인',
-															text: '가입이 완료 되었습니다'
-														});
+														webix.ajax().headers({
+															'Content-type': 'application/json'
+														}).post('player',
+															JSON.stringify(
+																$$('sign-up-form').getValues()
+															),
+															{
+																error: function(text/*, data, XmlHttpRequest */){
+																	var textJson = JSON.parse(text);
+																	webix.alert({
+																		title: '오류',
+																		ok: '확인',
+																		text: textJson.message
+																	});
+																},
+																success: function(/* text, data, XmlHttpRequest */){
+																	webix.alert({
+																		title: '정보',
+																		ok: '확인',
+																		text: '가입이 완료 되었습니다'
+																	});
+																	app.v_shell.showLogin();
+																}
+															}
+														);
 													}
+												}
+											},
+											{
+												view: 'button', value: '취소', type: 'danger',
+												click: function () {
+													app.v_shell.showLogin();
 												}
 											}
 										]
@@ -143,7 +173,7 @@ app.v_sign_up = function () {
 				rules: {
 					$obj: function (data) {
 						var nicknameKey = 'nickname', emailKey = 'email',
-							passwordKey = 'password', secPasswordKey = 'sec-password', message;
+							passwordKey = 'password', secPasswordKey = 'matchingPassword', message;
 
 						if (!webix.rules.isNotEmpty(data[nicknameKey])) {
 							message = '닉네임이 비어있습니다';
@@ -154,7 +184,7 @@ app.v_sign_up = function () {
 						} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
 							message = '패스워드가 비어있습니다';
 						} else if (data[passwordKey] !== data[secPasswordKey]) {
-							message = '패스워드가 다릅니다<br/>다시 확인해주세요';
+							//message = '패스워드가 다릅니다<br/>다시 확인해주세요';
 						}
 
 						if (message) {
@@ -171,4 +201,4 @@ app.v_sign_up = function () {
 	return {
 		initModule: initModule
 	};
-}();
+}());
