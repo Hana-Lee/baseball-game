@@ -17,12 +17,18 @@ app.v_shell = (function () {
 			width: 1024,
 			height: 750
 		}, stateMap = {
-			loggedIn: true
-		}, showSignUp, showGameRoom, showMainBoard, initModule;
+			loggedIn: false,
+			container: ''
+		}, showSignUp, showLogin, showGameRoom, showMainBoard, initModule;
 
-	showSignUp = function (container) {
+	showSignUp = function () {
 		$$('login-container').destructor();
-		app.v_sign_up.initModule(container);
+		app.v_sign_up.initModule(stateMap.container);
+	};
+
+	showLogin = function() {
+		$$('sign-up-container').destructor();
+		app.v_login.initModule(stateMap.container);
 	};
 
 	showGameRoom = function(roomId) {
@@ -38,9 +44,10 @@ app.v_shell = (function () {
 	};
 
 	initModule = function (container) {
+		stateMap.container = container;
 		if (stateMap.loggedIn) {
 			webix.ui({
-				container: container,
+				container: stateMap.container,
 				id: 'main-layout',
 				type: 'space',
 				css: 'main-layout',
@@ -51,14 +58,15 @@ app.v_shell = (function () {
 				]
 			});
 		} else {
-			//app.v_sign_up.initModule(container);
-			app.v_login.initModule(container);
+			app.v_sign_up.initModule(stateMap.container);
+			//app.v_login.initModule(stateMap.container);
 		}
 	};
 
 	return {
 		initModule: initModule,
 		showSignUp: showSignUp,
+		showLogin: showLogin,
 		showGameRoom: showGameRoom,
 		showMainBoard: showMainBoard
 	};
