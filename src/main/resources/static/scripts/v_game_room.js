@@ -44,7 +44,7 @@ app.v_game_room = (function () {
 							margin: 10,
 							rows: [
 								app.v_user_profile.getView(),
-								app.v_main_chat.getView()
+								app.v_game_room_chat.getView()
 							]
 						}
 					]

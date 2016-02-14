@@ -2,7 +2,7 @@
  * @author Hana Lee
  * @since 2016-01-17 21:37
  */
-/*jslint         browser : true, continue : true,
+/*jslint        browser : true, continue : true,
  devel  : true, indent  : 2,    maxerr   : 50,
  newcap : true, nomen   : true, plusplus : true,
  regexp : true, sloppy  : true, vars     : false,

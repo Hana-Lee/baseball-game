@@ -63,13 +63,18 @@ app.v_game_board = (function () {
 					width: 5
 				},
 				{
-					id: 'right-user-container', width: 220, rows: [{
-					rows: [{template: '유저3', type: 'header'}, {template: '유저3 정보'}]
-				}, {
-					height: 5
-				}, {
-					rows: [{template: '유저4', type: 'header'}, {template: '유저4 정보'}]
-				}]
+					id: 'right-user-container', width: 220,
+					rows: [
+						{
+							rows: [{template: '유저3', type: 'header'}, {template: '유저3 정보'}]
+						},
+						{
+							height: 5
+						},
+						{
+							rows: [{template: '유저4', type: 'header'}, {template: '유저4 정보'}]
+						}
+					]
 				}
 			]
 		};
