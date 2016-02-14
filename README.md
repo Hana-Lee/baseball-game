@@ -15,6 +15,7 @@
 
 * 게임룸
 ![GameRoom](https://github.com/Hana-Lee/baseball-game/blob/master/src/main/resources/static/images/screenshot/ss_gameroom.png?raw=true)
+
 ## 야구게임 설계
 
 ### 규칙
