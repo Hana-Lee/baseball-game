@@ -3,6 +3,18 @@
 * 서버는 Spring Boot 를 이용한 웹 서버 및 웹소켓을 이용한다
 * 클라이언트는 SPA 방식으로 처리한다
 
+## 스크린샷
+* 로그인
+![Login](https://raw.githubusercontent.com/Hana-Lee/baseball-game/master/src/main/resources/static/images/screenshot/ss_login.png)
+
+* 가입
+![Signup](https://github.com/Hana-Lee/baseball-game/blob/master/src/main/resources/static/images/screenshot/ss_signup.png?raw=true)
+
+* 메인화면
+![Main](https://github.com/Hana-Lee/baseball-game/blob/master/src/main/resources/static/images/screenshot/ss_main.png?raw=true)
+
+* 게임룸
+![GameRoom](https://github.com/Hana-Lee/baseball-game/blob/master/src/main/resources/static/images/screenshot/ss_gameroom.png?raw=true)
 ## 야구게임 설계
 
 ### 규칙
