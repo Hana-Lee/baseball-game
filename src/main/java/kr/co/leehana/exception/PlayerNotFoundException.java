@@ -1,28 +1,22 @@
 package kr.co.leehana.exception;
 
+import lombok.Getter;
+
 /**
  * @author Hana Lee
  * @since 2016-01-28 17:51
  */
 public class PlayerNotFoundException extends RuntimeException {
 
-	private Long id;
-	private String email;
+	@Getter
+	private String errorCode = "player.not.found.exception";
 
-	public PlayerNotFoundException(Long id) {
-		this.id = id;
+	public PlayerNotFoundException() {
+		super("email 혹은 비번을 확인해주세요");
 	}
 
-	public PlayerNotFoundException(String email) {
-		this.email = email;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getEmail() {
-		return email;
+	public PlayerNotFoundException(String message) {
+		super(message);
 	}
 }
 

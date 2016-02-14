@@ -8,7 +8,7 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, app, webix, $$ */
+/*global $, app, webix, $$, btoa */
 
 app.v_login = (function () {
 	'use strict';
@@ -46,9 +46,10 @@ app.v_login = (function () {
 					elements: [
 						{
 							id: 'email', view: 'text', type: 'email', label: '이메일', name: 'email', required: true,
+							invalidMessage: '',
 							on: {
 								onAfterRender: function () {
-									this.focus();
+									$$('email').focus();
 								}
 							}
 						},
@@ -58,6 +59,7 @@ app.v_login = (function () {
 							type: 'password',
 							label: '비밀번호',
 							name: 'password',
+							invalidMessage: '',
 							required: true
 						},
 						{
@@ -66,7 +68,26 @@ app.v_login = (function () {
 								{
 									view: 'button', value: '로그인', type: 'form',
 									click: function () {
-										$$('login-form').validate();
+										if ($$('login-form').validate()) {
+											webix.ajax().headers({
+												//'Authorization': 'Basic ' + btoa($$('email').getValue() + ':' + $$('password').getValue())
+											}).post('login',
+												$$('login-form').getValues(),
+												{
+													error: function (text/*, data, XmlHttpRequest */) {
+														var textJson = JSON.parse(text);
+														webix.alert({
+															title: '오류',
+															ok: '확인',
+															text: textJson.message
+														});
+													},
+													success: function (/*text, data, XmlHttpRequest */) {
+														app.v_shell.showMainBoard('login-container');
+													}
+												}
+											);
+										}
 									}
 								},
 								{
@@ -83,10 +104,13 @@ app.v_login = (function () {
 							var emailKey = 'email', passwordKey = 'password', message;
 							if (!webix.rules.isNotEmpty(data[emailKey])) {
 								message = '이메일 주소가 비어있습니다';
+								$$(emailKey).config.invalidMessage = message;
 							} else if (!webix.rules.isEmail(data[emailKey])) {
 								message = '이메일 주소가 잘못 입력되었습니다';
+								$$(emailKey).config.invalidMessage = message;
 							} else if (!webix.rules.isNotEmpty(data[passwordKey])) {
-								message = '패스워드가 비어있습니다';
+								message = '비밀번호가 비어있습니다';
+								$$(passwordKey).config.invalidMessage = message;
 							}
 
 							if (message) {

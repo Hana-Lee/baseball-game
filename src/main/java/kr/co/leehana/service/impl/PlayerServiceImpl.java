@@ -139,7 +139,7 @@ public class PlayerServiceImpl implements PlayerService {
 	public Player getById(Long id) {
 		Player player = playerRepository.findOne(id);
 		if (player == null) {
-			throw new PlayerNotFoundException(id);
+			throw new PlayerNotFoundException();
 		}
 
 		return player;
@@ -149,7 +149,7 @@ public class PlayerServiceImpl implements PlayerService {
 	public Player getByEmail(String email) {
 		Player player = playerRepository.findByEmail(email);
 		if (player == null) {
-			throw new PlayerNotFoundException(email);
+			throw new PlayerNotFoundException();
 		}
 
 		return player;

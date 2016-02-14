@@ -30,7 +30,7 @@ app.v_game_room_menu = (function () {
 					id: 'exit-room', view: 'button', label: '방나가기', type: 'danger', width: configMap.button_width,
 					on: {
 						onItemClick: function() {
-							app.v_shell.showMainBoard();
+							app.v_shell.showMainBoard('game-room');
 						}
 					}
 				},

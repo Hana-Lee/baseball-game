@@ -121,8 +121,8 @@ public class PlayerController {
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handlePlayerNotFoundException(PlayerNotFoundException e) {
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + e.getId() + "] 에 해당하는 계정이 없습니다.");
-		errorResponse.setErrorCode("player.not.found.exception");
+		errorResponse.setMessage(e.getMessage());
+		errorResponse.setErrorCode(e.getErrorCode());
 		return errorResponse;
 	}
 }

@@ -37,10 +37,17 @@ app.v_shell = (function () {
 		mainLayout.addView(app.v_game_room.getView());
 	};
 
-	showMainBoard = function() {
-		var mainLayout = $$('main-layout');
-		mainLayout.removeView('game-room');
-		mainLayout.addView(app.v_main_board.getView());
+	showMainBoard = function(removeContainer) {
+		var mainLayout;
+		if (removeContainer === 'login-container') {
+			$('#main-container').html('');
+			stateMap.loggedIn = true;
+			initModule(stateMap.container);
+		} else {
+			mainLayout = $$('main-layout');
+			mainLayout.removeView('game-room');
+			mainLayout.addView(app.v_main_board.getView());
+		}
 	};
 
 	initModule = function (container) {
@@ -58,8 +65,8 @@ app.v_shell = (function () {
 				]
 			});
 		} else {
-			app.v_sign_up.initModule(stateMap.container);
-			//app.v_login.initModule(stateMap.container);
+			//app.v_sign_up.initModule(stateMap.container);
+			app.v_login.initModule(stateMap.container);
 		}
 	};
 
