@@ -140,9 +140,15 @@ app.v_main_menu = (function () {
 				{id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width},
 				{id: 'game-room-admin', view: 'button', label: '관리', type: 'form', width: configMap.button_width},
 				{
-					width: 409
+					width: 409 - configMap.button_width
 				},
-				app.v_theme_selector.getView()
+				{
+					id: 'logout', view: 'button', label: '로그아웃', type: 'danger', width: configMap.button_width,
+					click: function() {
+						app.v_shell.logout();
+					}
+				}
+				//app.v_theme_selector.getView()
 			]
 		};
 	};

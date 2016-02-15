@@ -19,7 +19,8 @@ app.v_shell = (function () {
 		}, stateMap = {
 			loggedIn: false,
 			container: ''
-		}, showSignUp, showLogin, showGameRoom, showMainBoard, initModule;
+		}, showSignUp, showLogin, showGameRoom, showMainBoard, logout,
+		initModule;
 
 	showSignUp = function () {
 		$$('login-container').destructor();
@@ -40,6 +41,7 @@ app.v_shell = (function () {
 	showMainBoard = function(removeContainer) {
 		var mainLayout;
 		if (removeContainer === 'login-container') {
+			$$('login-container').destructor();
 			$('#main-container').html('');
 			stateMap.loggedIn = true;
 			initModule(stateMap.container);
@@ -48,6 +50,26 @@ app.v_shell = (function () {
 			mainLayout.removeView('game-room');
 			mainLayout.addView(app.v_main_board.getView());
 		}
+	};
+
+	logout = function() {
+		webix.ajax().post("logout", {
+			error: function(text) {
+				var textJson = JSON.parse(text);
+				webix.alert({
+					title: '오류',
+					ok: '확인',
+					text: textJson.message
+				});
+
+			},
+			success: function() {
+				$$('main-board').destructor();
+				stateMap.loggedIn = false;
+				$('#main-container').html('');
+				initModule(stateMap.container);
+			}
+		});
 	};
 
 	initModule = function (container) {
@@ -75,6 +97,7 @@ app.v_shell = (function () {
 		showSignUp: showSignUp,
 		showLogin: showLogin,
 		showGameRoom: showGameRoom,
-		showMainBoard: showMainBoard
+		showMainBoard: showMainBoard,
+		logout: logout
 	};
 }());

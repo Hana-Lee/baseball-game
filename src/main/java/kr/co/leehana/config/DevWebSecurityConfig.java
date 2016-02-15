@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 /**
  * @author Hana Lee
@@ -29,6 +30,9 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private AuthenticationFailureHandler bbgUrlAuthenticationFailureHandler;
+
+	@Autowired
+	private LogoutSuccessHandler logoutSuccessHandler;
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -51,6 +55,8 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity.httpBasic().and().formLogin()
 				.usernameParameter("email").passwordParameter("password")
 				.failureHandler(bbgUrlAuthenticationFailureHandler);
+
+		httpSecurity.logout().logoutSuccessHandler(logoutSuccessHandler);
 
 		httpSecurity.csrf().disable();
 		httpSecurity.headers().frameOptions().disable();

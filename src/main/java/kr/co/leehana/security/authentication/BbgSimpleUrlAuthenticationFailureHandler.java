@@ -21,11 +21,11 @@ import java.io.IOException;
  * simpleUrlAuthenticationFailureHandler 는 null 값을 허용하지 않음
  */
 @Component
-public class BbgUrlAuthenticationFailureHandler implements AuthenticationFailureHandler {
+public class BbgSimpleUrlAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
-	public BbgUrlAuthenticationFailureHandler() {
+	public BbgSimpleUrlAuthenticationFailureHandler() {
 	}
 
 	@Override
