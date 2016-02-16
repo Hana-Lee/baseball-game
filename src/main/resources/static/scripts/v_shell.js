@@ -18,8 +18,10 @@ app.v_shell = (function () {
 			height: 750
 		}, stateMap = {
 			loggedIn: false,
-			container: ''
+			container: '',
+			loggedInUser: null
 		}, showSignUp, showLogin, showGameRoom, showMainBoard, logout,
+		_getLoggedInPlayerInfo, _getLoggedInPlayers,
 		initModule;
 
 	showSignUp = function () {
@@ -72,7 +74,36 @@ app.v_shell = (function () {
 		});
 	};
 
+	_getLoggedInPlayerInfo = function () {
+		webix.ajax().get("player", {
+			error: function(text) {
+				console.log(text);
+			},
+			success: function(text) {
+				console.log('s', text);
+			}
+		});
+	};
+
+	_getLoggedInPlayers = function () {
+		webix.ajax().get("player/login/true", {
+			error: function(text) {
+				console.log(text);
+			},
+			success: function(text) {
+				console.log('s', text);
+			}
+		});
+	};
+
 	initModule = function (container) {
+		_getLoggedInPlayerInfo();
+		_getLoggedInPlayers();
+		webix.ajax().post("player/all", {
+			error: function(text) {
+				console.log(text);
+			}
+		});
 		stateMap.container = container;
 		if (stateMap.loggedIn) {
 			webix.ui({

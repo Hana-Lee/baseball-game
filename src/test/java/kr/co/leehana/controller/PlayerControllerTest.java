@@ -29,7 +29,10 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.servlet.Filter;
 
 import static kr.co.leehana.utils.CommonsTestConstant.ERROR_CODE_PATH;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -50,11 +53,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PlayerControllerTest {
 
 	private static final String TEST_URL = "/player";
+	private static final String TEST_LOGGED_IN_PLAYERS_URL = TEST_URL + "/login/true";
+
 	private static final String TEST_EMAIL = "email@email.co.kr";
 	private static final String TEST_NICKNAME = "이하나";
 	private static final String TEST_UP_NICKNAME = "이두나";
 	private static final String TEST_PASSWORD = "password";
 	private static final String TEST_EMPTY_STR = " ";
+	private static final String SEC_EMAIL = "i2@leehana.co.kr";
+	private static final String SEC_NICK = "이두나";
+	private static final String SEC_PASS = "dlgksk";
+
 	private static final String DUP_ERROR_CODE = "duplicated.email.exception";
 	private static final String PLAYER_NOT_FOUND_ERROR_CODE = "player.not.found.exception";
 	private static final String TEST_SHORT_NICK = "1";
@@ -64,6 +73,9 @@ public class PlayerControllerTest {
 	private static final String[] TEST_WRONG_EMAILS = {"a", "a@", "a@a", "a@2.컴"};
 	private static final String EMAIL_PATH = "$.email";
 	private static final String NICKNAME_PATH = "$.nickname";
+
+	private static final String PLAYER_EMAIL_CONTAIN_PATH = "$[?(@.email == '" + TEST_EMAIL + "')]";
+	private static final String SEC_PLAYER_EMAIL_CONTAIN_PATH = "$[?(@.email == '" + SEC_EMAIL + "')]";
 
 	@Autowired
 	private WebApplicationContext webApplicationContext;
@@ -239,5 +251,43 @@ public class PlayerControllerTest {
 				(TEST_EMAIL, TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isNoContent());
+	}
+
+	@Test
+	public void getLoggedInPlayers() throws Exception {
+		Player firstPlayer = creator.createTestPlayer(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		Player secPlayer = creator.createTestPlayer(SEC_EMAIL, SEC_NICK, SEC_PASS);
+
+		ResultActions resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(firstPlayer
+				.getEmail(), TEST_PASSWORD)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath("$", hasSize(1)));
+		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
+
+		resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(secPlayer.getEmail(),
+				SEC_PASS)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath("$", hasSize(2)));
+		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
+		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
+	}
+
+	@Test
+	public void getLoggedInPlayer() throws Exception {
+		Player firstPlayer = creator.createTestPlayer(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL).with(httpBasic(firstPlayer.getEmail(),
+				TEST_PASSWORD)));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isOk());
+		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));
+	}
+
+	@Test
+	public void getLoggedInPlayerWithUnauthorizedError() throws Exception {
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL));
+		resultActions.andDo(print());
+		resultActions.andExpect(status().isUnauthorized());
 	}
 }

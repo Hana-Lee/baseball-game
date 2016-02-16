@@ -4,7 +4,9 @@ import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
+import kr.co.leehana.exception.PlayerNotLoggedInException;
 import kr.co.leehana.model.Player;
+import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,15 +48,17 @@ public class PlayerController {
 	public static final String URL_VALUE = "/player";
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
+	private static final String URL_LOGGED_IN_USERS_VALUE = URL_VALUE + "/login/true";
 
 	private PlayerService playerService;
-
 	private ModelMapper modelMapper;
+	private SessionRegistry sessionRegistry;
 
 	@Autowired
-	public PlayerController(PlayerService playerService, ModelMapper modelMapper) {
+	public PlayerController(PlayerService playerService, ModelMapper modelMapper, SessionRegistry sessionRegistry) {
 		this.playerService = playerService;
 		this.modelMapper = modelMapper;
+		this.sessionRegistry = sessionRegistry;
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
@@ -108,21 +115,53 @@ public class PlayerController {
 		return new ResponseEntity<>(NO_CONTENT);
 	}
 
+	@RequestMapping(value = {URL_LOGGED_IN_USERS_VALUE}, method = {GET})
+	public ResponseEntity getLoggedInPlayers() {
+		List<Object> principals = sessionRegistry.getAllPrincipals();
+		List<PlayerDto.Response> loggedInPlayers = new ArrayList<>();
+		principals.stream().filter(principal -> principal instanceof UserDetailsImpl).forEach(principal -> {
+			Player player = playerService.getByEmail(((UserDetailsImpl) principal).getEmail());
+			PlayerDto.Response responseDto = modelMapper.map(player, PlayerDto.Response.class);
+			loggedInPlayers.add(responseDto);
+		});
+
+		return new ResponseEntity<>(loggedInPlayers, OK);
+	}
+
+	@RequestMapping(value = {URL_VALUE}, method = {GET})
+	public ResponseEntity getLoggedInPlayer() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		if (principal == null) {
+			throw new PlayerNotLoggedInException("Player do not logged in");
+		}
+
+		Player player = playerService.getByEmail(((UserDetailsImpl) principal).getEmail());
+		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.Response.class), OK);
+	}
+
+
 	@ExceptionHandler(PlayerDuplicatedException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException ex) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage("[" + ex.getEmail() + "] 중복된 e-mail 입니다.");
-		errorResponse.setErrorCode("duplicated.email.exception");
-		return errorResponse;
+		return createErrorResponse("[" + ex.getEmail() + "] 중복된 e-mail 입니다.", "duplicated.email.exception");
 	}
 
 	@ExceptionHandler(PlayerNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handlePlayerNotFoundException(PlayerNotFoundException e) {
+		return createErrorResponse(e.getMessage(), e.getErrorCode());
+	}
+
+	@ExceptionHandler(PlayerNotLoggedInException.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handlePlayerNotLoggedInException(PlayerNotLoggedInException e) {
+		return createErrorResponse(e.getMessage(), e.getErrorCode());
+	}
+
+	private ErrorResponse createErrorResponse(String message, String errorCode) {
 		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(e.getMessage());
-		errorResponse.setErrorCode(e.getErrorCode());
+		errorResponse.setMessage(message);
+		errorResponse.setErrorCode(errorCode);
 		return errorResponse;
 	}
 }

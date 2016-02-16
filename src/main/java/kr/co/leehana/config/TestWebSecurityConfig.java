@@ -20,8 +20,8 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
  * @since 2016-01-14 22-40
  */
 @EnableWebSecurity
-@Profile(value = {"dev"})
-public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
+@Profile(value = {"test"})
+public class TestWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -56,9 +56,7 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.anyRequest().permitAll();
 
-		httpSecurity.formLogin()
-				.usernameParameter("email").passwordParameter("password")
-				.failureHandler(bbgUrlAuthenticationFailureHandler);
+		httpSecurity.httpBasic();
 
 		httpSecurity.logout().logoutSuccessHandler(logoutSuccessHandler);
 
