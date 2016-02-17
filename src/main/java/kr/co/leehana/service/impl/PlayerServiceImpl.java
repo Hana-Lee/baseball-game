@@ -11,6 +11,7 @@ import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.TotalGame;
 import kr.co.leehana.model.TotalRank;
+import kr.co.leehana.model.TotalScore;
 import kr.co.leehana.model.Win;
 import kr.co.leehana.repository.PlayerRepository;
 import kr.co.leehana.service.PlayerService;
@@ -55,7 +56,7 @@ public class PlayerServiceImpl implements PlayerService {
 		String email = dto.getEmail();
 		if (playerRepository.findByEmail(email) != null) {
 			log.error("user duplicated exception. {}", email);
-			throw new PlayerDuplicatedException(email);
+			throw new PlayerDuplicatedException("[" + email + "] 중복된 e-mail 입니다.");
 		}
 
 		fillInitData(player);
@@ -77,6 +78,7 @@ public class PlayerServiceImpl implements PlayerService {
 		matchRecord.setWin(new Win(0));
 		matchRecord.setTotalGame(new TotalGame(0));
 
+		player.setTotalScore(new TotalScore(0));
 		player.setMatchRecord(matchRecord);
 		player.setTotalRank(new TotalRank(0));
 

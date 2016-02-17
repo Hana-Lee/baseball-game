@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
@@ -38,6 +40,12 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private SessionRegistry sessionRegistry;
 
+	@Autowired
+	private AccessDeniedHandler accessDeniedHandler;
+
+	@Autowired
+	private AuthenticationEntryPoint authenticationEntryPoint;
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
@@ -56,14 +64,24 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.POST, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.anyRequest().permitAll();
 
+		httpSecurity.exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationEntryPoint);
+
 		httpSecurity.formLogin()
 				.usernameParameter("email").passwordParameter("password")
 				.failureHandler(bbgUrlAuthenticationFailureHandler);
 
-		httpSecurity.logout().logoutSuccessHandler(logoutSuccessHandler);
+		httpSecurity.logout()
+				.invalidateHttpSession(true)
+				.clearAuthentication(true)
+				.logoutSuccessHandler(logoutSuccessHandler);
 
 		httpSecurity.csrf().disable();
+
 		httpSecurity.headers().frameOptions().disable();
-		httpSecurity.sessionManagement().maximumSessions(1).sessionRegistry(sessionRegistry);
+
+		httpSecurity.sessionManagement()
+				.maximumSessions(1)
+				.maxSessionsPreventsLogin(true)
+				.sessionRegistry(sessionRegistry);
 	}
 }

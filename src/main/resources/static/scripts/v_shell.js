@@ -18,9 +18,9 @@ app.v_shell = (function () {
 			height: 750
 		}, stateMap = {
 			loggedIn: false,
-			container: '',
-			loggedInUser: null
-		}, showSignUp, showLogin, showGameRoom, showMainBoard, logout,
+			container: ''
+		}, player = null, playerList = [],
+		showSignUp, showLogin, showGameRoom, showMainBoard, logout,
 		_getLoggedInPlayerInfo, _getLoggedInPlayers,
 		initModule;
 
@@ -55,7 +55,7 @@ app.v_shell = (function () {
 	};
 
 	logout = function() {
-		webix.ajax().post("logout", {
+		webix.ajax().post('logout', {
 			error: function(text) {
 				var textJson = JSON.parse(text);
 				webix.alert({
@@ -75,35 +75,58 @@ app.v_shell = (function () {
 	};
 
 	_getLoggedInPlayerInfo = function () {
-		webix.ajax().get("player", {
+		var serverResponse = '';
+		webix.ajax().sync().get('player', {
 			error: function(text) {
-				console.log(text);
+				serverResponse = JSON.parse(text);
 			},
 			success: function(text) {
-				console.log('s', text);
+				serverResponse = JSON.parse(text);
 			}
 		});
+
+		return serverResponse;
 	};
 
 	_getLoggedInPlayers = function () {
-		webix.ajax().get("player/login/true", {
+		var serverResponse = '';
+		webix.ajax().sync().get('player/login/true', {
 			error: function(text) {
-				console.log(text);
+				serverResponse = JSON.parse(text);
 			},
 			success: function(text) {
-				console.log('s', text);
+				serverResponse = JSON.parse(text);
 			}
 		});
+
+		return serverResponse;
 	};
 
 	initModule = function (container) {
-		_getLoggedInPlayerInfo();
-		_getLoggedInPlayers();
-		webix.ajax().post("player/all", {
-			error: function(text) {
-				console.log(text);
-			}
-		});
+		console.log('shell')
+		var playerResult, playerListResult;
+		playerResult = _getLoggedInPlayerInfo();
+		playerListResult = _getLoggedInPlayers();
+
+		if (playerResult && playerResult.status && playerResult.status === 401) {
+			stateMap.loggedIn = false;
+		} else if (playerResult && playerResult.email) {
+			stateMap.loggedIn = true;
+		}
+
+		if (stateMap.loggedIn) {
+			player = playerResult;
+		}
+
+		if (playerListResult.status && playerListResult.status === 401) {
+			playerList = [];
+		} else {
+			playerList = playerListResult;
+		}
+
+		console.log(playerResult);
+		console.log(playerListResult);
+
 		stateMap.container = container;
 		if (stateMap.loggedIn) {
 			webix.ui({
@@ -129,6 +152,8 @@ app.v_shell = (function () {
 		showLogin: showLogin,
 		showGameRoom: showGameRoom,
 		showMainBoard: showMainBoard,
-		logout: logout
+		logout: logout,
+		player: player,
+		playerList: playerList
 	};
 }());

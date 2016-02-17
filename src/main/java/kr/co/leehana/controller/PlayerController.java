@@ -139,11 +139,10 @@ public class PlayerController {
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.Response.class), OK);
 	}
 
-
 	@ExceptionHandler(PlayerDuplicatedException.class)
 	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException ex) {
-		return createErrorResponse("[" + ex.getEmail() + "] 중복된 e-mail 입니다.", "duplicated.email.exception");
+	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException e) {
+		return createErrorResponse(e.getMessage(), e.getErrorCode());
 	}
 
 	@ExceptionHandler(PlayerNotFoundException.class)

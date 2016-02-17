@@ -68,6 +68,11 @@ public class Player implements Serializable {
 	private Level level;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "total_score_id")
+	@NotNull
+	private TotalScore totalScore;
+
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "total_rank_id")
 	@NotNull
 	private TotalRank totalRank;
