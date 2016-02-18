@@ -262,16 +262,16 @@ public class PlayerControllerTest {
 				.getEmail(), TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
-		resultActions.andExpect(jsonPath("$", hasSize(1)));
-		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
+		resultActions.andExpect(jsonPath("$", hasSize(0)));
+		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(empty())));
 
 		resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(secPlayer.getEmail(),
 				SEC_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
-		resultActions.andExpect(jsonPath("$", hasSize(2)));
+		resultActions.andExpect(jsonPath("$", hasSize(1)));
 		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
-		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_CONTAIN_PATH, is(not(empty()))));
+		resultActions.andExpect(jsonPath(SEC_PLAYER_EMAIL_CONTAIN_PATH, is(empty())));
 	}
 
 	@Test
