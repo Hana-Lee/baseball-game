@@ -2,12 +2,13 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.annotation.PasswordMatches;
 import kr.co.leehana.annotation.ValidEmail;
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.TotalRank;
-import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.model.TotalScore;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -46,6 +47,7 @@ public class PlayerDto {
 		private String nickname;
 		private String email;
 		private Level level;
+		private TotalScore totalScore;
 		private TotalRank totalRank;
 		private MatchRecord matchRecord;
 		private DefenderRoleCount defenderRoleCount;

@@ -119,13 +119,21 @@ public class PlayerController {
 	public ResponseEntity getLoggedInPlayers() {
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		List<PlayerDto.Response> loggedInPlayers = new ArrayList<>();
+		String currentPlayerEmail = getCurrentPlayerEmail();
 		principals.stream().filter(principal -> principal instanceof UserDetailsImpl).forEach(principal -> {
-			Player player = playerService.getByEmail(((UserDetailsImpl) principal).getEmail());
-			PlayerDto.Response responseDto = modelMapper.map(player, PlayerDto.Response.class);
-			loggedInPlayers.add(responseDto);
+			String email = ((UserDetailsImpl) principal).getEmail();
+			if (!currentPlayerEmail.equals(email)) {
+				Player player = playerService.getByEmail(email);
+				PlayerDto.Response responseDto = modelMapper.map(player, PlayerDto.Response.class);
+				loggedInPlayers.add(responseDto);
+			}
 		});
 
 		return new ResponseEntity<>(loggedInPlayers, OK);
+	}
+
+	private String getCurrentPlayerEmail() {
+		return ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {GET})

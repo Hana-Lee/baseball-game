@@ -34,7 +34,7 @@ app.v_shell = (function () {
 		app.v_login.initModule(stateMap.container);
 	};
 
-	showGameRoom = function(roomId) {
+	showGameRoom = function(/*roomId*/) {
 		var mainLayout = $$('main-layout');
 		mainLayout.removeView('main-board');
 		mainLayout.addView(app.v_game_room.getView());
@@ -103,7 +103,7 @@ app.v_shell = (function () {
 	};
 
 	initModule = function (container) {
-		console.log('shell')
+		console.log('shell');
 		var playerResult, playerListResult;
 		playerResult = _getLoggedInPlayerInfo();
 		playerListResult = _getLoggedInPlayers();
@@ -126,6 +126,7 @@ app.v_shell = (function () {
 
 		console.log(playerResult);
 		console.log(playerListResult);
+		console.log(playerList);
 
 		stateMap.container = container;
 		if (stateMap.loggedIn) {
@@ -137,7 +138,7 @@ app.v_shell = (function () {
 				height: configMap.height,
 				width: configMap.width,
 				rows: [
-					app.v_main_board.getView()
+					app.v_main_board.initModule(playerList)
 				]
 			});
 		} else {

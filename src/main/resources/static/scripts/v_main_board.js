@@ -19,7 +19,7 @@ app.v_main_board = (function () {
 		return view;
 	};
 
-	initModule = function () {
+	initModule = function (playerList) {
 		view = {
 			id: 'main-board',
 			rows: [
@@ -45,13 +45,14 @@ app.v_main_board = (function () {
 							margin: 10,
 							rows: [
 								app.v_user_profile.getView(),
-								app.v_user_list.getView()
+								app.v_user_list.initModule(playerList)
 							]
 						}
 					]
 				}
 			]
 		};
+		return view;
 	};
 
 	return {

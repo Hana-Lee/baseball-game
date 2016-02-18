@@ -22,16 +22,17 @@ app.v_user_list = (function () {
 		return view;
 	};
 
-	initModule = function () {
-		var playerList = app.v_shell.playerList;
-console.log(app.v_shell.playerList);
+	initModule = function (playerList) {
+		//var playerList = app.v_shell.playerList;
+		console.log(playerList);
 		view = {
 			id: 'user-list',
 			view: 'list',
 			select: true,
 			type: {
 				height: configMap.height,
-				template: '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;"><div>#nickname#(#email#)</div><div style="padding-left:18px;">점수:#totalRank#, 등수:#totalRank#</div>'
+				template: '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
+					'<div>#nickname#(#email#)</div><div style="padding-left:18px;">점수:#totalScore.value#, 등수:#totalRank.value#</div>'
 			},
 			data: playerList
 			//data: [
@@ -50,6 +51,8 @@ console.log(app.v_shell.playerList);
 			//	{id: 13, img:'images/blank_character_2.gif', username: 'voyaging13', nickname: '이두나13', score: 1001, rank: 14}
 			//]
 		};
+
+		return view;
 	};
 
 	return {
