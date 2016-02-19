@@ -53,6 +53,7 @@ public class PlayerDto {
 		private DefenderRoleCount defenderRoleCount;
 		private AttackerRoleCount attackerRoleCount;
 		private GameRole gameRole;
+		private Boolean admin;
 		private Date joined;
 		private Date updated;
 	}

@@ -8,29 +8,20 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, app */
+/*global $, app:true, webix */
 
 var app = (function () {
-	'use strict';
-	var initModule;
+  'use strict';
+  var stateMap = {
+    container: null
+  }, initModule;
 
-	initModule = function(container) {
-		app.v_theme_selector.initModule();
-		app.v_main_chat.initModule();
-		app.v_user_profile.initModule();
-		app.v_main_menu.initModule();
-		//app.v_user_list.initModule();
-		app.v_game_list.initModule();
-		//app.v_main_board.initModule();
-		app.v_game_room_chat.initModule();
-		app.v_game_room_menu.initModule();
-		app.v_game_board.initModule();
-		app.v_game_pad.initModule();
-		app.v_game_room.initModule();
-		app.v_shell.initModule(container);
-	};
+  initModule = function (container) {
+    stateMap.container = container;
+    app.v_shell.initModule(stateMap.container);
+  };
 
-	return {
-		initModule: initModule
-	};
+  return {
+    initModule: initModule
+  };
 }());
