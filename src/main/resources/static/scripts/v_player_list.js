@@ -38,17 +38,26 @@ app.v_player_list = (function () {
   };
 
   _createView = function () {
-    var mainView = {
-      id: 'player-list',
-      view: 'list',
-      select: true,
-      type: {
-        height: configMap.height,
-        template: '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
-        '<div>#nickname#(#email#)</div><div style="padding-left:18px;">점수:#totalScore.value#, 등수:#totalRank.value#</div>'
-      },
-      data: _loggedInPlayers
-    };
+    var mainView;
+
+    if (_loggedInPlayers.length === 0) {
+      mainView = {
+        template: '<h3>대기중인 플레이어가 없습니다</h3>'
+      };
+    } else {
+      mainView = {
+        id: 'player-list',
+        view: 'list',
+        select: true,
+        type: {
+          height: configMap.height,
+          template: '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
+          '<div>#nickname#(#email#)</div>' +
+          '<div style="padding-left:18px;">점수:#totalScore.value#, 등수:#totalRank.value#</div>'
+        },
+        data: _loggedInPlayers
+      };
+    }
 
     webixMap.top = webix.ui(mainView, stateMap.container);
   };
