@@ -1,6 +1,7 @@
 package kr.co.leehana.service.impl;
 
 import kr.co.leehana.dto.GameRoomDto;
+import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
@@ -52,7 +53,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	private void fillInitData(final GameRoom gameRoom) {
-		gameRoom.setNumber(0);
+		gameRoom.setStatus(Status.NORMAL);
 
 		gameRoom.getPlayers().add(gameRoom.getOwner());
 		gameRoom.getPlayerRankMap().put(1, gameRoom.getOwner());

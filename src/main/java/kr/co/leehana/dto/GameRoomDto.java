@@ -1,14 +1,13 @@
 package kr.co.leehana.dto;
 
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.enums.GameRole;
 import lombok.Data;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,20 +40,6 @@ public class GameRoomDto {
 		private Setting setting;
 		private Integer gameCount;
 		private Map<Integer, Player> playerRankMap;
-	}
-
-	@Data
-	public static class Response {
-		private Integer number;
-		private String name;
-		private Integer limitPlayerCount;
-		private Player owner;
-		private Set<Player> players;
-		private Setting setting;
-		private Integer gameCount;
-		private Map<Integer, Player> playerRankMap;
-		private Date created;
-		private Date updated;
 	}
 
 	@Data

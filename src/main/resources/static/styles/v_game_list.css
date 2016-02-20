@@ -1,3 +1,32 @@
+.game_room_list fieldset.setting {
+	border: 1px dotted;
+	width: 166px;
+	position: relative;
+	top: -10px;
+}
+
+.game_room_list div.title.normal {
+	font-size: 16px;
+	color: deepskyblue;
+}
+
+.game_room_list div.title.running {
+	font-size: 16px;
+	color: crimson;
+}
+
+.game_room_list div.owner {
+	color: chocolate;
+}
+
+.game_room_list div.join_button {
+	position: relative;
+	float: right;
+	width: 70px;
+	height: 30px;
+	top: -8px;
+}
+
 .custom_item {
 	width: 193px;
 	height: 88px;

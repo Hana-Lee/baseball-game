@@ -15,36 +15,44 @@ app.v_game_list = (function () {
 
   var stateMap = {
       container: null
-    }, webixMap = {},
-    _createView,
+    }, webixMap = {
+      gameRoomList: []
+    },
+    _createView, _getCreatedGameRoomList,
+    _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate,
     initModule;
 
   _createView = function () {
+    /**
+     * data array
+     * {
+     *  id: 1,
+     *  name: '루비',
+     *  state: 'normal or running',
+     *  owner: { id: 1, nickname: '이하나', email: 'i@leehana.co.kr'....},
+     *  setting: {
+     *    limitGuessInputCount: 10,
+     *    generationNumberCount: 5,
+     *    limitWrongInputCount: 5
+     *  }, ......
+     * }
+     */
+    console.log('create view', stateMap.gameRoomList);
     var mainView = {
       id: 'game-room-list',
       view: 'dataview',
       select: true,
+      css: 'game_room_list',
       type: {
         height: 128,
         //width: 215,
         templateStart: '<div class="custom_item">',
-        template: '<div class="webix_strong">#name#</div>#user_count#/5, 횟수: #guess_num#, 갯수: #gen_num#<div>방장: #owner#</div><button class="join-room" data-room-id="#id#" style="float: right;">입장</button>',
+        template: _createTemplate,
         templateEnd: '</div>'
       },
-      data: [
-        {id: 1, name: '게임룸1', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나1'},
-        {id: 2, name: '게임룸2', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나2'},
-        {id: 3, name: '게임룸3', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나3'},
-        {id: 4, name: '게임룸4', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나4'},
-        {id: 5, name: '게임룸5', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나5'},
-        {id: 6, name: '게임룸6', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나6'},
-        {id: 7, name: '게임룸7', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나7'},
-        {id: 8, name: '게임룸8', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나8'},
-        {id: 9, name: '게임룸9', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나9'},
-        {id: 10, name: '게임룸10', user_count: 4, guess_num: 10, gen_num: 3, owner: '이하나10'}
-      ],
+      data: stateMap.gameRoomList,
       ready: function () {
-        $('.join-room').click(function (evt) {
+        $('.join_room').click(function (evt) {
           var target = evt.target, roomId;
           roomId = target.getAttribute('data-room-id');
           app.v_shell.showGameRoom(roomId);
@@ -55,9 +63,62 @@ app.v_game_list = (function () {
     webixMap.top = webix.ui(mainView, stateMap.container);
   };
 
+  _getCreatedGameRoomList = function (callback) {
+    webix.ajax().get('gameroom/all', {
+      error: function (text) {
+        console.log(text);
+        stateMap.gameRoomList = [];
+        callback();
+      },
+      success: function (text) {
+        var serverResponse = JSON.parse(text);
+        stateMap.gameRoomList = serverResponse.content;
+        console.log('success', stateMap.gameRoomList);
+        callback();
+      }
+    });
+  };
+
+  _createTemplate = function (obj) {
+    return _createTitleTemplate(obj) +
+      '<div class="owner">방장: ' + obj.owner.nickname +
+      _createJoinButtonTemplate(obj) +
+      _createSettingTemplate(obj);
+  };
+
+  _createTitleTemplate = function (obj) {
+    var userCount = obj.players.length, status = obj.status.toLowerCase();
+    return '<div class="webix_strong title ' + status + '">[' + obj.id + '] ' + obj.name + ' (' + userCount + '/5)</div>';
+  };
+
+  _createJoinButtonTemplate = function (obj) {
+    var disabledValue = '', disabledViewValue = '', disabledBoxValue = '', disabledElem = '';
+    if (obj.status.toLowerCase() === 'running') {
+      disabledViewValue = ' webix_disabled_view';
+      disabledBoxValue = ' webix_disabled_box';
+      disabledElem = '<div class="webix_disabled"></div>';
+      disabledValue = ' disabled';
+    }
+
+    return '<div class="webix_view webix_control webix_el_button join_button' + disabledViewValue + '" style="width: 40px;">' +
+      '<div class="webix_el_box' + disabledBoxValue + '">' +
+      '<button type="button" class="join_room webixtype_base" data-room-id="' + obj.id + '"' + disabledValue + '>입장</button>' +
+      '</div>' +
+      disabledElem +
+      '</div>' +
+      '</div>';
+  };
+
+  _createSettingTemplate = function (obj) {
+    var guessNum = obj.setting.limitGuessInputCount, genNum = obj.setting.generationNumberCount, wrongNum = obj.setting.limitWrongInputCount;
+    return '<fieldset class="setting"><legend>설정</legend>' +
+      '<div>입력: ' + guessNum + ', 갯수: ' + genNum + ', 오류: ' + wrongNum + '</div>' +
+      '</fieldset>';
+  };
+
   initModule = function (container) {
     stateMap.container = container;
-    _createView();
+    _getCreatedGameRoomList(_createView);
   };
 
   return {
