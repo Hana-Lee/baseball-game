@@ -1,14 +1,15 @@
 package kr.co.leehana.service.impl;
 
 import kr.co.leehana.dto.PlayerDto;
-import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.exception.PlayerDuplicatedException;
+import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.AttackerRoleCount;
+import kr.co.leehana.model.Avatar;
 import kr.co.leehana.model.DefenderRoleCount;
-import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
+import kr.co.leehana.model.Player;
 import kr.co.leehana.model.TotalGame;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.TotalScore;
@@ -70,6 +71,8 @@ public class PlayerServiceImpl implements PlayerService {
 		if (player.getAdmin() == null) {
 			player.setAdmin(false);
 		}
+
+		player.setAvatar(new Avatar());
 
 		player.setLevel(new Level(1));
 

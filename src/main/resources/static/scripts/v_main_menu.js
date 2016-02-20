@@ -26,8 +26,7 @@ app.v_main_menu = (function () {
   _createView = function () {
     console.log(stateMap.player);
     var isNotAdmin = function () {
-      //return stateMap.player.admin !== true;
-      return false;
+      return stateMap.player.admin !== true;
     }, getDynamicWidth = function () {
       return isNotAdmin() ? 609 : 409;
     }, mainView;

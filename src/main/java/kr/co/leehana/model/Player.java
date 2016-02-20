@@ -63,6 +63,10 @@ public class Player implements Serializable {
 	private String password;
 
 	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "avatar_id")
+	private Avatar avatar;
+
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
 	@JoinColumn(name = "level_id")
 	@NotNull
 	private Level level;

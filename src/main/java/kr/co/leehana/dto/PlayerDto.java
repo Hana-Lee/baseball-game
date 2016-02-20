@@ -4,6 +4,7 @@ import kr.co.leehana.annotation.PasswordMatches;
 import kr.co.leehana.annotation.ValidEmail;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.AttackerRoleCount;
+import kr.co.leehana.model.Avatar;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
@@ -39,6 +40,8 @@ public class PlayerDto {
 		private String matchingPassword;
 
 		private Boolean admin;
+
+//		private Avatar avatar;
 	}
 
 	@Data
@@ -46,6 +49,7 @@ public class PlayerDto {
 		private Long id;
 		private String nickname;
 		private String email;
+		private Avatar avatar;
 		private Level level;
 		private TotalScore totalScore;
 		private TotalRank totalRank;
@@ -63,6 +67,7 @@ public class PlayerDto {
 		private String email;
 		private String password;
 		private String nickname;
+		private Avatar avatar;
 		private Level level;
 		private TotalRank totalRank;
 		private MatchRecord matchRecord;

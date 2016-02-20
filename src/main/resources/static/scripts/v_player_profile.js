@@ -14,26 +14,40 @@ app.v_player_profile = (function () {
   'use strict';
 
   var stateMap = {
-      container: null
+      container: null,
+      player: null
     }, webixMap = {},
-    _createView, initModule;
+    _createView, _calculateWinRate, initModule;
 
   _createView = function () {
-    var mainView = {
+    var mainView, email, nickname, avatarImagePath, level, totalScore, totalGameCnt, winCnt, loseCnt, winRate, totalRank;
+
+    email = stateMap.player.email;
+    nickname = stateMap.player.nickname;
+    avatarImagePath = stateMap.player.avatar.imagePath;
+    level = stateMap.player.level.value;
+    totalScore = stateMap.player.totalScore.value;
+    totalGameCnt = stateMap.player.matchRecord.totalGame.count;
+    winCnt = stateMap.player.matchRecord.win.count;
+    loseCnt = stateMap.player.matchRecord.lose.count;
+    winRate = _calculateWinRate(totalGameCnt, winCnt);
+    totalRank = stateMap.player.totalRank.value;
+
+    mainView = {
       id: 'player-profile-container',
       height: 200,
       rows: [
-        {template: '이하나님', type: 'header'},
+        {template: nickname + '님 ( ' + email + ' )', type: 'header'},
         {
           cols: [
-            {template: '<img src="images/character.gif" height="100%" width="100%">', width: 130},
+            {template: '<img src="' + avatarImagePath + '" height="100%" width="100%">', width: 130},
             {
               template: '<ul style="list-style:none;padding:0;margin:0;">' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">Lv. 10</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: 1004점</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: 10전 8승 2패</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">승률: 80%</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전체등수: 1등</li></ul>'
+              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">레벨: ' + level + '</li>' +
+              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: ' + totalScore + '점</li>' +
+              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: ' + totalGameCnt + '전 ' + winCnt + '승 ' + loseCnt + '패</li>' +
+              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">승률: ' + winRate + '%</li>' +
+              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">등수: ' + totalRank + '등</li></ul>'
             }
           ]
         }
@@ -43,8 +57,17 @@ app.v_player_profile = (function () {
     webixMap.top = webix.ui(mainView, stateMap.container);
   };
 
+  _calculateWinRate = function (totalGameCnt, winCnt) {
+    var winRate = 0;
+    if (totalGameCnt > 0) {
+      winRate = winCnt / totalGameCnt * 100;
+    }
+    return winRate.toFixed(2);
+  };
+
   initModule = function (container) {
     stateMap.container = container;
+    stateMap.player = app.m_player.getInfo();
     _createView();
   };
 
