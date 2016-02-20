@@ -21,7 +21,11 @@ app.v_main_menu = (function () {
     player: {
       admin: false
     }
-  }, webixMap = {}, _createView, showCreateGameRoomDialog, getCreateFormView, initModule;
+  }, webixMap = {
+    player: null
+  },
+    _createView, _sendGameRoomDataToServer,
+    showCreateGameRoomDialog, getCreateFormView, initModule;
 
   _createView = function () {
     console.log(stateMap.player);
@@ -39,7 +43,7 @@ app.v_main_menu = (function () {
             showCreateGameRoomDialog();
           }
         },
-        {id: 'quick-join', view: 'button', label: '빠른입장', width: configMap.button_width},
+        {id: 'quick-join', view: 'button', label: '빠른입장', disabled: true, width: configMap.button_width},
         {
           id: 'game-room-admin',
           hidden: isNotAdmin(),
@@ -64,6 +68,37 @@ app.v_main_menu = (function () {
     webixMap.top = webix.ui(mainView, stateMap.container);
   };
 
+  _sendGameRoomDataToServer = function (data) {
+    var sendData = {
+      name: data.name,
+      gameRole: data.gameRole,
+      setting: {
+        generationNumberCount: data.generationNumberCount,
+        limitGuessInputCount: data.limitGuessInputCount,
+        limitWrongInputCount: data.limitWrongInputCount
+      }
+    };
+
+    sendData = JSON.stringify(sendData);
+
+    webix.ajax().headers({
+      'Content-Type': 'application/json'
+    }).post('gameroom', sendData, {
+      error: function(text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title: '오류',
+          ok: '확인',
+          text: textJson.message
+        });
+      },
+      success: function(text) {
+        console.log(text);
+      }
+    });
+  };
+
   showCreateGameRoomDialog = function () {
     webix.ui({
       view: 'window',
@@ -85,7 +120,14 @@ app.v_main_menu = (function () {
       elements: [
         {view: 'text', label: '이름', name: 'name', invalidMessage: '이름을 입력해주세요'},
         {
-          view: 'fieldset', label: '게임 설정',
+          view: 'richselect', label: '역할', name: 'gameRole', invalidMessage: '역할을 선택해주세요', value: 'ATTACKER',
+          options: [
+            {id: 'ATTACKER', value: '공격'},
+            {id: 'DEFENDER', value: '수비'}
+          ]
+        },
+        {
+          view: 'fieldset', label: '게임 설정', name: 'setting',
           body: {
             rows: [
               {
@@ -132,18 +174,12 @@ app.v_main_menu = (function () {
           }
         },
         {
-          view: 'richselect', label: '역할', name: 'gameRole', invalidMessage: '역할을 선택해주세요', value: 'ATTACKER',
-          options: [
-            {id: 'ATTACKER', value: '공격'},
-            {id: 'DEFENDER', value: '수비'}
-          ]
-        },
-        {
           cols: [
             {
-              view: 'button', value: '생성', hotkey: 'enter',
+              view: 'button', value: '생성', type: 'form', hotkey: 'enter',
               click: function () {
                 if ($$('create-game-room-form').validate()) { //validate form
+                  _sendGameRoomDataToServer($$('create-game-room-form').getValues());
                   this.getTopParentView().close();
                   // TODO: 생성된 게임룸으로 입장 하는 코드 작성하기
                 } else {
@@ -152,7 +188,7 @@ app.v_main_menu = (function () {
               }
             },
             {
-              view: 'button', value: '닫기',
+              view: 'button', value: '닫기', type: 'danger', hotkey: 'esc',
               click: function () {
                 this.getTopParentView().close();
               }
