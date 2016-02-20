@@ -81,7 +81,7 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		httpSecurity.sessionManagement()
 				.maximumSessions(1)
-				.maxSessionsPreventsLogin(false)
+				.maxSessionsPreventsLogin(true)
 				.sessionRegistry(sessionRegistry);
 	}
 }

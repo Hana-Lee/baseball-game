@@ -66,7 +66,7 @@ app.v_login = (function () {
 							margin: 5,
 							cols: [
 								{
-									view: 'button', value: '로그인', type: 'form',
+									view: 'button', value: '로그인', type: 'form', hotkey: 'enter',
 									click: function () {
 										if ($$('login-form').validate()) {
 											webix.ajax().headers({
