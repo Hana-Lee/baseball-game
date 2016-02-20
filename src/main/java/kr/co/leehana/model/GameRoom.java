@@ -1,5 +1,6 @@
 package kr.co.leehana.model;
 
+import kr.co.leehana.enums.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -10,6 +11,8 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -55,12 +58,12 @@ public class GameRoom implements Serializable {
 	private Long id;
 
 	@NotNull
-	private Integer number;
-
-	@NotNull
 	private String name;
 
 	private Integer limitPlayerCount = 5;
+
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@NotNull
 	@OneToOne(cascade = {MERGE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = false)
