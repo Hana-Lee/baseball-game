@@ -47,6 +47,7 @@ app.v_main_board = (function () {
     gameRoomListContainer = {
       id: 'game-room-list-container',
       view: 'layout',
+      css: 'game_room_list_container',
       rows: []
     };
 
