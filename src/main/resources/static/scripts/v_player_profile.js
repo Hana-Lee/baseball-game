@@ -34,7 +34,7 @@ app.v_player_profile = (function () {
     totalRank = stateMap.player.totalRank.value;
 
     mainView = {
-      id: 'player-profile-container',
+      id: 'player-profile-' + stateMap.player.id,
       height: 200,
       rows: [
         {template: nickname + '님 ( ' + email + ' )', type: 'header'},
