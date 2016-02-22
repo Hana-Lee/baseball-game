@@ -18,7 +18,7 @@ app.v_player_list = (function () {
     }, stateMap = {
       container: null
     }, webixMap = {},
-    _getLoggedInPlayers, _createView, _createContextMenu, _showPlayerInfoWindow, _calculateWinRate,
+    _getLoggedInPlayers, _createView, _createTemplate, _createContextMenu, _showPlayerInfoWindow, _calculateWinRate,
     _loggedInPlayers, initModule;
 
   _getLoggedInPlayers = function (callback) {
@@ -40,20 +40,18 @@ app.v_player_list = (function () {
   _createView = function () {
     var mainView;
 
-    if (_loggedInPlayers.length === 0) {
-      mainView = {
-        template: '<h3>대기중인 플레이어가 없습니다</h3>'
-      };
-    } else {
+    //if (_loggedInPlayers.length === 0) {
+    //  mainView = {
+    //    template: '<h3>대기중인 플레이어가 없습니다</h3>'
+    //  };
+    //} else {
       mainView = {
         id: 'player-list',
         view: 'list',
         select: true,
         type: {
           height: configMap.height,
-          template: '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
-          '<div>#nickname#(#email#)</div>' +
-          '<div style="padding-left:18px;">점수:#totalScore.value#, 등수:#totalRank.value#</div>'
+          template: _createTemplate
         },
         data: _loggedInPlayers,
         onContext: {},
@@ -63,13 +61,20 @@ app.v_player_list = (function () {
           }
         }
       };
-    }
+    //}
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('player-list');
     webixMap.context_menu = _createContextMenu();
 
     webixMap.context_menu.attachTo(webixMap.main_view);
+  };
+
+  _createTemplate = function (obj) {
+    console.log('obj', obj);
+    return '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
+      '<div>' + obj.nickname + '(' + obj.email + ')</div>' +
+      '<div style="padding-left:18px;">점수: ' + obj.totalScore.value + ', 등수:' + obj.totalRank.value + '</div>';
   };
 
   _createContextMenu = function () {

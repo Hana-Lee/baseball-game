@@ -54,6 +54,9 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.authorizeRequests()
+				.antMatchers("/sock/**").permitAll()
+				.antMatchers("/topic/**").permitAll()
+				.antMatchers("/app/**").permitAll()
 				.antMatchers("/console/**").hasRole("USER")
 				.antMatchers(HttpMethod.DELETE, PlayerController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.GET, PlayerController.URL_VALUE + "/**").hasRole("USER")

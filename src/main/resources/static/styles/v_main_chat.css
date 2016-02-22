@@ -1,0 +1,7 @@
+.main_chat .from span, .main_chat .to span {
+	font-weight: bold;
+}
+
+.main_chat .from {
+	background: lavender;
+}

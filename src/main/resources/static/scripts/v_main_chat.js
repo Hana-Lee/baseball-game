@@ -14,31 +14,23 @@ app.v_main_chat = (function () {
   'use strict';
 
   var stateMap = {
-      container: null
+      container: null,
+      player: null
     }, webixMap = {},
     _createView,
     initModule;
 
   _createView = function () {
-    webix.proxy.faye.client = new Faye.Client('//localhost:8000/');
-    webix.proxy.faye.clientId = webix.uid();
-
-    var user_name = '이하나', mainView;
+    var user_name = stateMap.player.nickname, mainView;
 
     function send_message() {
-      console.log(arguments);
       var text = $$('message').getValue();
 
       if (text) {
-        if (text.indexOf('/nick ') === 0) {
-          user_name = text.substr(6);
-
-        } else {
-          $$('chat').add({
-            user: user_name,
-            value: text
-          });
-        }
+        $$('chat').add({
+          user: user_name,
+          value: text
+        });
       }
 
       $$('message').setValue('');
@@ -49,17 +41,25 @@ app.v_main_chat = (function () {
     }
 
     function chat_template(obj) {
-      return '<span style="font-weight:bold;">' + obj.user + '</span>: ' + obj.value;
+      console.log(obj);
+      var template;
+      if (obj.user !== user_name) {
+        template = '<div class="from"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      } else {
+        template = '<div class="to"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      }
+
+      return template;
     }
 
     mainView = {
       id: 'main-chat',
       height: 240,
+      css: 'main_chat',
       rows: [
-        //{template: 'Webix Based Chat', type: 'header'},
         {
           view: 'list', id: 'chat', gravity: 3,
-          //url: 'faye->/data', save: 'faye->/data',
+          url: 'stomp->/topic/chat/message', save: 'stomp->/app/chat',
           type: {height: 'auto'},
           on: {
             onAfterAdd: function (id) {
@@ -91,6 +91,7 @@ app.v_main_chat = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
+    stateMap.player = app.m_player.getInfo();
     _createView();
   };
 

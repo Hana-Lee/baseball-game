@@ -25,18 +25,17 @@ import javax.servlet.http.HttpSessionListener;
 @SpringBootApplication
 public class App extends SpringBootServletInitializer {
 
+	public static void main(String[] args) {
+		SpringApplication.run(App.class, args);
+	}
+
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		WebApplicationContext rootAppContext = createRootApplicationContext(servletContext);
 		if (rootAppContext != null) {
 			servletContext.addListener(rootAppContext.getBean(HttpSessionListener.class));
 		}
-
 		super.onStartup(servletContext);
-	}
-
-	public static void main(String[] args) {
-		SpringApplication.run(App.class, args);
 	}
 
 	@Bean
