@@ -181,7 +181,7 @@ app.v_main_menu = (function () {
                 if ($$('create-game-room-form').validate()) { //validate form
                   _sendGameRoomDataToServer($$('create-game-room-form').getValues());
                   this.getTopParentView().close();
-                  // TODO: 생성된 게임룸으로 입장 하는 코드 작성하기
+                  app.v_shell.showGameRoom();
                 } else {
                   webix.message({type: 'error', text: 'Form data is invalid'});
                 }

@@ -11,85 +11,90 @@
 /*global $, app, webix, $$, Faye */
 
 app.v_game_room_chat = (function () {
-	'use strict';
+  'use strict';
 
-	var configMap = {}, getView, initModule,
-		view;
+  var stateMap = {
+      container: null,
+      player: null
+    }, webixMap = {}, _createView,
+    initModule;
 
-	getView = function () {
-		return view;
-	};
+  _createView = function () {
+    var user_name = stateMap.player.nickname, mainView;
 
-	initModule = function () {
-		webix.proxy.faye.client = new Faye.Client('//localhost:8000/');
-		webix.proxy.faye.clientId = webix.uid();
+    function send_message() {
+      var text = $$('message').getValue();
 
-		var user_name = '이하나';
+      if (text) {
+        $$('chat').add({
+          user: user_name,
+          value: text
+        });
+      }
 
-		function send_message() {
-			console.log(arguments);
-			var text = $$('message').getValue();
+      $$('message').setValue('');
 
-			if (text) {
-				if (text.indexOf('/nick ') === 0) {
-					user_name = text.substr(6);
+      setTimeout(function () {
+        $$('message').focus();
+      }, 100);
+    }
 
-				} else {
-					$$('chat').add({
-						user: user_name,
-						value: text
-					});
-				}
-			}
+    function chat_template(obj) {
+      console.log(obj);
+      var template;
+      if (obj.user !== user_name) {
+        template = '<div class="from"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      } else {
+        template = '<div class="to"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      }
 
-			$$('message').setValue('');
+      return template;
+    }
 
-			setTimeout(function() {
-				$$('message').focus();
-			}, 100);
-		}
+    mainView = {
+      id: 'game-room-chat',
+      css: 'game_room_chat',
+      height: 450,
+      rows: [
+        {
+          view: 'list', id: 'chat', gravity: 3,
+          url: 'stomp->/topic/chat/message', save: 'stomp->/app/chat',
+          type: {height: 'auto'},
+          on: {
+            onAfterAdd: function (id) {
+              webix.delay(function () {
+                this.showItem(id);
+              }, this);
+            }
+          },
+          template: chat_template
+        },
+        {
+          cols: [
+            {
+              view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3,
+              on: {
+                onAfterRender: function () {
+                  webix.UIManager.setFocus(this);
+                }
+              }
+            },
+            {view: 'button', value: 'Send', click: send_message, hotkey: 'enter'}
+          ]
+        }
+      ]
+    };
 
-		function chat_template(obj) {
-			return '<span style="font-weight:bold;">' + obj.user + '</span>: ' + obj.value;
-		}
+    webixMap.top = webix.ui(mainView, stateMap.container);
+  };
 
-		view = {
-			id: 'game-room-chat',
-			height: 450,
-			rows: [
-				//{template: 'Webix Based Chat', type: 'header'},
-				{
-					view: 'list', id: 'chat', gravity: 3,
-					//url: 'faye->/data', save: 'faye->/data',
-					type: {height: 'auto'},
-					on: {
-						onAfterAdd: function(id) {
-							webix.delay(function () {
-								this.showItem(id);
-							}, this);
-						}
-					},
-					template: chat_template
-				},
-				{
-					cols: [
-						{
-							view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3,
-							on: {
-								onAfterRender: function() {
-									webix.UIManager.setFocus(this);
-								}
-							}
-						},
-						{view: 'button', value: 'Send', click: send_message, hotkey: 'enter'}
-					]
-				}
-			]
-		};
-	};
+  initModule = function (container) {
+    stateMap.container = container;
+    stateMap.player = app.m_player.getInfo();
+    _createView();
+  };
 
-	return {
-		initModule: initModule,
-		getView: getView
-	};
+  return {
+    initModule: initModule
+  };
 }());

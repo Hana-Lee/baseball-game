@@ -15,7 +15,7 @@ app.v_main_board = (function () {
 
   var stateMap = {
     container: null
-  }, webixMap = {}, initModule, _createView;
+  }, webixMap = {}, _createView, initModule, destructor;
 
   _createView = function () {
     var mainTitle, playerListContainer, mainMenuContainer, playerProfileContainer,
@@ -99,6 +99,7 @@ app.v_main_board = (function () {
       ]
     }];
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.main_view = $$('main-board');
     webixMap.main_title = $$('main-title');
     webixMap.main_content = $$('main-content-container');
     webixMap.player_profile_container = $$('player-profile-container');
@@ -119,7 +120,12 @@ app.v_main_board = (function () {
     _createView();
   };
 
+  destructor = function () {
+    webixMap.main_view.destructor();
+  };
+
   return {
-    initModule: initModule
+    initModule: initModule,
+    destructor: destructor
   };
 }());

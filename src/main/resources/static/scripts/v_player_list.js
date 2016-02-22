@@ -40,28 +40,28 @@ app.v_player_list = (function () {
   _createView = function () {
     var mainView;
 
-    //if (_loggedInPlayers.length === 0) {
-    //  mainView = {
-    //    template: '<h3>대기중인 플레이어가 없습니다</h3>'
-    //  };
-    //} else {
-      mainView = {
-        id: 'player-list',
-        view: 'list',
-        select: true,
-        type: {
-          height: configMap.height,
-          template: _createTemplate
+    mainView = {
+      id: 'player-list',
+      view: 'list',
+      select: true,
+      type: {
+        height: configMap.height,
+        template: _createTemplate
+      },
+      data: _loggedInPlayers,
+      onContext: {},
+      on: {
+        onAfterContextMenu: function (id) {
+          this.select(id);
         },
-        data: _loggedInPlayers,
-        onContext: {},
-        on: {
-          onAfterContextMenu: function (id) {
-            this.select(id);
+        onDestruct: function () {
+          webixMap.context_menu.destructor();
+          if (webixMap.profile_window) {
+            webixMap.profile_window.destructor();
           }
         }
-      };
-    //}
+      }
+    };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('player-list');

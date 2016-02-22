@@ -6,55 +6,114 @@
  devel  : true, indent  : 2,    maxerr   : 50,
  newcap : true, nomen   : true, plusplus : true,
  regexp : true, sloppy  : true, vars     : false,
- white  : true
+ white  : true, unparam : true
  */
 /*global $, app, webix, $$ */
 
 app.v_game_room = (function () {
   'use strict';
 
-  var configMap = {}, stateMap = {}, initModule, view, getView;
+  var stateMap = {
+      container: null
+    }, webixMap = {}, _createView,
+    initModule, destructor;
 
-  getView = function () {
-    return view;
-  };
+  _createView = function () {
+    var gameRoomTitle, menuContainer, centerContainer, leftContainer, rightContainer,
+      gameBoardContainer, gamePadContainer, playerProfileContainer, chatContainer,
+      mainView;
+    gameRoomTitle = {template: '[1번방] 왕초보들 오세요', type: 'header'};
 
-  initModule = function () {
-    view = {
-      id: 'game-room',
-      rows: [
-        {template: '[1번방] 왕초보들 오세요', type: 'header'},
-        app.v_game_room_menu.getView(),
+    menuContainer = {
+      id: 'game-room-menu-container',
+      view: 'layout',
+      rows: []
+    };
+
+    gameBoardContainer = {
+      id: 'game-room-board-container',
+      view: 'layout',
+      rows: []
+    };
+
+    gamePadContainer = {
+      id: 'game-room-pad-container',
+      view: 'layout',
+      rows: []
+    };
+
+    playerProfileContainer = {
+      id: 'game-room-player-profile-container',
+      view: 'layout',
+      rows: []
+    };
+
+    chatContainer = {
+      id: 'game-room-chat-container',
+      view: 'layout',
+      rows: []
+    };
+
+    centerContainer = {
+      view: 'layout',
+      cols: [
         {
-          cols: [
-            {
-              template: '게임룸 컨테이너',
-              margin: 10,
-              rows: [
-                app.v_game_board.getView(),
-                app.v_game_pad.getView()
-              ]
-            },
-            {
-              width: 10
-            },
-            {
-              template: '유저 컨테이너',
-              width: 300,
-              margin: 10,
-              rows: [
-                app.v_player_profile.getView(),
-                app.v_game_room_chat.getView()
-              ]
-            }
+          view: 'layout',
+          margin: 10,
+          rows: [
+            gameBoardContainer,
+            gamePadContainer
+          ]
+        },
+        {width: 10},
+        {
+          view: 'layout',
+          width: 300,
+          margin: 10,
+          rows: [
+            playerProfileContainer,
+            chatContainer
           ]
         }
       ]
     };
+
+    mainView = [{
+      id: 'game-room',
+      view: 'layout',
+      rows: [
+        gameRoomTitle,
+        menuContainer,
+        centerContainer
+      ]
+    }];
+
+    webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.main_view = $$('game-room');
+    webixMap.menu_container = $$('game-room-menu-container');
+    webixMap.board_container = $$('game-room-board-container');
+    webixMap.pad_container = $$('game-room-pad-container');
+    webixMap.profile_container = $$('game-room-player-profile-container');
+    webixMap.chat_container = $$('game-room-chat-container');
+
+    app.v_game_room_menu.initModule(webixMap.menu_container);
+    app.v_game_board.initModule(webixMap.board_container);
+    app.v_game_pad.initModule(webixMap.pad_container);
+    app.v_player_profile.initModule(webixMap.profile_container);
+    app.v_game_room_chat.initModule(webixMap.chat_container);
+  };
+
+  initModule = function (container) {
+    stateMap.container = container;
+    _createView();
+  };
+
+  destructor = function () {
+    webixMap.main_view.destructor();
   };
 
   return {
     initModule: initModule,
-    getView: getView
+    destructor: destructor
   };
 }());

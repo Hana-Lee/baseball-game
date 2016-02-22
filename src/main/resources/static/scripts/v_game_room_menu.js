@@ -11,40 +11,40 @@
 /*global $, app, webix */
 
 app.v_game_room_menu = (function () {
-	'use strict';
+  'use strict';
 
-	var configMap = {
-			height: 45,
-			button_width: 200
-		}, getView, initModule,
-		view;
+  var configMap = {
+      height: 45,
+      button_width: 200
+    }, stateMap = {
+      container: null
+    }, webixMap = {}, _createView,
+    initModule;
 
-	getView = function () {
-		return view;
-	};
+  _createView = function () {
+    var mainView = [{
+      id: 'game-room-menu', height: configMap.height, cols: [
+        {
+          id: 'exit-room', view: 'button', label: '방나가기', type: 'danger', width: configMap.button_width,
+          on: {
+            onItemClick: function () {
+              app.v_shell.showMainBoard('game-room');
+            }
+          }
+        },
+        {id: 'room-setting', view: 'button', label: '설정', width: configMap.button_width}
+      ]
+    }];
 
-	initModule = function () {
-		view = {
-			id: 'main-menu', height: configMap.height, cols: [
-				{
-					id: 'exit-room', view: 'button', label: '방나가기', type: 'danger', width: configMap.button_width,
-					on: {
-						onItemClick: function() {
-							app.v_shell.showMainBoard('game-room');
-						}
-					}
-				},
-				{id: 'room-setting', view: 'button', label: '설정', width: configMap.button_width},
-				{
-					width: 409
-				},
-				app.v_theme_selector.getView()
-			]
-		};
-	};
+    webixMap.top = webix.ui(mainView, stateMap.container);
+  };
 
-	return {
-		initModule: initModule,
-		getView: getView
-	};
+  initModule = function (container) {
+    stateMap.container = container;
+    _createView();
+  };
+
+  return {
+    initModule: initModule
+  };
 }());
