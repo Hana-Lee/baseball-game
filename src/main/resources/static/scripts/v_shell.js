@@ -34,8 +34,9 @@ app.v_shell = (function () {
     app.v_login.initModule(stateMap.container);
   };
 
-  showGameRoom = function (/*roomId*/) {
+  showGameRoom = function (gameRoomInfo) {
     app.v_main_board.destructor();
+    app.v_game_room.setGameRoom(gameRoomInfo);
     app.v_game_room.initModule(webixMap.top);
   };
 

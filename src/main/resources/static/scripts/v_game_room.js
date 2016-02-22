@@ -16,13 +16,16 @@ app.v_game_room = (function () {
   var stateMap = {
       container: null
     }, webixMap = {}, _createView,
-    initModule, destructor;
+    setGameRoom, initModule, destructor;
 
   _createView = function () {
-    var gameRoomTitle, menuContainer, centerContainer, leftContainer, rightContainer,
+    var gameRoomTitle, menuContainer, centerContainer,
       gameBoardContainer, gamePadContainer, playerProfileContainer, chatContainer,
       mainView;
-    gameRoomTitle = {template: '[1번방] 왕초보들 오세요', type: 'header'};
+    gameRoomTitle = {
+      template: '[' + stateMap.game_room_info.id + '번방] ' + stateMap.game_room_info.name,
+      type: 'header'
+    };
 
     menuContainer = {
       id: 'game-room-menu-container',
@@ -103,6 +106,10 @@ app.v_game_room = (function () {
     app.v_game_room_chat.initModule(webixMap.chat_container);
   };
 
+  setGameRoom = function (gameRoomInfo) {
+    stateMap.game_room_info = gameRoomInfo;
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     _createView();
@@ -114,6 +121,7 @@ app.v_game_room = (function () {
 
   return {
     initModule: initModule,
-    destructor: destructor
+    destructor: destructor,
+    setGameRoom: setGameRoom
   };
 }());

@@ -8,7 +8,7 @@
  regexp : true, sloppy  : true, vars     : false,
  white  : true
  */
-/*global $, app, webix */
+/*global $, app, webix, $$ */
 
 app.v_game_list = (function () {
   'use strict';
@@ -16,7 +16,7 @@ app.v_game_list = (function () {
   var stateMap = {
       container: null
     }, webixMap = {
-      gameRoomList: []
+      game_room_list: []
     },
     _createView, _getCreatedGameRoomList,
     _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate,
@@ -24,7 +24,7 @@ app.v_game_list = (function () {
 
   _createView = function () {
     /**
-     * data array
+     * data structure
      * {
      *  id: 1,
      *  name: '루비',
@@ -37,7 +37,6 @@ app.v_game_list = (function () {
      *  }, ......
      * }
      */
-    console.log('create view', stateMap.gameRoomList);
     var mainView = {
       id: 'game-room-list',
       view: 'dataview',
@@ -45,35 +44,36 @@ app.v_game_list = (function () {
       css: 'game_room_list',
       type: {
         height: 128,
-        //width: 215,
         templateStart: '<div class="custom_item">',
         template: _createTemplate,
         templateEnd: '</div>'
       },
-      data: stateMap.gameRoomList,
+      data: stateMap.game_room_list,
       ready: function () {
         $('.join_room').click(function (evt) {
-          var target = evt.target, roomId;
+          evt.preventDefault();
+          var target = evt.target, roomId, selectedRoom;
           roomId = target.getAttribute('data-room-id');
-          app.v_shell.showGameRoom(roomId);
+          selectedRoom = webixMap.main_view.getItem(roomId);
+          app.v_shell.showGameRoom(selectedRoom);
         });
       }
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.main_view = $$('game-room-list');
   };
 
   _getCreatedGameRoomList = function (callback) {
     webix.ajax().get('gameroom/all', {
       error: function (text) {
         console.log(text);
-        stateMap.gameRoomList = [];
+        stateMap.game_room_list = [];
         callback();
       },
       success: function (text) {
         var serverResponse = JSON.parse(text);
-        stateMap.gameRoomList = serverResponse.content;
-        console.log('success', stateMap.gameRoomList);
+        stateMap.game_room_list = serverResponse.content;
         callback();
       }
     });
