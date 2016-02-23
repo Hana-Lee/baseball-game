@@ -27,7 +27,7 @@ app.v_main_chat = (function () {
       var text = $$('message').getValue();
 
       if (text) {
-        $$('chat').add({
+        webixMap.chat.add({
           user: user_name,
           value: text
         });
@@ -87,6 +87,15 @@ app.v_main_chat = (function () {
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.chat = $$('chat');
+    webix.dp(webixMap.chat).ignore(function(){
+      webixMap.chat.add({
+        user:"System", value:"Welcome to chat :)"
+      });
+      webixMap.chat.add({
+        user:"System", value:"Use '/nick Name' to set a name"
+      });
+    });
   };
 
   initModule = function (container) {

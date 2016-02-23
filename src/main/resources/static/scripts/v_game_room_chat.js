@@ -26,7 +26,7 @@ app.v_game_room_chat = (function () {
       var text = $$('message').getValue();
 
       if (text) {
-        $$('chat').add({
+        webixMap.chat.add({
           user: user_name,
           value: text
         });
@@ -57,7 +57,7 @@ app.v_game_room_chat = (function () {
       height: 450,
       rows: [
         {
-          view: 'list', id: 'chat', gravity: 3,
+          view: 'list', id: 'game-room-chat-list', gravity: 3,
           url: 'stomp->/topic/chat/message', save: 'stomp->/app/chat',
           type: {height: 'auto'},
           on: {
@@ -86,6 +86,15 @@ app.v_game_room_chat = (function () {
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.chat = $$('game-room-chat-list');
+    webix.dp(webixMap.chat).ignore(function(){
+      webixMap.chat.add({
+        user:"System", value:"Welcome to chat :)"
+      });
+      webixMap.chat.add({
+        user:"System", value:"Use '/nick Name' to set a name"
+      });
+    });
   };
 
   initModule = function (container) {
