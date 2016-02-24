@@ -10,6 +10,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 /**
  * @author Hana Lee
  * @since 2016-02-21 21:31
@@ -30,8 +32,14 @@ public class SocketController {
 	private ModelMapper modelMapper;
 
 	@MessageMapping(value = {"/chat"})
-	@SendTo(value = {"/topic/chat/message"})
-	public ChatMessage chat(ChatMessage message) {
+	@SendTo(value = {"/topic/chat"})
+	public ChatMessage chat(ChatMessage message, Principal principal) {
+		return message;
+	}
+
+	@MessageMapping(value = {"/chat/gameroom"})
+	@SendTo(value = {"/topic/chat/gameroom"})
+	public ChatMessage gameRoomChat(ChatMessage message, Principal principal) {
 		return message;
 	}
 }

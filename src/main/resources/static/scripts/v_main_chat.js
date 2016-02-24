@@ -59,13 +59,16 @@ app.v_main_chat = (function () {
       rows: [
         {
           view: 'list', id: 'chat', gravity: 3,
-          url: 'stomp->/topic/chat/message', save: 'stomp->/app/chat',
+          url: 'stomp->/chat', save: 'stomp->/chat',
           type: {height: 'auto'},
           on: {
             onAfterAdd: function (id) {
               webix.delay(function () {
                 this.showItem(id);
               }, this);
+            },
+            onDestruct: function() {
+              console.log('destruct', arguments);
             }
           },
           template: chat_template

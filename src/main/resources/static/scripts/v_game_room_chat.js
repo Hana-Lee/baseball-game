@@ -58,7 +58,7 @@ app.v_game_room_chat = (function () {
       rows: [
         {
           view: 'list', id: 'game-room-chat-list', gravity: 3,
-          url: 'stomp->/topic/chat/message', save: 'stomp->/app/chat',
+          url: 'stomp->/chat/gameroom', save: 'stomp->/chat/gameroom',
           type: {height: 'auto'},
           on: {
             onAfterAdd: function (id) {
