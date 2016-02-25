@@ -1,5 +1,7 @@
 package kr.co.leehana.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.GameRoomNotFoundException;
@@ -12,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.core.MessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,17 +31,21 @@ import java.util.List;
 public class GameRoomServiceImpl implements GameRoomService {
 
 	private final GameRoomRepository gameRoomRepository;
-
 	private final ModelMapper modelMapper;
+	private final MessageSendingOperations<String> messageSendingOperations;
+	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper) {
+	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper,
+	                           MessageSendingOperations<String> messageSendingOperations, ObjectMapper objectMapper) {
 		this.gameRoomRepository = gameRoomRepository;
 		this.modelMapper = modelMapper;
+		this.messageSendingOperations = messageSendingOperations;
+		this.objectMapper = objectMapper;
 	}
 
 	@Override
-	public GameRoom create(final GameRoomDto.Create createDto) {
+	public GameRoom create(final GameRoomDto.Create createDto) throws JsonProcessingException {
 		final GameRoom gameRoom = modelMapper.map(createDto, GameRoom.class);
 
 		if (gameRoomRepository.findByOwner(createDto.getOwner()) != null) {
@@ -49,7 +56,17 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 		fillInitData(gameRoom);
 
-		return gameRoomRepository.save(gameRoom);
+		final GameRoom createdGameRoom = gameRoomRepository.save(gameRoom);
+		sendNewGameRoomNotification(createdGameRoom);
+		return createdGameRoom;
+	}
+
+	private void sendNewGameRoomNotification(GameRoom newGameRoom) throws JsonProcessingException {
+		String topic = "/topic/gameroom-created";
+		GameRoomDto.Message message = new GameRoomDto.Message();
+		message.setOperation("insert");
+		message.setData(newGameRoom);
+		messageSendingOperations.convertAndSend(topic, message);
 	}
 
 	private void fillInitData(final GameRoom gameRoom) {

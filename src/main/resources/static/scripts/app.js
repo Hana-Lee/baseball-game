@@ -32,6 +32,8 @@ app = (function () {
         subscribeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
           var update = {};
           update = JSON.parse(response.body);
+          console.log('update', update);
+          console.log(update.clientId, selfId);
           if (update.clientId === selfId.toString()) {
             return;
           }

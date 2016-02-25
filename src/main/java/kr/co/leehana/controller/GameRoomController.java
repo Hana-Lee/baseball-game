@@ -1,7 +1,9 @@
 package kr.co.leehana.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
@@ -13,7 +15,6 @@ import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
-import kr.co.leehana.enums.GameRole;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -82,7 +83,8 @@ public class GameRoomController {
 		}
 	 */
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
-	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) {
+	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
+			JsonProcessingException {
 		if (bindingResult.hasErrors()) {
 			return createErrorResponseEntity(bindingResult);
 		}
@@ -183,7 +185,7 @@ public class GameRoomController {
 			int randomInteger = random.nextInt(gameRooms.size());
 
 			selectedGameRoom = gameRooms.get(randomInteger);
-		} else if (gameRooms.size() == 1){
+		} else if (gameRooms.size() == 1) {
 			selectedGameRoom = gameRooms.get(0);
 		} else {
 			throw new GameRoomNotFoundException("게임룸이 존재 하지 않습니다.");

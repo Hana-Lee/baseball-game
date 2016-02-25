@@ -106,7 +106,7 @@ app.v_shell = (function () {
       }
     );
 
-    webix.proxy.stomp.clientId = webix.uid();
+    //webix.proxy.stomp.clientId = webix.uid();
   };
 
   _createView = function () {

@@ -1,5 +1,6 @@
 package kr.co.leehana.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.model.GameRoom;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface GameRoomService {
 
-	GameRoom create(GameRoomDto.Create createDto);
+	GameRoom create(GameRoomDto.Create createDto) throws JsonProcessingException;
 
 	GameRoom getById(Long id);
 

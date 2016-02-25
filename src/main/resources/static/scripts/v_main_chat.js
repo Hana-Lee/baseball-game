@@ -103,6 +103,7 @@ app.v_main_chat = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
+    webix.proxy.stomp.clientId = webix.uid();
     stateMap.player = app.m_player.getInfo();
     _createView();
   };
