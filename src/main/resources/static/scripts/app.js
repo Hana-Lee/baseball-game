@@ -2,16 +2,22 @@
  * @author Hana Lee
  * @since 2016-01-15 19:35
  */
-/*jslint         browser : true, continue : true,
- devel  : true, indent  : 2,    maxerr   : 50,
- newcap : true, nomen   : true, plusplus : true,
- regexp : true, sloppy  : true, vars     : false,
- white  : true, unparam : true
+/*jslint
+ browser  : true,
+ continue : true,
+ devel    : true,
+ indent   : 2,
+ maxerr   : 100,
+ nomen    : true,
+ plusplus : true,
+ regexp   : true,
+ vars     : false,
+ white    : true,
+ todo     : true
  */
 /*global $, app:true, webix */
 
-var app;
-app = (function () {
+var app = (function () {
   'use strict';
   var stateMap = {
     container : null
@@ -60,7 +66,7 @@ app = (function () {
       unload : function () {
         app.v_shell.getStompClient().unsubscribe('sub-' + this.clientId);
       },
-      save : function (view, update/*, dp, callback*/) {
+      save : function (/*view, */update/*, dp, callback*/) {
         update.clientId = this.clientId;
         update.data.email = app.m_player.getInfo().email;
         var header = {}, sendUrl = "/app" + this.source;
@@ -78,7 +84,6 @@ app = (function () {
   };
 
   return {
-    initModule : initModule,
-    stateMap : stateMap
+    initModule : initModule
   };
 }());

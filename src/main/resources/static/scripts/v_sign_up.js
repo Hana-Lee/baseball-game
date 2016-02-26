@@ -2,11 +2,18 @@
  * @author Hana Lee
  * @since 2016-01-25 01:53
  */
-/*jslint         browser : true, continue : true,
- devel  : true, indent  : 2,    maxerr   : 50,
- newcap : true, nomen   : true, plusplus : true,
- regexp : true, sloppy  : true, vars     : false,
- white  : true
+/*jslint
+ browser  : true,
+ continue : true,
+ devel    : true,
+ indent   : 2,
+ maxerr   : 100,
+ nomen    : true,
+ plusplus : true,
+ regexp   : true,
+ vars     : false,
+ white    : true,
+ todo     : true
  */
 /*global $, app, webix, $$ */
 
@@ -50,7 +57,7 @@ app.v_sign_up = (function () {
                     required : false,
                     accept : 'image/png, image/gif, image/jpg',
                     link : 'avatar-preview',
-                    click : function (id, evt) {
+                    click : function (/*id, */evt) {
                       evt.preventDefault();
 
                       webix.alert({
@@ -184,7 +191,7 @@ app.v_sign_up = (function () {
             } else if (!webix.rules.isNotEmpty(data[passwordKey])) {
               message = '패스워드가 비어있습니다';
             } else if (data[passwordKey] !== data[secPasswordKey]) {
-              //message = '패스워드가 다릅니다<br/>다시 확인해주세요';
+              message = '패스워드가 다릅니다<br/>다시 확인해주세요';
             }
 
             if (message) {
