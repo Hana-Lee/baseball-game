@@ -110,6 +110,8 @@ app.v_game_room = (function () {
     app.v_game_board.initModule(webixMap.board_container);
     app.v_game_pad.initModule(webixMap.pad_container);
     app.v_player_profile.initModule(webixMap.profile_container);
+
+    app.v_game_room_chat.setGameRoom(stateMap.game_room_info);
     app.v_game_room_chat.initModule(webixMap.chat_container);
   };
 

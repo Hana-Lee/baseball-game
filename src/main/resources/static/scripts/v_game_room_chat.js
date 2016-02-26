@@ -22,9 +22,10 @@ app.v_game_room_chat = (function () {
 
   var stateMap = {
       container : null,
-      player : null
+      player : null,
+      game_room_info : null
     }, webixMap = {}, _createView,
-    initModule;
+    setGameRoom, initModule;
 
   _createView = function () {
     var user_name = stateMap.player.nickname, mainView;
@@ -47,15 +48,17 @@ app.v_game_room_chat = (function () {
     }
 
     function chat_template(obj) {
-      console.log(obj);
-      var template;
-      if (obj.user !== user_name) {
-        template = '<div class="from"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      var className;
+
+      if (obj.user === '시스템') {
+        className = 'system';
+      } else if (obj.user !== user_name) {
+        className = 'from';
       } else {
-        template = '<div class="to"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+        className = 'to';
       }
 
-      return template;
+      return '<div class="' + className + '"><span>' + obj.user + '</span>&nbsp;:&nbsp;' + obj.value + '</div>';
     }
 
     mainView = {
@@ -65,7 +68,7 @@ app.v_game_room_chat = (function () {
       rows : [
         {
           view : 'list', id : 'game-room-chat-list', gravity : 3,
-          url : 'stomp->/chat/gameroom', save : 'stomp->/chat/gameroom',
+          url : stateMap.proxy, save : stateMap.proxy,
           type : {height : 'auto'},
           on : {
             onAfterAdd : function (id) {
@@ -96,21 +99,30 @@ app.v_game_room_chat = (function () {
     webixMap.chat = $$('game-room-chat-list');
     webix.dp(webixMap.chat).ignore(function () {
       webixMap.chat.add({
-        user : "System", value : "Welcome to chat :)"
+        user : '시스템', value : '[' + stateMap.game_room_info.id + '번 ' + stateMap.game_room_info.name + '] 방에 입장 하셨습니다'
       });
       webixMap.chat.add({
-        user : "System", value : "Use '/nick Name' to set a name"
+        user : '시스템', value : '즐거운 게임 즐기시기 바랍니다'
       });
     });
   };
 
+  setGameRoom = function (gameRoomInfo) {
+    stateMap.game_room_info = gameRoomInfo;
+  };
+
   initModule = function (container) {
     stateMap.container = container;
+
+    stateMap.proxy = webix.proxy('stomp', '/chat/gameroom');
+    stateMap.proxy.clientId = app.utils.guid();
+
     stateMap.player = app.m_player.getInfo();
     _createView();
   };
 
   return {
-    initModule : initModule
+    initModule : initModule,
+    setGameRoom : setGameRoom
   };
 }());

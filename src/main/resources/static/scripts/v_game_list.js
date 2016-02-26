@@ -56,7 +56,7 @@ app.v_game_list = (function () {
         templateEnd : '</div>'
       },
       data : stateMap.game_room_list,
-      url : 'stomp->/gameroom-created',
+      url : stateMap.proxy,
       ready : function () {
         $('.join_room').click(function (evt) {
           evt.preventDefault();
@@ -126,7 +126,10 @@ app.v_game_list = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    webix.proxy.stomp.clientId = webix.uid();
+
+    stateMap.proxy = webix.proxy('stomp', '/gameroom-created');
+    stateMap.proxy.clientId = app.utils.guid();
+
     _getCreatedGameRoomList(_createView);
   };
 

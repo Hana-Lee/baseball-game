@@ -35,12 +35,13 @@ var app = (function () {
             id : 'sub-' + this.clientId
           }, subscribeObj;
 
+        console.log(view.$view);
+
         subscribeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
           var update = {};
           update = JSON.parse(response.body);
-          console.log('update', update);
-          console.log(update.clientId, selfId);
-          if (update.clientId === selfId.toString()) {
+
+          if (update.clientId === selfId) {
             return;
           }
 
@@ -63,13 +64,15 @@ var app = (function () {
           subscribeObj.unsubscribe();
         });
       },
-      unload : function () {
-        app.v_shell.getStompClient().unsubscribe('sub-' + this.clientId);
-      },
-      save : function (/*view, */update/*, dp, callback*/) {
+      save : function (view, update/*, dp, callback*/) {
+        console.log('proxy save', arguments);
+        if (view === undefined || view === null) {
+          return;
+        }
+
         update.clientId = this.clientId;
         update.data.email = app.m_player.getInfo().email;
-        var header = {}, sendUrl = "/app" + this.source;
+        var header = {}, sendUrl = '/app' + this.source;
         app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(update));
       }
     };

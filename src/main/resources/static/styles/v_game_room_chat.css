@@ -1,7 +1,11 @@
-.game_room_chat .from span, .main_chat .to span {
+.game_room_chat .from span, .game_room_chat .to span, .game_room_chat .system {
 	font-weight: bold;
 }
 
 .game_room_chat .from {
 	background: lavender;
+}
+
+.game_room_chat .system {
+	background: aquamarine;
 }

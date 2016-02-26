@@ -48,15 +48,17 @@ app.v_main_chat = (function () {
     }
 
     function chat_template(obj) {
-      console.log(obj);
-      var template;
-      if (obj.user !== user_name) {
-        template = '<div class="from"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+      var className;
+
+      if (obj.user === '시스템') {
+        className = 'system';
+      } else if (obj.user !== user_name) {
+        className = 'from';
       } else {
-        template = '<div class="to"><span>' + obj.user + '</span>: ' + obj.value + '</div>';
+        className = 'to';
       }
 
-      return template;
+      return '<div class="' + className + '"><span>' + obj.user + '</span>&nbsp;:&nbsp;' + obj.value + '</div>';
     }
 
     mainView = {
@@ -66,7 +68,7 @@ app.v_main_chat = (function () {
       rows : [
         {
           view : 'list', id : 'chat', gravity : 3,
-          url : 'stomp->/chat', save : 'stomp->/chat',
+          url : stateMap.proxy, save : stateMap.proxy,
           type : {height : 'auto'},
           on : {
             onAfterAdd : function (id) {
@@ -100,17 +102,18 @@ app.v_main_chat = (function () {
     webixMap.chat = $$('chat');
     webix.dp(webixMap.chat).ignore(function () {
       webixMap.chat.add({
-        user : "시스템", value : "Welcome to chat :)"
+        user : '시스템', value : '숫자 야구 게임에 오신걸 환영합니다 :-)'
       });
       webixMap.chat.add({
-        user : "System", value : "Use '/nick Name' to set a name"
+        user : '시스템', value : '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
       });
     });
   };
 
   initModule = function (container) {
     stateMap.container = container;
-    webix.proxy.stomp.clientId = webix.uid();
+    stateMap.proxy = webix.proxy('stomp', '/chat');
+    stateMap.proxy.clientId = app.utils.guid();
     stateMap.player = app.m_player.getInfo();
     _createView();
   };
