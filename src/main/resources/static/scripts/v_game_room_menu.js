@@ -14,25 +14,25 @@ app.v_game_room_menu = (function () {
   'use strict';
 
   var configMap = {
-      height: 45,
-      button_width: 200
+      height : 45,
+      button_width : 200
     }, stateMap = {
-      container: null
+      container : null
     }, webixMap = {}, _createView,
     initModule;
 
   _createView = function () {
     var mainView = [{
-      id: 'game-room-menu', height: configMap.height, cols: [
+      id : 'game-room-menu', height : configMap.height, cols : [
         {
-          id: 'exit-room', view: 'button', label: '방나가기', type: 'danger', width: configMap.button_width,
-          on: {
-            onItemClick: function () {
+          id : 'exit-room', view : 'button', label : '방나가기', type : 'danger', width : configMap.button_width,
+          on : {
+            onItemClick : function () {
               app.v_shell.showMainBoard('game-room');
             }
           }
         },
-        {id: 'room-setting', view: 'button', label: '설정', width: configMap.button_width}
+        {id : 'room-setting', view : 'button', label : '설정', width : configMap.button_width}
       ]
     }];
 
@@ -45,6 +45,6 @@ app.v_game_room_menu = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());

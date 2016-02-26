@@ -14,12 +14,12 @@ app.v_shell = (function () {
   'use strict';
 
   var configMap = {
-      width: 1024,
-      height: 750
+      width : 1024,
+      height : 750
     }, stateMap = {
-      loggedIn: false,
-      container: null,
-      stomp_client: null
+      loggedIn : false,
+      container : null,
+      stomp_client : null
     }, webixMap = {}, player = null, playerList = [],
     showSignUp, showLogin, showGameRoom, showMainBoard, logout, getStompClient,
     _getLoggedInPlayerInfo, _initStompClient, _createView,
@@ -55,16 +55,16 @@ app.v_shell = (function () {
 
   logout = function () {
     webix.ajax().post('logout', {
-      error: function (text) {
+      error : function (text) {
         var textJson = JSON.parse(text);
         webix.alert({
-          title: '오류',
-          ok: '확인',
-          text: textJson.message
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
         });
 
       },
-      success: function () {
+      success : function () {
         $$('main-layout').destructor();
         stateMap.loggedIn = false;
         $('#main-container').html('');
@@ -77,13 +77,13 @@ app.v_shell = (function () {
   _getLoggedInPlayerInfo = function (callback) {
     var serverResponse = '';
     webix.ajax().sync().get('player', {
-      error: function (text) {
+      error : function (text) {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(null);
         stateMap.loggedIn = false;
         app.v_login.initModule(stateMap.container);
       },
-      success: function (text) {
+      success : function (text) {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(serverResponse);
         stateMap.loggedIn = true;
@@ -92,7 +92,7 @@ app.v_shell = (function () {
     });
   };
 
-  _initStompClient = function(callback) {
+  _initStompClient = function (callback) {
     var api_socket = new SockJS('/bbg/sock'), login = '', passcode = '';
     stateMap.stomp_client = Stomp.over(api_socket);
     stateMap.stomp_client.connect(login, passcode,
@@ -112,13 +112,13 @@ app.v_shell = (function () {
   _createView = function () {
     if (stateMap.loggedIn) {
       var mainView = {
-        id: 'main-layout',
-        type: 'space',
-        css: 'main-layout',
-        view: 'layout',
-        height: configMap.height,
-        width: configMap.width,
-        rows: [{template: 'main-content'}]
+        id : 'main-layout',
+        type : 'space',
+        css : 'main-layout',
+        view : 'layout',
+        height : configMap.height,
+        width : configMap.width,
+        rows : [{template : 'main-content'}]
       };
 
       webixMap.top = webix.ui(mainView, stateMap.container);
@@ -138,14 +138,14 @@ app.v_shell = (function () {
   };
 
   return {
-    initModule: initModule,
-    showSignUp: showSignUp,
-    showLogin: showLogin,
-    showGameRoom: showGameRoom,
-    showMainBoard: showMainBoard,
-    logout: logout,
-    getStompClient: getStompClient,
-    player: player,
-    playerList: playerList
+    initModule : initModule,
+    showSignUp : showSignUp,
+    showLogin : showLogin,
+    showGameRoom : showGameRoom,
+    showMainBoard : showMainBoard,
+    logout : logout,
+    getStompClient : getStompClient,
+    player : player,
+    playerList : playerList
   };
 }());

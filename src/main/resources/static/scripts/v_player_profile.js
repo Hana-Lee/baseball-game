@@ -14,8 +14,8 @@ app.v_player_profile = (function () {
   'use strict';
 
   var stateMap = {
-      container: null,
-      player: null
+      container : null,
+      player : null
     }, webixMap = {},
     _createView, _calculateWinRate, initModule;
 
@@ -34,15 +34,15 @@ app.v_player_profile = (function () {
     totalRank = stateMap.player.totalRank.value;
 
     mainView = {
-      id: 'player-profile-' + stateMap.player.id,
-      height: 200,
-      rows: [
-        {template: nickname + '님 ( ' + email + ' )', type: 'header'},
+      id : 'player-profile-' + stateMap.player.id,
+      height : 200,
+      rows : [
+        {template : nickname + '님 ( ' + email + ' )', type : 'header'},
         {
-          cols: [
-            {template: '<img src="' + avatarImagePath + '" height="100%" width="100%">', width: 130},
+          cols : [
+            {template : '<img src="' + avatarImagePath + '" height="100%" width="100%">', width : 130},
             {
-              template: '<ul style="list-style:none;padding:0;margin:0;">' +
+              template : '<ul style="list-style:none;padding:0;margin:0;">' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">레벨: ' + level + '</li>' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: ' + totalScore + '점</li>' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: ' + totalGameCnt + '전 ' + winCnt + '승 ' + loseCnt + '패</li>' +
@@ -72,6 +72,6 @@ app.v_player_profile = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());

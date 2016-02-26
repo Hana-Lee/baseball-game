@@ -14,7 +14,7 @@ app.v_main_board = (function () {
   'use strict';
 
   var stateMap = {
-    container: null
+    container : null
   }, webixMap = {}, _createView, initModule, destructor;
 
   _createView = function () {
@@ -22,79 +22,79 @@ app.v_main_board = (function () {
       gameRoomListContainer, mainChatContainer,
       mainContentLeftContainer, mainContentRightContainer, mainContentContainer, mainView;
 
-    mainTitle = {id: 'main-title', template: '야구게임 v0.1', type: 'header'};
+    mainTitle = {id : 'main-title', template : '야구게임 v0.1', type : 'header'};
 
     mainMenuContainer = {
-      id: 'main-menu-container',
-      view: 'layout',
-      rows: []
+      id : 'main-menu-container',
+      view : 'layout',
+      rows : []
     };
 
     playerProfileContainer = {
-      id: 'player-profile-container',
-      view: 'layout',
-      rows: []
+      id : 'player-profile-container',
+      view : 'layout',
+      rows : []
     };
 
     playerListContainer = {
-      id: 'player-list-container',
-      view: 'layout',
-      width: 300,
-      margin: 10,
-      rows: []
+      id : 'player-list-container',
+      view : 'layout',
+      width : 300,
+      margin : 10,
+      rows : []
     };
 
     gameRoomListContainer = {
-      id: 'game-room-list-container',
-      view: 'layout',
-      css: 'game_room_list_container',
-      rows: []
+      id : 'game-room-list-container',
+      view : 'layout',
+      css : 'game_room_list_container',
+      rows : []
     };
 
     mainChatContainer = {
-      id: 'main-chat-container',
-      view: 'layout',
-      rows: []
+      id : 'main-chat-container',
+      view : 'layout',
+      rows : []
     };
 
     mainContentLeftContainer = {
-      template: '게임룸 컨테이너',
-      id: 'main-content-left-container',
-      margin: 10,
-      rows: [
+      template : '게임룸 컨테이너',
+      id : 'main-content-left-container',
+      margin : 10,
+      rows : [
         gameRoomListContainer,
-        {view: 'resizer'},
+        {view : 'resizer'},
         mainChatContainer
       ]
     };
 
     mainContentRightContainer = {
-      id: 'main-content-right-container',
-      view: 'layout',
-      width: 300,
-      rows: [
+      id : 'main-content-right-container',
+      view : 'layout',
+      width : 300,
+      rows : [
         playerProfileContainer,
-        {height: 10},
+        {height : 10},
         playerListContainer
       ]
     };
 
     mainContentContainer = {
-      cols: [
+      cols : [
         mainContentLeftContainer,
-        {width: 10},
+        {width : 10},
         mainContentRightContainer
       ]
     };
 
     mainView = [{
-      id: 'main-board',
-      view: 'layout',
-      rows: [
+      id : 'main-board',
+      view : 'layout',
+      rows : [
         mainTitle,
-        {height: 5},
+        {height : 5},
         mainMenuContainer,
-        {height: 5},
+        {height : 5},
         mainContentContainer
       ]
     }];
@@ -125,7 +125,7 @@ app.v_main_board = (function () {
   };
 
   return {
-    initModule: initModule,
-    destructor: destructor
+    initModule : initModule,
+    destructor : destructor
   };
 }());

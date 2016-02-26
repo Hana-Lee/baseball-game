@@ -14,19 +14,19 @@ var app;
 app = (function () {
   'use strict';
   var stateMap = {
-    container: null
+    container : null
   }, initModule, _registerStompProxy;
 
   _registerStompProxy = function () {
     webix.proxy.stomp = {
-      $proxy: true,
-      init: function () {
+      $proxy : true,
+      init : function () {
         this.clientId = this.clientId || webix.uid();
       },
-      load: function (view) {
+      load : function (view) {
         var selfId = this.clientId, subscribeUrl = '/topic' + this.source,
           headers = {
-            id: 'sub-' + this.clientId
+            id : 'sub-' + this.clientId
           }, subscribeObj;
 
         subscribeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
@@ -57,10 +57,10 @@ app = (function () {
           subscribeObj.unsubscribe();
         });
       },
-      unload: function () {
+      unload : function () {
         app.v_shell.getStompClient().unsubscribe('sub-' + this.clientId);
       },
-      save: function (view, update/*, dp, callback*/) {
+      save : function (view, update/*, dp, callback*/) {
         update.clientId = this.clientId;
         update.data.email = app.m_player.getInfo().email;
         var header = {}, sendUrl = "/app" + this.source;
@@ -78,7 +78,7 @@ app = (function () {
   };
 
   return {
-    initModule: initModule,
-    stateMap: stateMap
+    initModule : initModule,
+    stateMap : stateMap
   };
 }());

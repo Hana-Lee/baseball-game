@@ -11,15 +11,15 @@
 /*global  */
 
 var user = {
-	id: null,
-	nickname: null,
-	email: null,
-	level: null,
-	totalRank:null,
-	matchRecord: null,
-	defenderRoleCount: null,
-	attackerRoleCount: null,
-	gameRole: null,
-	joined: null,
-	updated: null
+  id : null,
+  nickname : null,
+  email : null,
+  level : null,
+  totalRank : null,
+  matchRecord : null,
+  defenderRoleCount : null,
+  attackerRoleCount : null,
+  gameRole : null,
+  joined : null,
+  updated : null
 };

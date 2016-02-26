@@ -14,8 +14,8 @@ app.v_main_chat = (function () {
   'use strict';
 
   var stateMap = {
-      container: null,
-      player: null
+      container : null,
+      player : null
     }, webixMap = {},
     _createView,
     initModule;
@@ -28,8 +28,8 @@ app.v_main_chat = (function () {
 
       if (text) {
         webixMap.chat.add({
-          user: user_name,
-          value: text
+          user : user_name,
+          value : text
         });
       }
 
@@ -53,37 +53,37 @@ app.v_main_chat = (function () {
     }
 
     mainView = {
-      id: 'main-chat',
-      height: 240,
-      css: 'main_chat',
-      rows: [
+      id : 'main-chat',
+      height : 240,
+      css : 'main_chat',
+      rows : [
         {
-          view: 'list', id: 'chat', gravity: 3,
-          url: 'stomp->/chat', save: 'stomp->/chat',
-          type: {height: 'auto'},
-          on: {
-            onAfterAdd: function (id) {
+          view : 'list', id : 'chat', gravity : 3,
+          url : 'stomp->/chat', save : 'stomp->/chat',
+          type : {height : 'auto'},
+          on : {
+            onAfterAdd : function (id) {
               webix.delay(function () {
                 this.showItem(id);
               }, this);
             },
-            onDestruct: function() {
+            onDestruct : function () {
               console.log('destruct', arguments);
             }
           },
-          template: chat_template
+          template : chat_template
         },
         {
-          cols: [
+          cols : [
             {
-              view: 'text', id: 'message', placeholder: '채팅 메세지를 입력해주세요', gravity: 3,
-              on: {
-                onAfterRender: function () {
+              view : 'text', id : 'message', placeholder : '채팅 메세지를 입력해주세요', gravity : 3,
+              on : {
+                onAfterRender : function () {
                   webix.UIManager.setFocus(this);
                 }
               }
             },
-            {view: 'button', value: 'Send', click: send_message, hotkey: 'enter'}
+            {view : 'button', value : 'Send', click : send_message, hotkey : 'enter'}
           ]
         }
       ]
@@ -91,12 +91,12 @@ app.v_main_chat = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.chat = $$('chat');
-    webix.dp(webixMap.chat).ignore(function(){
+    webix.dp(webixMap.chat).ignore(function () {
       webixMap.chat.add({
-        user:"System", value:"Welcome to chat :)"
+        user : "시스템", value : "Welcome to chat :)"
       });
       webixMap.chat.add({
-        user:"System", value:"Use '/nick Name' to set a name"
+        user : "System", value : "Use '/nick Name' to set a name"
       });
     });
   };
@@ -109,6 +109,6 @@ app.v_main_chat = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());

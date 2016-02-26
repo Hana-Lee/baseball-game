@@ -15,7 +15,7 @@ app.m_player = (function () {
 
   var info, initModule, getInfo;
 
-  getInfo = function() {
+  getInfo = function () {
     return info;
   };
 
@@ -24,7 +24,7 @@ app.m_player = (function () {
   };
 
   return {
-    initModule: initModule,
-    getInfo: getInfo
+    initModule : initModule,
+    getInfo : getInfo
   };
 }());

@@ -14,14 +14,14 @@ app.v_main_menu = (function () {
   'use strict';
 
   var configMap = {
-      height: 45,
-      button_width: 200
+      height : 45,
+      button_width : 200
     }, stateMap = {
-      container: null,
-      player: {
-        admin: false
+      container : null,
+      player : {
+        admin : false
       },
-      game_room_list: []
+      game_room_list : []
     }, webixMap = {},
     _createView, _sendGameRoomDataToServer, _getCreatedGameRoomList,
     _joinRandomGameRoom,
@@ -38,37 +38,37 @@ app.v_main_menu = (function () {
     }, mainView;
 
     mainView = {
-      id: 'main-menu', height: configMap.height, cols: [
+      id : 'main-menu', height : configMap.height, cols : [
         {
-          id: 'make-room', view: 'button', label: '방만들기', type: 'danger', width: configMap.button_width,
-          click: function () {
+          id : 'make-room', view : 'button', label : '방만들기', type : 'danger', width : configMap.button_width,
+          click : function () {
             showCreateGameRoomDialog();
           }
         },
         {
-          id: 'quick-join',
-          view: 'button',
-          label: '빠른입장',
-          disabled: isGameRoomsNotExist(),
-          width: configMap.button_width,
-          click: function () {
+          id : 'quick-join',
+          view : 'button',
+          label : '빠른입장',
+          disabled : isGameRoomsNotExist(),
+          width : configMap.button_width,
+          click : function () {
             _joinRandomGameRoom();
           }
         },
         {
-          id: 'game-room-admin',
-          hidden: isNotAdmin(),
-          view: 'button',
-          label: '관리',
-          type: 'form',
-          width: configMap.button_width
+          id : 'game-room-admin',
+          hidden : isNotAdmin(),
+          view : 'button',
+          label : '관리',
+          type : 'form',
+          width : configMap.button_width
         },
         {
-          width: getDynamicWidth() - configMap.button_width
+          width : getDynamicWidth() - configMap.button_width
         },
         {
-          id: 'logout', view: 'button', label: '로그아웃', type: 'danger', width: configMap.button_width,
-          click: function () {
+          id : 'logout', view : 'button', label : '로그아웃', type : 'danger', width : configMap.button_width,
+          click : function () {
             app.v_shell.logout();
           }
         }
@@ -80,34 +80,34 @@ app.v_main_menu = (function () {
 
   _sendGameRoomDataToServer = function (data) {
     var sendData = {
-      name: data.name,
-      gameRole: data.gameRole,
-      setting: {
-        generationNumberCount: data.generationNumberCount,
-        limitGuessInputCount: data.limitGuessInputCount,
-        limitWrongInputCount: data.limitWrongInputCount
+      name : data.name,
+      gameRole : data.gameRole,
+      setting : {
+        generationNumberCount : data.generationNumberCount,
+        limitGuessInputCount : data.limitGuessInputCount,
+        limitWrongInputCount : data.limitWrongInputCount
       }
     };
 
     sendData = JSON.stringify(sendData);
 
     webix.ajax().headers({
-      'Content-Type': 'application/json'
+      'Content-Type' : 'application/json'
     }).post('gameroom', sendData, {
-      error: function (text) {
+      error : function (text) {
         console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
-          title: '오류',
-          ok: '확인',
-          text: textJson.message
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
         });
 
         if (webixMap.create_game_room_window) {
           webixMap.create_game_room_window.close();
         }
       },
-      success: function (text) {
+      success : function (text) {
         var gameRoomJson = JSON.parse(text);
         if (webixMap.create_game_room_window) {
           webixMap.create_game_room_window.close();
@@ -119,99 +119,99 @@ app.v_main_menu = (function () {
 
   showCreateGameRoomDialog = function () {
     webix.ui({
-      view: 'window',
-      id: 'create-game-room-window',
-      head: '게임룸 생성',
-      height: 400,
-      width: 300,
-      position: 'center',
-      modal: true,
-      body: {
-        id: 'create-game-room-form',
-        view: 'form',
-        borderless: true,
-        elements: [
-          {view: 'text', label: '이름', name: 'name', invalidMessage: '이름을 입력해주세요'},
+      view : 'window',
+      id : 'create-game-room-window',
+      head : '게임룸 생성',
+      height : 400,
+      width : 300,
+      position : 'center',
+      modal : true,
+      body : {
+        id : 'create-game-room-form',
+        view : 'form',
+        borderless : true,
+        elements : [
+          {view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요'},
           {
-            view: 'richselect', label: '역할', name: 'gameRole', invalidMessage: '역할을 선택해주세요', value: 'ATTACKER',
-            options: [
-              {id: 'ATTACKER', value: '공격'},
-              {id: 'DEFENDER', value: '수비'}
+            view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요', value : 'ATTACKER',
+            options : [
+              {id : 'ATTACKER', value : '공격'},
+              {id : 'DEFENDER', value : '수비'}
             ]
           },
           {
-            view: 'fieldset', label: '게임 설정', name: 'setting',
-            body: {
-              rows: [
+            view : 'fieldset', label : '게임 설정', name : 'setting',
+            body : {
+              rows : [
                 {
-                  view: 'richselect',
-                  label: '숫자갯수',
-                  name: 'generationNumberCount',
-                  invalidMessage: '숫자 갯수를 정해주세요',
-                  value: 3,
-                  options: [
-                    {id: 2, value: '2 개'},
-                    {id: 3, value: '3 개'},
-                    {id: 4, value: '4 개'},
-                    {id: 5, value: '5 개'}
+                  view : 'richselect',
+                  label : '숫자갯수',
+                  name : 'generationNumberCount',
+                  invalidMessage : '숫자 갯수를 정해주세요',
+                  value : 3,
+                  options : [
+                    {id : 2, value : '2 개'},
+                    {id : 3, value : '3 개'},
+                    {id : 4, value : '4 개'},
+                    {id : 5, value : '5 개'}
                   ]
                 },
                 {
-                  view: 'richselect',
-                  label: '입력횟수',
-                  name: 'limitGuessInputCount',
-                  invalidMessage: '입력 횟수를 정해주세요',
-                  value: 10,
-                  options: [
-                    {id: 1, value: '1 회'},
-                    {id: 5, value: '5 회'},
-                    {id: 10, value: '10 회'},
-                    {id: 15, value: '15 회'},
-                    {id: 20, value: '20 회'}
+                  view : 'richselect',
+                  label : '입력횟수',
+                  name : 'limitGuessInputCount',
+                  invalidMessage : '입력 횟수를 정해주세요',
+                  value : 10,
+                  options : [
+                    {id : 1, value : '1 회'},
+                    {id : 5, value : '5 회'},
+                    {id : 10, value : '10 회'},
+                    {id : 15, value : '15 회'},
+                    {id : 20, value : '20 회'}
                   ]
                 },
                 {
-                  view: 'richselect',
-                  label: '입력오류횟수',
-                  name: 'limitWrongInputCount',
-                  invalidMessage: '입력 오류 횟수를 정해주세요',
-                  value: 5,
-                  options: [
-                    {id: 5, value: '5 회'},
-                    {id: 10, value: '10 회'},
-                    {id: 15, value: '15 회'},
-                    {id: 20, value: '20 회'}
+                  view : 'richselect',
+                  label : '입력오류횟수',
+                  name : 'limitWrongInputCount',
+                  invalidMessage : '입력 오류 횟수를 정해주세요',
+                  value : 5,
+                  options : [
+                    {id : 5, value : '5 회'},
+                    {id : 10, value : '10 회'},
+                    {id : 15, value : '15 회'},
+                    {id : 20, value : '20 회'}
                   ]
                 }
               ]
             }
           },
           {
-            cols: [
+            cols : [
               {
-                view: 'button', value: '생성', type: 'form', hotkey: 'enter',
-                click: function () {
+                view : 'button', value : '생성', type : 'form', hotkey : 'enter',
+                click : function () {
                   if ($$('create-game-room-form').validate()) { //validate form
                     _sendGameRoomDataToServer($$('create-game-room-form').getValues());
                   } else {
-                    webix.message({type: 'error', text: 'Form data is invalid'});
+                    webix.message({type : 'error', text : 'Form data is invalid'});
                   }
                 }
               },
               {
-                view: 'button', value: '닫기', type: 'danger', hotkey: 'esc',
-                click: function () {
+                view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
+                click : function () {
                   this.getTopParentView().close();
                 }
               }
             ]
           }
         ],
-        rules: {
-          name: webix.rules.isNotEmpty
+        rules : {
+          name : webix.rules.isNotEmpty
         },
-        elementsConfig: {
-          labelPosition: 'left'
+        elementsConfig : {
+          labelPosition : 'left'
         }
       }
     }).show();
@@ -221,12 +221,12 @@ app.v_main_menu = (function () {
 
   _getCreatedGameRoomList = function (callback) {
     webix.ajax().get('gameroom/all', {
-      error: function (text) {
+      error : function (text) {
         console.log(text);
         stateMap.game_room_list = [];
         callback();
       },
-      success: function (text) {
+      success : function (text) {
         var serverResponse = JSON.parse(text);
         stateMap.game_room_list = serverResponse.content;
         callback();
@@ -246,6 +246,6 @@ app.v_main_menu = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());

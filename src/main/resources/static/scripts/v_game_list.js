@@ -14,9 +14,9 @@ app.v_game_list = (function () {
   'use strict';
 
   var stateMap = {
-      container: null
+      container : null
     }, webixMap = {
-      game_room_list: []
+      game_room_list : []
     },
     _createView, _getCreatedGameRoomList,
     _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate,
@@ -38,19 +38,19 @@ app.v_game_list = (function () {
      * }
      */
     var mainView = {
-      id: 'game-room-list',
-      view: 'dataview',
-      select: true,
-      css: 'game_room_list',
-      type: {
-        height: 128,
-        templateStart: '<div class="custom_item">',
-        template: _createTemplate,
-        templateEnd: '</div>'
+      id : 'game-room-list',
+      view : 'dataview',
+      select : true,
+      css : 'game_room_list',
+      type : {
+        height : 128,
+        templateStart : '<div class="custom_item">',
+        template : _createTemplate,
+        templateEnd : '</div>'
       },
-      data: stateMap.game_room_list,
-      url: 'stomp->/gameroom-created',
-      ready: function () {
+      data : stateMap.game_room_list,
+      url : 'stomp->/gameroom-created',
+      ready : function () {
         $('.join_room').click(function (evt) {
           evt.preventDefault();
           var target = evt.target, roomId, selectedRoom;
@@ -67,12 +67,12 @@ app.v_game_list = (function () {
 
   _getCreatedGameRoomList = function (callback) {
     webix.ajax().get('gameroom/all', {
-      error: function (text) {
+      error : function (text) {
         console.log(text);
         stateMap.game_room_list = [];
         callback();
       },
-      success: function (text) {
+      success : function (text) {
         var serverResponse = JSON.parse(text);
         stateMap.game_room_list = serverResponse.content;
         callback();
@@ -124,6 +124,6 @@ app.v_game_list = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());

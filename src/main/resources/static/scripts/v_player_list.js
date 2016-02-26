@@ -14,9 +14,9 @@ app.v_player_list = (function () {
   'use strict';
 
   var configMap = {
-      height: 62
+      height : 62
     }, stateMap = {
-      container: null
+      container : null
     }, webixMap = {},
     _getLoggedInPlayers, _createView, _createTemplate, _createContextMenu, _showPlayerInfoWindow, _calculateWinRate,
     _loggedInPlayers, initModule;
@@ -24,11 +24,11 @@ app.v_player_list = (function () {
   _getLoggedInPlayers = function (callback) {
     var serverResponse = '';
     webix.ajax().sync().get('player/login/true', {
-      error: function (text) {
+      error : function (text) {
         serverResponse = JSON.parse(text);
         _loggedInPlayers = [];
       },
-      success: function (text) {
+      success : function (text) {
         serverResponse = JSON.parse(text);
         _loggedInPlayers = serverResponse;
       }
@@ -41,20 +41,20 @@ app.v_player_list = (function () {
     var mainView;
 
     mainView = {
-      id: 'player-list',
-      view: 'list',
-      select: true,
-      type: {
-        height: configMap.height,
-        template: _createTemplate
+      id : 'player-list',
+      view : 'list',
+      select : true,
+      type : {
+        height : configMap.height,
+        template : _createTemplate
       },
-      data: _loggedInPlayers,
-      onContext: {},
-      on: {
-        onAfterContextMenu: function (id) {
+      data : _loggedInPlayers,
+      onContext : {},
+      on : {
+        onAfterContextMenu : function (id) {
           this.select(id);
         },
-        onDestruct: function () {
+        onDestruct : function () {
           webixMap.context_menu.destructor();
           if (webixMap.profile_window) {
             webixMap.profile_window.destructor();
@@ -79,13 +79,13 @@ app.v_player_list = (function () {
 
   _createContextMenu = function () {
     return webix.ui({
-      view: 'contextmenu',
-      id: 'player-context-menu',
-      data: [
+      view : 'contextmenu',
+      id : 'player-context-menu',
+      data : [
         '상세보기'
       ],
-      on: {
-        onItemClick: function () {
+      on : {
+        onItemClick : function () {
           var selectedPlayerInfo = webixMap.main_view.getSelectedItem();
           console.log(selectedPlayerInfo);
           _showPlayerInfoWindow(selectedPlayerInfo);
@@ -110,16 +110,16 @@ app.v_player_list = (function () {
     totalRank = playerInfo.totalRank.value;
 
     profileView = {
-      id: 'player-profile-' + playerInfo.id,
-      height: 260,
-      type: 'space',
-      rows: [
-        {template: nickname + '님 ( ' + email + ' )', type: 'header'},
+      id : 'player-profile-' + playerInfo.id,
+      height : 260,
+      type : 'space',
+      rows : [
+        {template : nickname + '님 ( ' + email + ' )', type : 'header'},
         {
-          cols: [
-            {template: '<img src="' + avatarImagePath + '" height="100%" width="100%">', width: 130},
+          cols : [
+            {template : '<img src="' + avatarImagePath + '" height="100%" width="100%">', width : 130},
             {
-              template: '<ul style="list-style:none;padding:0;margin:0;">' +
+              template : '<ul style="list-style:none;padding:0;margin:0;">' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">레벨: ' + level + '</li>' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: ' + totalScore + '점</li>' +
               '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: ' + totalGameCnt + '전 ' + winCnt + '승 ' + loseCnt + '패</li>' +
@@ -129,10 +129,10 @@ app.v_player_list = (function () {
           ]
         },
         {
-          cols: [
+          cols : [
             {
-              view: 'button', type: 'form', label: '닫기', hotkey: 'esc',
-              click: function () {
+              view : 'button', type : 'form', label : '닫기', hotkey : 'esc',
+              click : function () {
                 webixMap.profile_window.close();
               }
             }
@@ -142,13 +142,13 @@ app.v_player_list = (function () {
     };
 
     webix.ui({
-      view: 'window',
-      id: 'player-info-window',
-      head: '플레이어 정보',
-      position: 'center',
-      modal: true,
-      width: 400,
-      body: profileView
+      view : 'window',
+      id : 'player-info-window',
+      head : '플레이어 정보',
+      position : 'center',
+      modal : true,
+      width : 400,
+      body : profileView
     }).show();
 
     webixMap.profile_window = $$('player-info-window');
@@ -168,6 +168,6 @@ app.v_player_list = (function () {
   };
 
   return {
-    initModule: initModule
+    initModule : initModule
   };
 }());
