@@ -1,0 +1,11 @@
+.chat .from span, .chat .to span, .chat .system {
+	font-weight: bold;
+}
+
+.chat .from {
+	background: lavender;
+}
+
+.chat .system {
+	background: aquamarine;
+}
