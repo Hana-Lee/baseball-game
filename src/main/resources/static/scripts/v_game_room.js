@@ -111,8 +111,16 @@ app.v_game_room = (function () {
     app.v_game_pad.initModule(webixMap.pad_container);
     app.v_player_profile.initModule(webixMap.profile_container);
 
-    app.v_game_room_chat.setGameRoom(stateMap.game_room_info);
-    app.v_game_room_chat.initModule(webixMap.chat_container);
+    app.v_chat.configModule({
+      chat_height : 450,
+      data_url : '/chat/gameroom',
+      system_message_list : [
+        '[' + stateMap.game_room_info.id + '번 ' + stateMap.game_room_info.name + '] 방에 입장 하셨습니다',
+        '즐거운 게임 즐기시기 바랍니다 :-)'
+      ],
+      player_model : app.m_player.getInfo()
+    });
+    app.v_chat.initModule(webixMap.chat_container);
   };
 
   setGameRoom = function (gameRoomInfo) {
