@@ -116,7 +116,12 @@ app.v_main_board = (function () {
     webixMap.player_list_container = $$('player-list-container');
 
     app.v_game_list.initModule(webixMap.game_room_list_container);
-    app.v_main_chat.initModule(webixMap.main_chat_container);
+
+    app.v_chat.configModule({
+      data_url : '/chat',
+      player_model : app.m_player.getInfo()
+    });
+    app.v_chat.initModule(webixMap.main_chat_container);
     app.v_main_menu.initModule(webixMap.main_menu_container);
     app.v_player_profile.initModule(webixMap.player_profile_container);
     app.v_player_list.initModule(webixMap.player_list_container);
