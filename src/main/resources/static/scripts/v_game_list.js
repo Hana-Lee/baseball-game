@@ -57,6 +57,24 @@ app.v_game_list = (function () {
       },
       data : stateMap.game_room_list,
       url : stateMap.proxy,
+      on : {
+        onAfterAdd : function (id) {
+          if (!id) {
+            return;
+          }
+
+          app.v_main_menu.enableQuickBtn();
+        },
+        onAfterDelete : function (id) {
+          if (!id) {
+            return;
+          }
+
+          if (this.data.count() === 0) {
+            app.v_main_menu.disableQuickBtn();
+          }
+        }
+      },
       ready : function () {
         $('.join_room').click(function (evt) {
           evt.preventDefault();

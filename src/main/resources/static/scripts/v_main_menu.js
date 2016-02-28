@@ -32,7 +32,7 @@ app.v_main_menu = (function () {
     }, webixMap = {},
     _createView, _sendGameRoomDataToServer, _getCreatedGameRoomList,
     _joinRandomGameRoom,
-    showCreateGameRoomDialog, initModule;
+    showCreateGameRoomDialog, disableQuickBtn, enableQuickBtn, initModule;
 
   _createView = function () {
     console.log(stateMap.player);
@@ -83,6 +83,8 @@ app.v_main_menu = (function () {
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.main_view = $$('main-menu');
+    webixMap.quick_join_btn = $$('quick-join');
   };
 
   _sendGameRoomDataToServer = function (data) {
@@ -246,6 +248,14 @@ app.v_main_menu = (function () {
     app.v_shell.showGameRoom(stateMap.game_room_list[randomGameRoomIndex]);
   };
 
+  disableQuickBtn = function () {
+    webixMap.quick_join_btn.disable();
+  };
+
+  enableQuickBtn = function () {
+    webixMap.quick_join_btn.enable();
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     stateMap.player = app.m_player.getInfo();
@@ -253,6 +263,8 @@ app.v_main_menu = (function () {
   };
 
   return {
-    initModule : initModule
+    initModule : initModule,
+    disableQuickBtn : disableQuickBtn,
+    enableQuickBtn : enableQuickBtn
   };
 }());
