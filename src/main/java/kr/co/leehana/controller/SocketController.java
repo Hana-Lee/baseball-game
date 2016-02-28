@@ -1,6 +1,7 @@
 package kr.co.leehana.controller;
 
 import kr.co.leehana.dto.ChatDto;
+import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import org.modelmapper.ModelMapper;
@@ -40,6 +41,16 @@ public class SocketController {
 	@MessageMapping(value = {"/chat/gameroom"})
 	@SendTo(value = {"/topic/chat/gameroom"})
 	public ChatDto.Message gameRoomChat(ChatDto.Message message, Principal principal) {
+		return message;
+	}
+
+	@MessageMapping(value = {"/player/login"})
+	@SendTo(value = {"/topic/player-list-updated"})
+	public PlayerDto.Message playerLoggedIn(Principal principal) {
+		PlayerDto.Message message = new PlayerDto.Message();
+		message.setOperation("insert");
+		message.setData(modelMapper.map(playerService.getByEmail(principal.getName()), PlayerDto.Response.class));
+
 		return message;
 	}
 }

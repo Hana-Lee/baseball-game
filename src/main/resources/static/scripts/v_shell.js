@@ -29,7 +29,7 @@ app.v_shell = (function () {
       stomp_client : null
     }, webixMap = {}, player = null, playerList = [],
     showSignUp, showLogin, showGameRoom, showMainBoard, logout, getStompClient,
-    _getLoggedInPlayerInfo, _initStompClient, _createView,
+    _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification,
     initModule;
 
   showSignUp = function () {
@@ -106,6 +106,7 @@ app.v_shell = (function () {
       function (frame) {
         // connect 완료 시 error subscribe, global 에러 처리.
         console.log(frame);
+        _loginNotification();
         callback();
       },
       function (error) {
@@ -133,6 +134,11 @@ app.v_shell = (function () {
       app.v_main_board.initModule(webixMap.top);
       //app.v_game_room.initModule(webixMap.top);
     }
+  };
+
+  _loginNotification = function () {
+    var header = {};
+    stateMap.stomp_client.send('/app/player/login', header, {});
   };
 
   getStompClient = function () {

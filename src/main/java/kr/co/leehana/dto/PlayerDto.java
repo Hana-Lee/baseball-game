@@ -75,4 +75,12 @@ public class PlayerDto {
 		private AttackerRoleCount attackerRoleCount;
 		private GameRole gameRole;
 	}
+
+	@Data
+	public static class Message {
+		private String clientId;
+		private String operation;
+		private String id;
+		private PlayerDto.Response data;
+	}
 }

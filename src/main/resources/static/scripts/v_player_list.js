@@ -56,6 +56,7 @@ app.v_player_list = (function () {
         template : _createTemplate
       },
       data : _loggedInPlayers,
+      url : stateMap.proxy,
       onContext : {},
       on : {
         onAfterContextMenu : function (id) {
@@ -94,7 +95,6 @@ app.v_player_list = (function () {
       on : {
         onItemClick : function () {
           var selectedPlayerInfo = webixMap.main_view.getSelectedItem();
-          console.log(selectedPlayerInfo);
           _showPlayerInfoWindow(selectedPlayerInfo);
         }
       }
@@ -171,6 +171,9 @@ app.v_player_list = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
+    stateMap.proxy = webix.proxy('stomp', '/player-list-updated');
+    stateMap.proxy.clientId = app.utils.guid();
+
     _getLoggedInPlayers(_createView);
   };
 
