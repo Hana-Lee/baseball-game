@@ -47,7 +47,7 @@ app.v_game_list = (function () {
     var mainView = {
       id : 'game-room-list',
       view : 'dataview',
-      select : true,
+      select : false,
       css : 'game_room_list',
       type : {
         height : 128,

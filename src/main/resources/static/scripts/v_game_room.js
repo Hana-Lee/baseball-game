@@ -21,7 +21,8 @@ app.v_game_room = (function () {
   'use strict';
 
   var stateMap = {
-      container : null
+      container : null,
+      webix_events : []
     }, webixMap = {}, _createView,
     setGameRoom, initModule, destructor;
 
@@ -105,6 +106,27 @@ app.v_game_room = (function () {
     webixMap.pad_container = $$('game-room-pad-container');
     webixMap.profile_container = $$('game-room-player-profile-container');
     webixMap.chat_container = $$('game-room-chat-container');
+
+    webixMap.main_view.attachEvent('onDestruct', function () {
+      stateMap.webix_events.forEach(function (eventItem) {
+        webix.detachEvent(eventItem);
+      });
+      stateMap.webix_events = [];
+    });
+    stateMap.webix_events.push(webix.attachEvent('onLeaveGameRoom', function () {
+      webix.ajax().headers({
+        'Content-Type' : 'application/json'
+      }).post('gameroom/leave/' + stateMap.game_room_info.id, {}, {
+        error : function (text) {
+          console.log(text);
+        },
+        success : function (text) {
+          console.log(text);
+          var from = 'game-room';
+          app.v_shell.showMainBoard(from);
+        }
+      });
+    }));
 
     app.v_game_room_menu.initModule(webixMap.menu_container);
     app.v_game_board.initModule(webixMap.board_container);

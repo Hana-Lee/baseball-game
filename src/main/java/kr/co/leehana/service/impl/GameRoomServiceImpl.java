@@ -1,7 +1,6 @@
 package kr.co.leehana.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.GameRoomNotFoundException;
@@ -33,15 +32,13 @@ public class GameRoomServiceImpl implements GameRoomService {
 	private final GameRoomRepository gameRoomRepository;
 	private final ModelMapper modelMapper;
 	private final MessageSendingOperations<String> messageSendingOperations;
-	private final ObjectMapper objectMapper;
 
 	@Autowired
 	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper,
-	                           MessageSendingOperations<String> messageSendingOperations, ObjectMapper objectMapper) {
+	                           MessageSendingOperations<String> messageSendingOperations) {
 		this.gameRoomRepository = gameRoomRepository;
 		this.modelMapper = modelMapper;
 		this.messageSendingOperations = messageSendingOperations;
-		this.objectMapper = objectMapper;
 	}
 
 	@Override
@@ -57,16 +54,8 @@ public class GameRoomServiceImpl implements GameRoomService {
 		fillInitData(gameRoom);
 
 		final GameRoom createdGameRoom = gameRoomRepository.save(gameRoom);
-		sendNewGameRoomNotification(createdGameRoom);
+		sendGameRoomUpdatedNotification(createdGameRoom, "insert");
 		return createdGameRoom;
-	}
-
-	private void sendNewGameRoomNotification(GameRoom newGameRoom) throws JsonProcessingException {
-		String topic = "/topic/gameroom-created";
-		GameRoomDto.Message message = new GameRoomDto.Message();
-		message.setOperation("insert");
-		message.setData(newGameRoom);
-		messageSendingOperations.convertAndSend(topic, message);
 	}
 
 	private void fillInitData(final GameRoom gameRoom) {
@@ -134,5 +123,19 @@ public class GameRoomServiceImpl implements GameRoomService {
 	@Override
 	public void delete(Long id) {
 		gameRoomRepository.delete(id);
+	}
+
+	@Override
+	public void delete(GameRoom gameRoom) throws JsonProcessingException {
+		gameRoomRepository.delete(gameRoom);
+		sendGameRoomUpdatedNotification(gameRoom, "delete");
+	}
+
+	private void sendGameRoomUpdatedNotification(GameRoom gameRoom, String operation) throws JsonProcessingException {
+		String topic = "/topic/gameroom-updated";
+		GameRoomDto.Message message = new GameRoomDto.Message();
+		message.setOperation(operation);
+		message.setData(gameRoom);
+		messageSendingOperations.convertAndSend(topic, message);
 	}
 }

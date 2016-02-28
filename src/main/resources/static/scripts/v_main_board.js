@@ -118,7 +118,14 @@ app.v_main_board = (function () {
     app.v_game_list.initModule(webixMap.game_room_list_container);
 
     app.v_chat.configModule({
+      chat_height : 240,
+      chat_list_height : 'auto',
+      proxy_name : 'stomp',
       data_url : '/chat',
+      system_message_list : [
+        '숫자 야구 게임에 오신걸 환영합니다 :-)',
+        '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
+      ],
       player_model : app.m_player.getInfo()
     });
     app.v_chat.initModule(webixMap.main_chat_container);

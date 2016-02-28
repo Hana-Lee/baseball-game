@@ -15,7 +15,7 @@
  white    : true,
  todo     : true
  */
-/*global $, app, webix */
+/*global $, app, webix, $$ */
 
 app.v_game_room_menu = (function () {
   'use strict';
@@ -35,7 +35,7 @@ app.v_game_room_menu = (function () {
           id : 'exit-room', view : 'button', label : '방나가기', type : 'danger', width : configMap.button_width,
           on : {
             onItemClick : function () {
-              app.v_shell.showMainBoard('game-room');
+              webix.callEvent('onLeaveGameRoom', []);
             }
           }
         },
@@ -44,6 +44,7 @@ app.v_game_room_menu = (function () {
     }];
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.main_view = $$('game-room-menu');
   };
 
   initModule = function (container) {

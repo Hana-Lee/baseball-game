@@ -35,8 +35,6 @@ var app = (function () {
             id : 'sub-' + this.clientId
           }, subscribeObj;
 
-        console.log(view.$view);
-
         subscribeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
           var update = {};
           update = JSON.parse(response.body);

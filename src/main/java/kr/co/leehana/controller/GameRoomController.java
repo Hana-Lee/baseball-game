@@ -218,7 +218,7 @@ public class GameRoomController {
 	}
 
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {POST})
-	public ResponseEntity leave(@PathVariable Long id) {
+	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
 		Player player = getCurrentPlayer();
 
@@ -229,7 +229,7 @@ public class GameRoomController {
 		gameRoom.getPlayers().remove(player);
 
 		if (gameRoom.getPlayers().isEmpty()) {
-			gameRoomService.delete(id);
+			gameRoomService.delete(gameRoom);
 
 			return new ResponseEntity<>(NO_CONTENT);
 		}
