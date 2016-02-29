@@ -27,7 +27,7 @@ app.v_shell = (function () {
       loggedIn : false,
       container : null,
       stomp_client : null
-    }, webixMap = {}, player = null, playerList = [],
+    }, webixMap = {},
     showSignUp, showLogin, showGameRoom, showMainBoard, logout, getStompClient,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification,
     initModule;
@@ -53,7 +53,10 @@ app.v_shell = (function () {
       $$('login-container').destructor();
       $('#main-container').html('');
       stateMap.loggedIn = true;
-      initModule(stateMap.container);
+      _initStompClient(function () {
+        _loginNotification();
+        initModule(stateMap.container);
+      });
     } else {
       app.v_game_room.destructor();
       app.v_main_board.initModule(webixMap.top);
@@ -69,13 +72,14 @@ app.v_shell = (function () {
           ok : '확인',
           text : textJson.message
         });
-
       },
       success : function () {
         $$('main-layout').destructor();
         stateMap.loggedIn = false;
+        stateMap.stomp_client.disconnect();
+        stateMap.stomp_client = null;
         $('#main-container').html('');
-        //initModule(stateMap.container);
+
         app.initModule(stateMap.container);
       }
     });
@@ -88,13 +92,21 @@ app.v_shell = (function () {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(null);
         stateMap.loggedIn = false;
+        if (stateMap.stomp_client) {
+          stateMap.stomp_client.disconnect();
+        }
         app.v_login.initModule(stateMap.container);
       },
       success : function (text) {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(serverResponse);
         stateMap.loggedIn = true;
-        _initStompClient(callback);
+
+        if (!stateMap.stomp_client) {
+          _initStompClient(callback);
+        } else {
+          callback();
+        }
       }
     });
   };
@@ -106,15 +118,15 @@ app.v_shell = (function () {
       function (frame) {
         // connect 완료 시 error subscribe, global 에러 처리.
         console.log(frame);
-        _loginNotification();
-        callback();
+
+        if (callback) {
+          callback();
+        }
       },
       function (error) {
         console.log(error);
       }
     );
-
-    //webix.proxy.stomp.clientId = webix.uid();
   };
 
   _createView = function () {
@@ -157,8 +169,6 @@ app.v_shell = (function () {
     showGameRoom : showGameRoom,
     showMainBoard : showMainBoard,
     logout : logout,
-    getStompClient : getStompClient,
-    player : player,
-    playerList : playerList
+    getStompClient : getStompClient
   };
 }());

@@ -53,8 +53,9 @@ app.v_chat = (function () {
 
     if (text) {
       webixMap.chat_list.add({
-        user : configMap.player_model.nickname,
-        value : text
+        player : configMap.player_model,
+        //nickname : configMap.player_model.nickname,
+        message : text
       });
     }
 
@@ -68,15 +69,15 @@ app.v_chat = (function () {
   _chatTemplate = function (obj) {
     var className;
 
-    if (obj.user === configMap.system_nickname) {
+    if (obj.player.nickname === configMap.system_nickname) {
       className = 'system';
-    } else if (obj.user !== configMap.player_model.nickname) {
+    } else if (obj.player.nickname !== configMap.player_model.nickname) {
       className = 'from';
     } else {
       className = 'to';
     }
 
-    return '<div class="' + className + '"><span>' + obj.user + '</span>&nbsp;:&nbsp;' + obj.value + '</div>';
+    return '<div class="' + className + '"><span>' + obj.player.nickname + '</span>&nbsp;:&nbsp;' + obj.message + '</div>';
   };
 
   _createView = function () {
@@ -120,7 +121,7 @@ app.v_chat = (function () {
     webix.dp(webixMap.chat_list).ignore(function () {
       configMap.system_message_list.forEach(function (message) {
         webixMap.chat_list.add({
-          user : configMap.system_nickname, value : message
+          player : {nickname : configMap.system_nickname}, message : message
         });
       });
     });
@@ -141,7 +142,6 @@ app.v_chat = (function () {
     //stateMap.proxy = webix.proxy('stomp', '/chat/gameroom');
     stateMap.proxy.clientId = app.utils.guid();
 
-    stateMap.player = app.m_player.getInfo();
     _createView();
   };
 

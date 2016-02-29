@@ -59,6 +59,25 @@ app.v_player_list = (function () {
       url : stateMap.proxy,
       onContext : {},
       on : {
+        onBeforeAdd : function (id, obj/*, index*/) { // 이미 플레이어의 정보가 있는데 동일한 정보를 또 Add 하려고 하는것 방지
+          if (!id) {
+            return;
+          }
+          var addObjEmail = obj.email, bool_already_exist = false, email_elems, email_elems_length, idx;
+
+          email_elems = document.getElementsByClassName('player-list-email');
+          email_elems_length = email_elems.length;
+          for (idx = 0; idx < email_elems_length; idx++) {
+            if (addObjEmail === email_elems[idx]) {
+              bool_already_exist = true;
+              break;
+            }
+          }
+
+          if (bool_already_exist) {
+            return false;
+          }
+        },
         onAfterContextMenu : function (id) {
           this.select(id);
         },
@@ -79,9 +98,8 @@ app.v_player_list = (function () {
   };
 
   _createTemplate = function (obj) {
-    console.log('obj', obj);
     return '<img src="images/blank_character_2.gif" width="50" height="55" style="float:left;padding-right:10px;">' +
-      '<div>' + obj.nickname + '(' + obj.email + ')</div>' +
+      '<div class="player-list-email" data-email="' + obj.email + '">' + obj.nickname + '(' + obj.email + ')</div>' +
       '<div style="padding-left:18px;">점수: ' + obj.totalScore.value + ', 등수:' + obj.totalRank.value + '</div>';
   };
 

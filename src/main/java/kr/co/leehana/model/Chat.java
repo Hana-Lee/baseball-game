@@ -25,8 +25,7 @@ public class Chat implements Serializable {
 	private static final long serialVersionUID = 3055921412133797685L;
 
 	private String id;
-	private String email;
-	private String user;
+	private Player player;
 	// 채팅 메세지
-	private String value;
+	private String message;
 }
