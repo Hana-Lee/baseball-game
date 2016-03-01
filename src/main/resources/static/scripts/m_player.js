@@ -20,10 +20,14 @@
 app.m_player = (function () {
   'use strict';
 
-  var info, initModule, getInfo;
+  var info, initModule, getInfo, reset;
 
   getInfo = function () {
     return info;
+  };
+
+  reset = function () {
+    info = null;
   };
 
   initModule = function (playerObject) {
@@ -32,6 +36,7 @@ app.m_player = (function () {
 
   return {
     initModule : initModule,
-    getInfo : getInfo
+    getInfo : getInfo,
+    reset : reset
   };
 }());

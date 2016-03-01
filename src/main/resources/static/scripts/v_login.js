@@ -90,7 +90,7 @@ app.v_login = (function () {
                             });
                           },
                           success : function (/*text, data, XmlHttpRequest */) {
-                            app.v_shell.showMainBoard('login-container');
+                            app.v_shell.showMainBoard('login-container', $$('email').getValue());
                           }
                         }
                       );

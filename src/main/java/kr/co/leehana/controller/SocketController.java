@@ -12,6 +12,7 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.Map;
 
 /**
  * @author Hana Lee
@@ -44,12 +45,16 @@ public class SocketController {
 		return message;
 	}
 
-	@MessageMapping(value = {"/player/login"})
+	@MessageMapping(value = {"/player/login", "/player/logout"})
 	@SendTo(value = {"/topic/player-list-updated"})
-	public PlayerDto.Message playerLoggedIn(Principal principal) {
+	public PlayerDto.Message playerLoggedInOut(Map<String, String> params) {
+		return createCurrentPlayerInfoMessage(params.get("email"), params.get("operation"));
+	}
+
+	private PlayerDto.Message createCurrentPlayerInfoMessage(String email, String operation) {
 		PlayerDto.Message message = new PlayerDto.Message();
-		message.setOperation("insert");
-		message.setData(modelMapper.map(playerService.getByEmail(principal.getName()), PlayerDto.Response.class));
+		message.setOperation(operation);
+		message.setData(modelMapper.map(playerService.getByEmail(email), PlayerDto.Response.class));
 
 		return message;
 	}

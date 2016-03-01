@@ -29,7 +29,7 @@ app.v_shell = (function () {
       stomp_client : null
     }, webixMap = {},
     showSignUp, showLogin, showGameRoom, showMainBoard, logout, getStompClient,
-    _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification,
+    _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification,
     initModule;
 
   showSignUp = function () {
@@ -48,13 +48,13 @@ app.v_shell = (function () {
     app.v_game_room.initModule(webixMap.top);
   };
 
-  showMainBoard = function (removeContainer) {
+  showMainBoard = function (removeContainer, email) {
     if (removeContainer === 'login-container') {
       $$('login-container').destructor();
       $('#main-container').html('');
       stateMap.loggedIn = true;
       _initStompClient(function () {
-        _loginNotification();
+        _loginNotification(email);
         initModule(stateMap.container);
       });
     } else {
@@ -64,6 +64,8 @@ app.v_shell = (function () {
   };
 
   logout = function () {
+    _logoutNotification(app.m_player.getInfo().email);
+
     webix.ajax().post('logout', {
       error : function (text) {
         var textJson = JSON.parse(text);
@@ -75,10 +77,15 @@ app.v_shell = (function () {
       },
       success : function () {
         $$('main-layout').destructor();
+
+        //_logoutNotification(app.m_player.getInfo().email);
+
         stateMap.loggedIn = false;
         stateMap.stomp_client.disconnect();
         stateMap.stomp_client = null;
         $('#main-container').html('');
+
+        app.m_player.reset();
 
         app.initModule(stateMap.container);
       }
@@ -148,9 +155,15 @@ app.v_shell = (function () {
     }
   };
 
-  _loginNotification = function () {
-    var header = {};
-    stateMap.stomp_client.send('/app/player/login', header, {});
+  _loginNotification = function (email) {
+    var header = {}, data = {email : email, operation : 'insert'};
+    stateMap.stomp_client.send('/app/player/login', header, JSON.stringify(data));
+  };
+
+  _logoutNotification = function (email) {
+    var header = {}, data = {email : email, operation : 'delete'};
+    stateMap.stomp_client.send('/app/player/logout', header, JSON.stringify(data));
+    //stateMap.stomp_client.send('/app/player/logout', header, {});
   };
 
   getStompClient = function () {
