@@ -26,6 +26,7 @@ var app = (function () {
   _registerStompProxy = function () {
     webix.proxy.stomp = {
       $proxy : true,
+      game_room : null,
       init : function () {
         this.clientId = this.clientId || webix.uid();
       },
@@ -63,9 +64,16 @@ var app = (function () {
         });
       },
       save : function (view, update/*, dp, callback*/) {
-        console.log('proxy save', arguments);
         if (view === undefined || view === null) {
           return;
+        }
+
+        if (this.source.indexOf('chat') !== -1) {
+          delete update.data.id;
+        }
+
+        if (this.game_room) {
+          update.data.gameRoom = this.game_room;
         }
 
         update.clientId = this.clientId;

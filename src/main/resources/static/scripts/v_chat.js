@@ -28,7 +28,8 @@ app.v_chat = (function () {
         proxy_name : null,
         data_url : null,
         system_message_list : null,
-        player_model : null
+        player_model : null,
+        game_room_model : null
       },
       chat_height : 240,
       chat_list_height : 'auto',
@@ -39,6 +40,7 @@ app.v_chat = (function () {
         '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
       ],
       player_model : {},
+      game_room_model : null,
 
       system_nickname : '시스템'
     },
@@ -139,8 +141,11 @@ app.v_chat = (function () {
     stateMap.container = container;
 
     stateMap.proxy = webix.proxy(configMap.proxy_name, configMap.data_url);
-    //stateMap.proxy = webix.proxy('stomp', '/chat/gameroom');
     stateMap.proxy.clientId = app.utils.guid();
+
+    if (configMap.game_room_model) {
+      stateMap.proxy.game_room = configMap.game_room_model;
+    }
 
     _createView();
   };

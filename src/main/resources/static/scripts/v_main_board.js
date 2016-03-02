@@ -126,7 +126,8 @@ app.v_main_board = (function () {
         '숫자 야구 게임에 오신걸 환영합니다 :-)',
         '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
       ],
-      player_model : app.m_player.getInfo()
+      player_model : app.m_player.getInfo(),
+      game_room_model : null
     });
     app.v_chat.initModule(webixMap.main_chat_container);
     app.v_main_menu.initModule(webixMap.main_menu_container);

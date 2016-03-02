@@ -140,7 +140,8 @@ app.v_game_room = (function () {
         '[' + stateMap.game_room_info.id + '번 ' + stateMap.game_room_info.name + '] 방에 입장 하셨습니다',
         '즐거운 게임 즐기시기 바랍니다 :-)'
       ],
-      player_model : app.m_player.getInfo()
+      player_model : app.m_player.getInfo(),
+      game_room_model : stateMap.game_room_info
     });
     app.v_chat.initModule(webixMap.chat_container);
   };
