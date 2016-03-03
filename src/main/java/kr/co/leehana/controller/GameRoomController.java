@@ -16,6 +16,7 @@ import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import org.apache.commons.lang3.StringUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,11 +64,13 @@ public class GameRoomController {
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
+	private final ModelMapper modelMapper;
 
 	@Autowired
-	public GameRoomController(GameRoomService gameRoomService, PlayerService playerService) {
+	public GameRoomController(GameRoomService gameRoomService, PlayerService playerService, ModelMapper modelMapper) {
 		this.gameRoomService = gameRoomService;
 		this.playerService = playerService;
+		this.modelMapper = modelMapper;
 	}
 
 	/*
@@ -136,7 +139,7 @@ public class GameRoomController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {DELETE})
-	public ResponseEntity delete(@PathVariable Long id) {
+	public ResponseEntity delete(@PathVariable Long id) throws JsonProcessingException {
 		gameRoomService.delete(id);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -166,6 +169,8 @@ public class GameRoomController {
 
 		gameRoom.getPlayers().add(joinPlayer);
 
+		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
+
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
@@ -193,6 +198,8 @@ public class GameRoomController {
 
 		selectedGameRoom.getPlayers().add(player);
 
+		gameRoomService.update(selectedGameRoom.getId(), modelMapper.map(selectedGameRoom, GameRoomDto.Update.class));
+
 		return new ResponseEntity<>(selectedGameRoom, OK);
 	}
 
@@ -214,6 +221,8 @@ public class GameRoomController {
 
 		Player newOwner = playerService.getById(changeOwnerDto.getNewOwnerId());
 		gameRoom.setOwner(newOwner);
+		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
+
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
@@ -250,6 +259,8 @@ public class GameRoomController {
 		if (gameRoom.getOwner().equals(player)) {
 			gameRoom.setOwner(gameRoom.getPlayers().iterator().next());
 		}
+
+		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
 
 		return new ResponseEntity<>(gameRoom, OK);
 	}

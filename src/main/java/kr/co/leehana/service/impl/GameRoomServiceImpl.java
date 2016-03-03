@@ -139,22 +139,20 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	@Override
-	public void delete(Long id) {
-		GameRoom gameRoom = getById(id);
-		gameRoom.setEnabled(Enabled.FALSE);
-		gameRoom.getPlayers().clear();
-		gameRoom.getPlayerRankMap().clear();
-		gameRoom.setDeleted(new Date());
-//		gameRoomRepository.delete(id);
+	public void delete(Long id) throws JsonProcessingException {
+		delete(getById(id));
 	}
 
 	@Override
 	public void delete(GameRoom gameRoom) throws JsonProcessingException {
+		deleteOperation(gameRoom);
+	}
+
+	private void deleteOperation(GameRoom gameRoom) throws JsonProcessingException {
 		gameRoom.setEnabled(Enabled.FALSE);
 		gameRoom.getPlayers().clear();
 		gameRoom.getPlayerRankMap().clear();
 		gameRoom.setDeleted(new Date());
-//		gameRoomRepository.delete(gameRoom);
 		sendGameRoomUpdatedNotification(gameRoom, "delete");
 	}
 

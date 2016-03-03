@@ -20,13 +20,18 @@
 app.v_game_list = (function () {
   'use strict';
 
-  var stateMap = {
+  var
+    configMap = {
+      height : 128
+    },
+    stateMap = {
       container : null
     }, webixMap = {
       game_room_list : []
     },
     _createView, _getCreatedGameRoomList,
-    _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate,
+    _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate, _joinGameRoom,
+    _showGameRoleSelectWindow,
     initModule;
 
   _createView = function () {
@@ -50,7 +55,7 @@ app.v_game_list = (function () {
       select : false,
       css : 'game_room_list',
       type : {
-        height : 128,
+        height : configMap.height,
         templateStart : '<div class="custom_item">',
         template : _createTemplate,
         templateEnd : '</div>'
@@ -59,7 +64,6 @@ app.v_game_list = (function () {
       url : stateMap.proxy,
       on : {
         onAfterAdd : function (id) {
-          console.log('after add');
           if (!id) {
             return;
           }
@@ -81,7 +85,8 @@ app.v_game_list = (function () {
             var target = evt.target, roomId, selectedRoom;
             roomId = target.getAttribute('data-room-id');
             selectedRoom = webixMap.main_view.getItem(roomId);
-            app.v_shell.showGameRoom(selectedRoom);
+            _showGameRoleSelectWindow(selectedRoom);
+            //_joinGameRoom(selectedRoom);
           });
         }
       }
@@ -89,6 +94,63 @@ app.v_game_list = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('game-room-list');
+  };
+
+  _showGameRoleSelectWindow = function (selectedGameRoom) {
+    webix.ui({
+      id : 'game-role-select-window',
+      view : 'window',
+      head : '게임 역할 선택',
+      width : 200,
+      position : 'center',
+      modal : true,
+      body : {
+        id : 'game-role-select-form',
+        view : 'form',
+        elements : [{
+          id : 'role-selector',
+          view : 'richselect', label : '역할', value : 'ATTACKER',
+          labelAlign : 'center',
+          options : [{
+            id : 'ATTACKER', value : '공격'
+          }, {
+            id : 'DEFENDER', value : '수비'
+          }]
+        }, {
+          cols : [{
+            view : 'button', value : '확인', hotkey : 'enter', type : 'form',
+            click : function () {
+              _joinGameRoom(selectedGameRoom, $$('role-selector').getValue());
+              this.getTopParentView().close();
+            }
+          }, {
+            view : 'button', value : '취소', hotkey : 'esc', type : 'danger',
+            click : function () {
+              this.getTopParentView().close();
+            }
+          }]
+        }]
+      }
+    }).show();
+  };
+
+  _joinGameRoom = function (selectedRoom, selectedGameRole) {
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).post('gameroom/join/' + selectedRoom.id, JSON.stringify({gameRole : selectedGameRole}), {
+      error : function (text) {
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        var joinedGameRoom = JSON.parse(text);
+        app.v_shell.showGameRoom(joinedGameRoom);
+      }
+    });
   };
 
   _getCreatedGameRoomList = function (callback) {
@@ -137,7 +199,8 @@ app.v_game_list = (function () {
   };
 
   _createSettingTemplate = function (obj) {
-    var guessNum = obj.setting.limitGuessInputCount, genNum = obj.setting.generationNumberCount, wrongNum = obj.setting.limitWrongInputCount;
+    var guessNum = obj.setting.limitGuessInputCount, genNum = obj.setting.generationNumberCount,
+      wrongNum = obj.setting.limitWrongInputCount;
     return '<fieldset class="setting"><legend>설정</legend>' +
       '<div>입력: ' + guessNum + ', 갯수: ' + genNum + ', 오류: ' + wrongNum + '</div>' +
       '</fieldset>';
