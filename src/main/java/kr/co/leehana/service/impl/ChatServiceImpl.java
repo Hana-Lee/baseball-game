@@ -1,5 +1,6 @@
 package kr.co.leehana.service.impl;
 
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.model.Chat;
 import kr.co.leehana.repository.ChatRepository;
 import kr.co.leehana.service.ChatService;
@@ -37,30 +38,52 @@ public class ChatServiceImpl implements ChatService {
 	private void fillInitData(Chat chat) {
 		final Date now = new Date();
 		chat.setCreated(now);
+
+		chat.setEnabled(Enabled.TRUE);
 	}
 
 	@Override
 	public Chat getById(Long id) {
-		return chatRepository.findOne(id);
+		return getByIdAndEnabled(id, Enabled.TRUE);
+	}
+
+	@Override
+	public Chat getByIdAndEnabled(Long id, Enabled enabled) {
+		return chatRepository.findOneByIdAndEnabled(id, enabled);
 	}
 
 	@Override
 	public List<Chat> getAll() {
-		return chatRepository.findAll();
+		return getAllByEnabled(Enabled.TRUE);
+	}
+
+	@Override
+	public List<Chat> getAllByEnabled(Enabled enabled) {
+		return chatRepository.findAllByEnabled(enabled);
 	}
 
 	@Override
 	public Page<Chat> getAll(Pageable pageable) {
-		return chatRepository.findAll(pageable);
+		return getAllByEnabled(Enabled.TRUE, pageable);
+	}
+
+	@Override
+	public Page<Chat> getAllByEnabled(Enabled enabled, Pageable pageable) {
+		return chatRepository.findAllByEnabled(enabled, pageable);
 	}
 
 	@Override
 	public void delete(Long id) {
-		chatRepository.delete(id);
+		Chat chat = getById(id);
+		chat.setEnabled(Enabled.FALSE);
+		chat.setDeleted(new Date());
+//		chatRepository.delete(id);
 	}
 
 	@Override
 	public void delete(Chat chat) {
-		chatRepository.delete(chat);
+		chat.setEnabled(Enabled.FALSE);
+		chat.setDeleted(new Date());
+//		chatRepository.delete(chat);
 	}
 }

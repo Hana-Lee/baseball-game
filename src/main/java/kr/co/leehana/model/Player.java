@@ -1,6 +1,7 @@
 package kr.co.leehana.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.GameRole;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -107,6 +108,13 @@ public class Player implements Serializable {
 	@NotNull
 	private Date updated;
 
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date deleted;
+
 	@NotNull
 	private Boolean admin;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Enabled enabled;
 }

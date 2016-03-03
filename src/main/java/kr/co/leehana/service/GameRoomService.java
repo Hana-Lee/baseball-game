@@ -2,6 +2,7 @@ package kr.co.leehana.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.leehana.dto.GameRoomDto;
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.model.GameRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +19,15 @@ public interface GameRoomService {
 
 	GameRoom getById(Long id);
 
+	GameRoom getByIdAndEnabled(Long id, Enabled enabled);
+
 	List<GameRoom> getAll();
 
+	List<GameRoom> getAllByEnabled(Enabled enabled);
+
 	Page<GameRoom> getAll(Pageable pageable);
+
+	Page<GameRoom> getAllByEnabled(Enabled enabled, Pageable pageable);
 
 	GameRoom update(Long id, GameRoomDto.Update updateDto);
 

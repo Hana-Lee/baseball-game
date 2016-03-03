@@ -1,5 +1,6 @@
 package kr.co.leehana.service;
 
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.model.Chat;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +17,15 @@ public interface ChatService {
 
 	Chat getById(Long id);
 
+	Chat getByIdAndEnabled(Long id, Enabled enabled);
+
 	List<Chat> getAll();
 
+	List<Chat> getAllByEnabled(Enabled enabled);
+
 	Page<Chat> getAll(Pageable pageable);
+
+	Page<Chat> getAllByEnabled(Enabled enabled, Pageable pageable);
 
 	void delete(Long id);
 

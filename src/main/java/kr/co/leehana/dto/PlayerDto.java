@@ -2,6 +2,7 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.annotation.PasswordMatches;
 import kr.co.leehana.annotation.ValidEmail;
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.Avatar;
@@ -60,6 +61,8 @@ public class PlayerDto {
 		private Boolean admin;
 		private Date joined;
 		private Date updated;
+		private Date deleted;
+		private Enabled enabled;
 	}
 
 	@Data

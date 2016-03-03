@@ -226,6 +226,8 @@ public class GameRoomController {
 			throw new GameRoomPlayerNotFoundException(gameRoom, player);
 		}
 
+		player.setGameRole(null);
+
 		gameRoom.getPlayers().remove(player);
 
 		if (gameRoom.getPlayers().isEmpty()) {

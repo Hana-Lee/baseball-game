@@ -1,5 +1,6 @@
 package kr.co.leehana.model;
 
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,11 +17,11 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.MapKeyColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
@@ -66,7 +67,7 @@ public class GameRoom implements Serializable {
 	private Status status;
 
 	@NotNull
-	@OneToOne(cascade = {MERGE, REFRESH, DETACH}, optional = false, fetch = EAGER, orphanRemoval = false)
+	@OneToOne(cascade = {MERGE, REFRESH, DETACH}, optional = true, fetch = EAGER, orphanRemoval = false)
 	@JoinColumn(name = "owner_id")
 	private Player owner;
 
@@ -82,8 +83,9 @@ public class GameRoom implements Serializable {
 
 	private String generationNumbers;
 
-	@OneToMany(cascade = {MERGE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
-	@MapKeyColumn(name = "player_rank")
+//	@OneToMany(cascade = {MERGE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
+//	@MapKeyColumn(name = "player_rank")
+	@Transient
 	private Map<Integer, Player> playerRankMap = new HashMap<>();
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -93,4 +95,11 @@ public class GameRoom implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull
 	private Date updated;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date deleted;
+
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Enabled enabled;
 }

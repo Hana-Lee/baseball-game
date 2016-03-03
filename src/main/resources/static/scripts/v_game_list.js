@@ -59,6 +59,7 @@ app.v_game_list = (function () {
       url : stateMap.proxy,
       on : {
         onAfterAdd : function (id) {
+          console.log('after add');
           if (!id) {
             return;
           }
@@ -73,16 +74,16 @@ app.v_game_list = (function () {
           if (this.data.count() === 0) {
             app.v_main_menu.disableQuickBtn();
           }
+        },
+        onAfterRender : function () {
+          $('.join_room').click(function (evt) {
+            evt.preventDefault();
+            var target = evt.target, roomId, selectedRoom;
+            roomId = target.getAttribute('data-room-id');
+            selectedRoom = webixMap.main_view.getItem(roomId);
+            app.v_shell.showGameRoom(selectedRoom);
+          });
         }
-      },
-      ready : function () {
-        $('.join_room').click(function (evt) {
-          evt.preventDefault();
-          var target = evt.target, roomId, selectedRoom;
-          roomId = target.getAttribute('data-room-id');
-          selectedRoom = webixMap.main_view.getItem(roomId);
-          app.v_shell.showGameRoom(selectedRoom);
-        });
       }
     };
 

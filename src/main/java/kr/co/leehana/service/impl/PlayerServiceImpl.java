@@ -1,6 +1,7 @@
 package kr.co.leehana.service.impl;
 
 import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.AttackerRoleCount;
@@ -55,7 +56,7 @@ public class PlayerServiceImpl implements PlayerService {
 	public Player create(PlayerDto.Create dto) {
 		Player player = modelMapper.map(dto, Player.class);
 		String email = dto.getEmail();
-		if (playerRepository.findByEmail(email) != null) {
+		if (playerRepository.findOneByEmail(email) != null) {
 			log.error("user duplicated exception. {}", email);
 			throw new PlayerDuplicatedException("[" + email + "] 중복된 e-mail 입니다.");
 		}
@@ -91,6 +92,8 @@ public class PlayerServiceImpl implements PlayerService {
 		final Date now = new Date();
 		player.setCreated(now);
 		player.setUpdated(now);
+
+		player.setEnabled(Enabled.TRUE);
 	}
 
 	@Override
@@ -142,17 +145,22 @@ public class PlayerServiceImpl implements PlayerService {
 
 	@Override
 	public Player getById(Long id) {
-		Player player = playerRepository.findOne(id);
+		Player player = getByIdAndEnabled(id, Enabled.TRUE);
 		if (player == null) {
 			throw new PlayerNotFoundException();
 		}
 
 		return player;
+	}
+
+	@Override
+	public Player getByIdAndEnabled(Long id, Enabled enabled) {
+		return playerRepository.findOneByIdAndEnabled(id, enabled);
 	}
 
 	@Override
 	public Player getByEmail(String email) {
-		Player player = playerRepository.findByEmail(email);
+		Player player = getByEmailAndEnabled(email, Enabled.TRUE);
 		if (player == null) {
 			throw new PlayerNotFoundException();
 		}
@@ -161,17 +169,40 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
+	public Player getByEmailAndEnabled(String email, Enabled enabled) {
+		return playerRepository.findOneByEmailAndEnabled(email, enabled);
+	}
+
+	@Override
 	public Page<Player> getAll(Pageable pageable) {
-		return playerRepository.findAll(pageable);
+		return getAllByEnabled(Enabled.TRUE, pageable);
+	}
+
+	@Override
+	public Page<Player> getAllByEnabled(Enabled enabled, Pageable pageable) {
+		return playerRepository.findAllByEnabled(enabled, pageable);
 	}
 
 	@Override
 	public List<Player> getAll() {
-		return playerRepository.findAll();
+		return getAllByEnabled(Enabled.TRUE);
+	}
+
+	@Override
+	public List<Player> getAllByEnabled(Enabled enabled) {
+		return playerRepository.findAllByEnabled(enabled);
 	}
 
 	@Override
 	public void delete(Long id) {
-		playerRepository.delete(getById(id));
+		Player player = getByIdAndEnabled(id, Enabled.TRUE);
+		player.setEnabled(Enabled.FALSE);
+//		playerRepository.delete(getById(id));
+	}
+
+	@Override
+	public void delete(Player player) {
+		player.setEnabled(Enabled.FALSE);
+		player.setDeleted(new Date());
 	}
 }

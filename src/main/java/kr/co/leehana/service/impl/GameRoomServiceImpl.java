@@ -2,6 +2,7 @@ package kr.co.leehana.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.leehana.dto.GameRoomDto;
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
@@ -45,7 +46,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 	public GameRoom create(final GameRoomDto.Create createDto) throws JsonProcessingException {
 		final GameRoom gameRoom = modelMapper.map(createDto, GameRoom.class);
 
-		if (gameRoomRepository.findByOwner(createDto.getOwner()) != null) {
+		if (gameRoomRepository.findOneByOwnerAndEnabled(createDto.getOwner(), Enabled.TRUE) != null) {
 			log.error("owner duplicated exception. {} : {}", createDto.getOwner().getId(), createDto.getOwner()
 					.getNickname());
 			throw new OwnerDuplicatedException(createDto.getOwner());
@@ -67,11 +68,13 @@ public class GameRoomServiceImpl implements GameRoomService {
 		final Date now = new Date();
 		gameRoom.setCreated(now);
 		gameRoom.setUpdated(now);
+
+		gameRoom.setEnabled(Enabled.TRUE);
 	}
 
 	@Override
 	public GameRoom getById(final Long id) {
-		final GameRoom gameRoom = gameRoomRepository.findOne(id);
+		final GameRoom gameRoom = getByIdAndEnabled(id, Enabled.TRUE);
 		if (gameRoom == null) {
 			throw new GameRoomNotFoundException("[" + id + "] 에 해당하는 게임룸이 없습니다.");
 		}
@@ -80,13 +83,28 @@ public class GameRoomServiceImpl implements GameRoomService {
 	}
 
 	@Override
+	public GameRoom getByIdAndEnabled(Long id, Enabled enabled) {
+		return gameRoomRepository.findOneByIdAndEnabled(id, enabled);
+	}
+
+	@Override
 	public List<GameRoom> getAll() {
-		return gameRoomRepository.findAll();
+		return getAllByEnabled(Enabled.TRUE);
+	}
+
+	@Override
+	public List<GameRoom> getAllByEnabled(Enabled enabled) {
+		return gameRoomRepository.findAllByEnabled(enabled);
 	}
 
 	@Override
 	public Page<GameRoom> getAll(Pageable pageable) {
-		return gameRoomRepository.findAll(pageable);
+		return getAllByEnabled(Enabled.TRUE, pageable);
+	}
+
+	@Override
+	public Page<GameRoom> getAllByEnabled(Enabled enabled, Pageable pageable) {
+		return gameRoomRepository.findAllByEnabled(enabled, pageable);
 	}
 
 	@Override
@@ -122,12 +140,21 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	@Override
 	public void delete(Long id) {
-		gameRoomRepository.delete(id);
+		GameRoom gameRoom = getById(id);
+		gameRoom.setEnabled(Enabled.FALSE);
+		gameRoom.getPlayers().clear();
+		gameRoom.getPlayerRankMap().clear();
+		gameRoom.setDeleted(new Date());
+//		gameRoomRepository.delete(id);
 	}
 
 	@Override
 	public void delete(GameRoom gameRoom) throws JsonProcessingException {
-		gameRoomRepository.delete(gameRoom);
+		gameRoom.setEnabled(Enabled.FALSE);
+		gameRoom.getPlayers().clear();
+		gameRoom.getPlayerRankMap().clear();
+		gameRoom.setDeleted(new Date());
+//		gameRoomRepository.delete(gameRoom);
 		sendGameRoomUpdatedNotification(gameRoom, "delete");
 	}
 

@@ -1,9 +1,14 @@
 package kr.co.leehana.repository;
 
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Hana Lee
@@ -12,5 +17,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface GameRoomRepository extends JpaRepository<GameRoom, Long> {
 
-	GameRoom findByOwner(Player player);
+	GameRoom findOneByOwnerAndEnabled(Player player, Enabled enabled);
+
+	GameRoom findOneByIdAndEnabled(Long id, Enabled enabled);
+
+	List<GameRoom> findAllByEnabled(Enabled enabled);
+
+	Page<GameRoom> findAllByEnabled(Enabled enabled, Pageable pageable);
 }

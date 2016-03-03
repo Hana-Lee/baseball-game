@@ -1,8 +1,13 @@
 package kr.co.leehana.repository;
 
+import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.model.Player;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * @author Hana Lee
@@ -11,5 +16,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PlayerRepository extends JpaRepository<Player, Long> {
 
-	Player findByEmail(String email);
+	Player findOneByIdAndEnabled(Long id, Enabled enabled);
+
+	Player findOneByEmail(String email);
+
+	Player findOneByEmailAndEnabled(String email, Enabled enabled);
+
+	List<Player> findAllByEnabled(Enabled enabled);
+
+	Page<Player> findAllByEnabled(Enabled enabled, Pageable pageable);
 }
