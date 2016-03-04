@@ -31,6 +31,8 @@ public interface GameRoomService {
 
 	GameRoom update(Long id, GameRoomDto.Update updateDto);
 
+	GameRoom update(GameRoom gameRoom);
+
 	void delete(Long id) throws JsonProcessingException;
 
 	void delete(GameRoom gameRoom) throws JsonProcessingException;

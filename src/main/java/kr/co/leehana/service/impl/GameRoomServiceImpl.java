@@ -14,7 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.core.MessageSendingOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,14 +31,11 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 	private final GameRoomRepository gameRoomRepository;
 	private final ModelMapper modelMapper;
-	private final MessageSendingOperations<String> messageSendingOperations;
 
 	@Autowired
-	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper,
-	                           MessageSendingOperations<String> messageSendingOperations) {
+	public GameRoomServiceImpl(GameRoomRepository gameRoomRepository, ModelMapper modelMapper) {
 		this.gameRoomRepository = gameRoomRepository;
 		this.modelMapper = modelMapper;
-		this.messageSendingOperations = messageSendingOperations;
 	}
 
 	@Override
@@ -54,9 +50,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 		fillInitData(gameRoom);
 
-		final GameRoom createdGameRoom = gameRoomRepository.save(gameRoom);
-		sendGameRoomUpdatedNotification(createdGameRoom, "insert");
-		return createdGameRoom;
+		return gameRoomRepository.save(gameRoom);
 	}
 
 	private void fillInitData(final GameRoom gameRoom) {
@@ -115,6 +109,10 @@ public class GameRoomServiceImpl implements GameRoomService {
 			gameRoom.setName(updateDto.getName());
 		}
 
+		if (updateDto.getOwner() != null) {
+			gameRoom.setOwner(updateDto.getOwner());
+		}
+
 		if (updateDto.getPlayers() != null) {
 			gameRoom.getPlayers().clear();
 			gameRoom.setPlayers(updateDto.getPlayers());
@@ -135,6 +133,11 @@ public class GameRoomServiceImpl implements GameRoomService {
 
 		gameRoom.setUpdated(new Date());
 
+		return update(gameRoom);
+	}
+
+	@Override
+	public GameRoom update(GameRoom gameRoom) {
 		return gameRoomRepository.save(gameRoom);
 	}
 
@@ -153,14 +156,5 @@ public class GameRoomServiceImpl implements GameRoomService {
 		gameRoom.getPlayers().clear();
 		gameRoom.getPlayerRankMap().clear();
 		gameRoom.setDeleted(new Date());
-		sendGameRoomUpdatedNotification(gameRoom, "delete");
-	}
-
-	private void sendGameRoomUpdatedNotification(GameRoom gameRoom, String operation) throws JsonProcessingException {
-		String topic = "/topic/gameroom-updated";
-		GameRoomDto.Message message = new GameRoomDto.Message();
-		message.setOperation(operation);
-		message.setData(gameRoom);
-		messageSendingOperations.convertAndSend(topic, message);
 	}
 }

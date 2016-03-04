@@ -1,6 +1,7 @@
 package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import kr.co.leehana.annotation.NotifyClients;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.enums.GameRole;
@@ -85,6 +86,7 @@ public class GameRoomController {
 		    }
 		}
 	 */
+	@NotifyClients(url = "/topic/gameroom-updated", operation = "insert")
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
 			JsonProcessingException {
@@ -221,11 +223,13 @@ public class GameRoomController {
 
 		Player newOwner = playerService.getById(changeOwnerDto.getNewOwnerId());
 		gameRoom.setOwner(newOwner);
-		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
+
+		gameRoomService.update(gameRoom);
 
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
+	@NotifyClients(url = "/topic/gameroom-updated", operation = "delete")
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {POST})
 	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
@@ -242,7 +246,7 @@ public class GameRoomController {
 		if (gameRoom.getPlayers().isEmpty()) {
 			gameRoomService.delete(gameRoom);
 
-			return new ResponseEntity<>(NO_CONTENT);
+			return new ResponseEntity<>(gameRoom, NO_CONTENT);
 		}
 
 		Integer playerRankKey = null;

@@ -1,10 +1,12 @@
 package kr.co.leehana;
 
+import kr.co.leehana.aspect.NotifyAspect;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpSessionListener;
  * @since 2016-01-14 22-21
  */
 @SpringBootApplication
+@EnableAspectJAutoProxy
 public class App extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
@@ -61,5 +64,10 @@ public class App extends SpringBootServletInitializer {
 	@Bean
 	public HttpSessionListener httpSessionListener() {
 		return new HttpSessionEventPublisher();
+	}
+
+	@Bean
+	public NotifyAspect notifyAspect() {
+		return new NotifyAspect();
 	}
 }
