@@ -5,6 +5,7 @@ import kr.co.leehana.model.Player;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +22,9 @@ public interface PlayerRepository extends JpaRepository<Player, Long> {
 	Player findOneByEmail(String email);
 
 	Player findOneByEmailAndEnabled(String email, Enabled enabled);
+
+	@Query(value = "select * from player where email = ?1 and enabled = 'TRUE' and joined_room_id is null", nativeQuery = true)
+	Player findOneByEmailAndEnabledAndNoJoinedRoom(String email);
 
 	List<Player> findAllByEnabled(Enabled enabled);
 

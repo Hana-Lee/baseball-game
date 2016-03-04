@@ -174,6 +174,11 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	@Override
+	public Player getByEmailAndEnabledAndNoJoinedRoom(String email) {
+		return playerRepository.findOneByEmailAndEnabledAndNoJoinedRoom(email);
+	}
+
+	@Override
 	public Page<Player> getAll(Pageable pageable) {
 		return getAllByEnabled(Enabled.TRUE, pageable);
 	}

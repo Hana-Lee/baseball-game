@@ -18,12 +18,12 @@ public @interface NotifyClients {
 	/**
 	 * (필수) topic 을 보낼 url 지정
 	 */
-	String url();
+	String[] url();
 
 	/**
 	 * (필수) webix 전용 operation
 	 *
 	 * insert, delete, update
  	 */
-	String operation();
+	String[] operation();
 }

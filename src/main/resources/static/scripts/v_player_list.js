@@ -78,6 +78,11 @@ app.v_player_list = (function () {
             return false;
           }
         },
+        onBeforeDelete : function (id) {
+          if (!this.getItem(id)) {
+            return false;
+          }
+        },
         onAfterContextMenu : function (id) {
           this.select(id);
         },

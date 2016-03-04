@@ -86,7 +86,7 @@ public class GameRoomController {
 		    }
 		}
 	 */
-	@NotifyClients(url = "/topic/gameroom-updated", operation = "insert")
+	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"insert", "delete"})
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
 			JsonProcessingException {
@@ -147,7 +147,7 @@ public class GameRoomController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@NotifyClients(url = "/topic/gameroom-updated", operation = "update")
+	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"update", "delete"})
 	@RequestMapping(value = {URL_JOIN_VALUE}, method = {POST})
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
@@ -177,6 +177,7 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
+	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"update", "delete"})
 	@RequestMapping(value = {URL_QUICK_JOIN_VALUE}, method = {POST})
 	public ResponseEntity quickJoin(@RequestBody @Valid GameRoomDto.Join joinDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -230,7 +231,7 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@NotifyClients(url = "/topic/gameroom-updated", operation = "delete")
+	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"delete", "insert"})
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {POST})
 	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);

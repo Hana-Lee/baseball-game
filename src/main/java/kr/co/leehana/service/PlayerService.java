@@ -28,6 +28,8 @@ public interface PlayerService {
 
 	Player getByEmailAndEnabled(String email, Enabled enabled);
 
+	Player getByEmailAndEnabledAndNoJoinedRoom(String email);
+
 	Page<Player> getAll(Pageable pageable);
 
 	Page<Player> getAllByEnabled(Enabled enabled, Pageable pageable);

@@ -123,9 +123,11 @@ public class PlayerController {
 		principals.stream().filter(principal -> principal instanceof UserDetailsImpl).forEach(principal -> {
 			String email = ((UserDetailsImpl) principal).getEmail();
 			if (!currentPlayerEmail.equals(email)) {
-				Player player = playerService.getByEmail(email);
-				PlayerDto.Response responseDto = modelMapper.map(player, PlayerDto.Response.class);
-				loggedInPlayers.add(responseDto);
+				Player player = playerService.getByEmailAndEnabledAndNoJoinedRoom(email);
+				if (player != null) {
+					PlayerDto.Response responseDto = modelMapper.map(player, PlayerDto.Response.class);
+					loggedInPlayers.add(responseDto);
+				}
 			}
 		});
 
