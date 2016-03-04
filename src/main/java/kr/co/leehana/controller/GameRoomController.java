@@ -147,6 +147,7 @@ public class GameRoomController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
+	@NotifyClients(url = "/topic/gameroom-updated", operation = "update")
 	@RequestMapping(value = {URL_JOIN_VALUE}, method = {POST})
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
