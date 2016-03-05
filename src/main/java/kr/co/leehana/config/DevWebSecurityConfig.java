@@ -58,13 +58,17 @@ public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers(HttpMethod.DELETE, PlayerController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.GET, PlayerController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.PUT, PlayerController.URL_VALUE + "/**").hasRole("USER")
-				.antMatchers(HttpMethod.DELETE, GameRoomController.URL_VALUE + "/**").hasRole("ADMIN")
+				.antMatchers(HttpMethod.PATCH, PlayerController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.DELETE, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.GET, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.PUT, GameRoomController.URL_VALUE + "/**").hasRole("USER")
+				.antMatchers(HttpMethod.PATCH, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.antMatchers(HttpMethod.POST, GameRoomController.URL_VALUE + "/**").hasRole("USER")
 				.anyRequest().permitAll();
 
-		httpSecurity.exceptionHandling().accessDeniedHandler(accessDeniedHandler).authenticationEntryPoint(authenticationEntryPoint);
+		httpSecurity.exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler)
+				.authenticationEntryPoint(authenticationEntryPoint);
 
 		httpSecurity.formLogin()
 				.usernameParameter("email").passwordParameter("password")

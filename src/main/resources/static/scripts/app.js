@@ -21,9 +21,9 @@ var app = (function () {
   'use strict';
   var stateMap = {
     container : null
-  }, initModule, _registerStompProxy;
+  }, initModule, _registerWebixStompProxy, _registerWebixAjaxMethod;
 
-  _registerStompProxy = function () {
+  _registerWebixStompProxy = function () {
     webix.proxy.stomp = {
       $proxy : true,
       game_room : null,
@@ -84,10 +84,17 @@ var app = (function () {
     };
   };
 
+  _registerWebixAjaxMethod = function () {
+    webix.ajax.prototype.patch = function (url, params, call) {
+      return this._send(url, params, call, 0, "PATCH");
+    };
+  };
+
   initModule = function (container) {
     stateMap.container = container;
 
-    _registerStompProxy();
+    _registerWebixStompProxy();
+    _registerWebixAjaxMethod();
 
     app.v_shell.initModule(stateMap.container);
   };

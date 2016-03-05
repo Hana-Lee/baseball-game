@@ -209,7 +209,7 @@ app.v_game_list = (function () {
   initModule = function (container) {
     stateMap.container = container;
 
-    stateMap.proxy = webix.proxy('stomp', '/gameroom-updated');
+    stateMap.proxy = webix.proxy('stomp', '/gameroom/list/updated');
     stateMap.proxy.clientId = app.utils.guid();
 
     _getCreatedGameRoomList(_createView);

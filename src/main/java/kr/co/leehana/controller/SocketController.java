@@ -5,8 +5,10 @@ import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.service.ChatService;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.core.session.SessionRegistry;
@@ -19,6 +21,7 @@ import java.util.Map;
  * @since 2016-02-21 21:31
  */
 @Controller
+@Slf4j
 public class SocketController {
 
 	@Autowired
@@ -43,9 +46,11 @@ public class SocketController {
 		return message;
 	}
 
-	@MessageMapping(value = {"/chat/gameroom"})
-	@SendTo(value = {"/topic/chat/gameroom"})
-	public ChatDto.Message gameRoomChat(ChatDto.Message message) {
+	@MessageMapping(value = {"/chat/gameroom/{id}"})
+	@SendTo(value = {"/topic/chat/gameroom/{id}"})
+	public ChatDto.Message gameRoomChat(@DestinationVariable Long id, ChatDto.Message message) {
+		log.debug("Chat destination game room id : {}", id);
+
 		saveChatMessage(message);
 		return message;
 	}
@@ -55,7 +60,7 @@ public class SocketController {
 	}
 
 	@MessageMapping(value = {"/player/login", "/player/logout"})
-	@SendTo(value = {"/topic/player-list-updated"})
+	@SendTo(value = {"/topic/player/list/updated"})
 	public PlayerDto.Message playerLoggedInOut(Map<String, String> params) {
 		return createCurrentPlayerInfoMessage(params.get("email"), params.get("operation"));
 	}

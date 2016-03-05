@@ -9,6 +9,7 @@ import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayerNotFoundException;
+import kr.co.leehana.exception.GameRoomPlayersNotEmpty;
 import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.GameRoom;
@@ -86,7 +87,8 @@ public class GameRoomController {
 		    }
 		}
 	 */
-	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"insert", "delete"})
+	@NotifyClients(url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"}, operation = {"insert",
+			"delete"})
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
 			JsonProcessingException {
@@ -147,7 +149,9 @@ public class GameRoomController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"update", "delete"})
+	@NotifyClients(
+			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
+			operation = {"update", "update", "delete"})
 	@RequestMapping(value = {URL_JOIN_VALUE}, method = {POST})
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
@@ -177,7 +181,8 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"update", "delete"})
+	@NotifyClients(url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"}, operation = {"update",
+			"delete"})
 	@RequestMapping(value = {URL_QUICK_JOIN_VALUE}, method = {POST})
 	public ResponseEntity quickJoin(@RequestBody @Valid GameRoomDto.Join joinDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -231,10 +236,13 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@NotifyClients(url = {"/topic/gameroom-updated", "/topic/player-list-updated"}, operation = {"delete", "insert"})
-	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {POST})
-	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
+	@NotifyClients(
+			url = {"/topic/gameroom/list/updated", "/player/list/updated"},
+			operation = {"delete", "insert"})
+	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {DELETE})
+	public ResponseEntity leaveAndDelete(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
+
 		Player player = getCurrentPlayer();
 
 		if (!gameRoom.getPlayers().contains(player)) {
@@ -249,7 +257,27 @@ public class GameRoomController {
 			gameRoomService.delete(gameRoom);
 
 			return new ResponseEntity<>(gameRoom, NO_CONTENT);
+		} else {
+			throw new GameRoomPlayersNotEmpty("Game Room No. " + gameRoom.getId() + " player list must be empty. " +
+					"[player count : " + gameRoom.getPlayers().size() + "]");
 		}
+	}
+
+	@NotifyClients(
+			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
+			operation = {"update", "update", "insert"})
+	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {PATCH})
+	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
+		GameRoom gameRoom = gameRoomService.getById(id);
+		Player player = getCurrentPlayer();
+
+		if (!gameRoom.getPlayers().contains(player)) {
+			throw new GameRoomPlayerNotFoundException(gameRoom, player);
+		}
+
+		player.setGameRole(null);
+
+		gameRoom.getPlayers().remove(player);
 
 		Integer playerRankKey = null;
 		for (Integer key : gameRoom.getPlayerRankMap().keySet()) {
@@ -266,7 +294,7 @@ public class GameRoomController {
 			gameRoom.setOwner(gameRoom.getPlayers().iterator().next());
 		}
 
-		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
+		gameRoomService.update(gameRoom);
 
 		return new ResponseEntity<>(gameRoom, OK);
 	}
@@ -335,6 +363,12 @@ public class GameRoomController {
 	@ExceptionHandler(GameRoomPlayerNotFoundException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoomPlayerNotFoundException(GameRoomPlayerNotFoundException ex) {
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
+	}
+
+	@ExceptionHandler(GameRoomPlayersNotEmpty.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handleGameRoomPlayersNotEmptyException(GameRoomPlayersNotEmpty ex) {
 		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
 	}
 

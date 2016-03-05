@@ -194,7 +194,7 @@ app.v_player_list = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    stateMap.proxy = webix.proxy('stomp', '/player-list-updated');
+    stateMap.proxy = webix.proxy('stomp', '/player/list/updated');
     stateMap.proxy.clientId = app.utils.guid();
 
     _getLoggedInPlayers(_createView);
