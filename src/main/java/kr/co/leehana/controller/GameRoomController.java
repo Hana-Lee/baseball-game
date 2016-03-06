@@ -85,8 +85,9 @@ public class GameRoomController {
 		    }
 		}
 	 */
-	@NotifyClients(url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"}, operation = {"insert",
-			"delete"})
+	@NotifyClients(
+			url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"},
+			operation = {"insert", "delete"})
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
 	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
 			JsonProcessingException {
@@ -125,12 +126,15 @@ public class GameRoomController {
 		return gameRoomService.getById(id);
 	}
 
+	@NotifyClients(
+			url = {"/topic/gameroom/{id}/updated", "/topic/gameroom/list/updated"},
+			operation = {"update", "update"})
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PUT})
 	public ResponseEntity update(@PathVariable Long id, @RequestBody GameRoomDto.Update updateDto) {
 		if (updateDtoHasAllFieldNullValue(updateDto)) {
 			return createErrorResponseEntity("Update fields are must not be null", null);
 		}
-
+		
 		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
 		return new ResponseEntity<>(updatedGameRoom, OK);
 	}

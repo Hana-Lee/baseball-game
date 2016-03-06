@@ -121,6 +121,7 @@ app.v_main_menu = (function () {
         if (webixMap.create_game_room_window) {
           webixMap.create_game_room_window.close();
         }
+        app.m_player.getInfo().gameRole = gameRoomJson.owner.gameRole;
         app.v_shell.showGameRoom(gameRoomJson);
       }
     });
@@ -245,6 +246,7 @@ app.v_main_menu = (function () {
 
   _joinRandomGameRoom = function () {
     var url, data, dataString, randomGameRoomIndex, selectedGameRoom;
+
     data = {
       gameRole : 'ATTACKER'
     };
@@ -269,6 +271,7 @@ app.v_main_menu = (function () {
       },
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
+        app.m_player.getInfo().gameRole = data.gameRole;
         app.v_shell.showGameRoom(joinedGameRoom);
       }
     });

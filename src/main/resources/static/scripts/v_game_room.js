@@ -33,14 +33,31 @@ app.v_game_room = (function () {
       subscribeObj : []
     }, webixMap = {},
     _createView, _onOwnerChangeHandler,
+    _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
     configModule, initModule, destructor, getGameRoomModel;
+
+  _getSettingTemplate = function () {
+    return [
+      '입력 : ', configMap.game_room_model.setting.limitGuessInputCount,
+      ', 갯수 : ', configMap.game_room_model.setting.generationNumberCount,
+      ', 오류 : ', configMap.game_room_model.setting.limitWrongInputCount
+    ];
+  };
+
+  _getTitleTemplate = function () {
+    return [
+      '[', configMap.game_room_model.id, '번방] ', configMap.game_room_model.name
+    ];
+  };
 
   _createView = function () {
     var gameRoomTitle, menuContainer, centerContainer,
       gameBoardContainer, gamePadContainer, playerProfileContainer, chatContainer,
       mainView;
+
     gameRoomTitle = {
-      template : '[' + configMap.game_room_model.id + '번방] ' + configMap.game_room_model.name,
+      id : 'game-room-title',
+      template : _getTitleTemplate().join('') + ' - ' + _getSettingTemplate().join(''),
       type : 'header'
     };
 
@@ -115,6 +132,7 @@ app.v_game_room = (function () {
     webixMap.pad_container = $$('game-room-pad-container');
     webixMap.profile_container = $$('game-room-player-profile-container');
     webixMap.chat_container = $$('game-room-chat-container');
+    webixMap.title = $$('game-room-title');
 
     webixMap.main_view.attachEvent('onDestruct', function () {
       stateMap.webix_events.forEach(function (eventItem) {
@@ -141,6 +159,7 @@ app.v_game_room = (function () {
         success : function (text) {
           console.log(text);
           var from = 'game-room';
+          app.m_player.getInfo().gameRole = null;
           app.v_shell.showMainBoard(from);
         }
       });
@@ -162,6 +181,7 @@ app.v_game_room = (function () {
         success : function (text) {
           console.log(text);
           var from = 'game-room';
+          app.m_player.getInfo().gameRole = null;
           app.v_shell.showMainBoard(from);
         }
       });
@@ -207,6 +227,13 @@ app.v_game_room = (function () {
     }
   };
 
+  _updateGameRoomTitle = function () {
+    webixMap.title.define({
+      template : _getTitleTemplate().join('') + ' - ' + _getSettingTemplate().join('')
+    });
+    webixMap.title.refresh();
+  };
+
   initModule = function (container) {
     var
       header = {},
@@ -221,6 +248,8 @@ app.v_game_room = (function () {
           _onOwnerChangeHandler(updatedGameRoom);
         }
         configMap.game_room_model = updatedGameRoom;
+
+        _updateGameRoomTitle();
       }, header)
     );
     _createView();

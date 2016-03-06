@@ -30,7 +30,7 @@ app.v_game_room_menu = (function () {
       button_width : 200
     }, stateMap = {
       container : null
-    }, webixMap = {}, _createView, _showOwnerChangeWindow,
+    }, webixMap = {}, _createView, _showOwnerChangeWindow, _showSettingChangeWindow, _sendGameRoomSettingDataToServer,
     configModule, initModule;
 
   _createView = function () {
@@ -51,7 +51,12 @@ app.v_game_room_menu = (function () {
           }
         }
       }, {
-        id : 'room-setting', view : 'button', label : '설정', width : configMap.button_width
+        id : 'setting-change', hidden : true, view : 'button', label : '설정', width : configMap.button_width,
+        on : {
+          onItemClick : function () {
+            _showSettingChangeWindow();
+          }
+        }
       }, {
         id : 'owner-change', hidden : true, view : 'button', label : '방장변경', width : configMap.button_width,
         on : {
@@ -64,7 +69,135 @@ app.v_game_room_menu = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('game-room-menu');
+    webixMap.setting_change = $$('setting-change');
     webixMap.owner_change = $$('owner-change');
+  };
+
+  _showSettingChangeWindow = function () {
+    var gameRoom = app.v_game_room.getGameRoomModel();
+    webix.ui({
+      id : 'setting-change-window',
+      view : 'window',
+      head : '설정 변경',
+      height : 400,
+      width : 300,
+      position : 'center',
+      modal : true,
+      body : {
+        id : 'setting-change-form',
+        view : 'form',
+        borderless : true,
+        elements : [{
+          view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요',
+          value : gameRoom.name
+        }, {
+          view : 'fieldset', label : '게임 설정', name : 'setting',
+          body : {
+            rows : [{
+              view : 'richselect',
+              label : '숫자갯수',
+              name : 'generationNumberCount',
+              invalidMessage : '숫자 갯수를 정해주세요',
+              value : gameRoom.setting.generationNumberCount,
+              options : [
+                {id : 2, value : '2 개'},
+                {id : 3, value : '3 개'},
+                {id : 4, value : '4 개'},
+                {id : 5, value : '5 개'}
+              ]
+            }, {
+              view : 'richselect',
+              label : '입력횟수',
+              name : 'limitGuessInputCount',
+              invalidMessage : '입력 횟수를 정해주세요',
+              value : gameRoom.setting.limitGuessInputCount,
+              options : [
+                {id : 1, value : '1 회'},
+                {id : 5, value : '5 회'},
+                {id : 10, value : '10 회'},
+                {id : 15, value : '15 회'},
+                {id : 20, value : '20 회'}
+              ]
+            }, {
+              view : 'richselect',
+              label : '입력오류횟수',
+              name : 'limitWrongInputCount',
+              invalidMessage : '입력 오류 횟수를 정해주세요',
+              value : gameRoom.setting.limitWrongInputCount,
+              options : [
+                {id : 5, value : '5 회'},
+                {id : 10, value : '10 회'},
+                {id : 15, value : '15 회'},
+                {id : 20, value : '20 회'}
+              ]
+            }]
+          }
+        }, {
+          cols : [
+            {
+              view : 'button', value : '생성', type : 'form', hotkey : 'enter',
+              click : function () {
+                if ($$('setting-change-form').validate()) { //validate form
+                  _sendGameRoomSettingDataToServer($$('setting-change-form').getValues());
+                } else {
+                  webix.message({type : 'error', text : 'Form data is invalid'});
+                }
+              }
+            },
+            {
+              view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
+              click : function () {
+                this.getTopParentView().close();
+              }
+            }
+          ]
+        }],
+        rules : {
+          name : webix.rules.isNotEmpty
+        },
+        elementsConfig : {
+          labelPosition : 'left'
+        }
+      }
+    }).show();
+
+    webixMap.setting_change_window = $$('setting-change-window');
+  };
+
+  _sendGameRoomSettingDataToServer = function (data) {
+    var sendData, url;
+
+    sendData = {
+      name : data.name,
+      setting : {
+        generationNumberCount : data.generationNumberCount,
+        limitGuessInputCount : data.limitGuessInputCount,
+        limitWrongInputCount : data.limitWrongInputCount
+      }
+    };
+
+    sendData = JSON.stringify(sendData);
+
+    url = 'gameroom/' + app.v_game_room.getGameRoomModel().id;
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).put(url, sendData, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (/*text*/) {
+        if (webixMap.setting_change_window) {
+          webixMap.setting_change_window.close();
+        }
+      }
+    });
   };
 
   _showOwnerChangeWindow = function () {
@@ -159,6 +292,7 @@ app.v_game_room_menu = (function () {
 
     if (app.v_game_room.getGameRoomModel().owner.id === app.m_player.getInfo().id) {
       webixMap.owner_change.show();
+      webixMap.setting_change.show();
     }
   };
 

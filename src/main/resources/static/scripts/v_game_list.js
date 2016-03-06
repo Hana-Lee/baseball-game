@@ -137,7 +137,7 @@ app.v_game_list = (function () {
   _joinGameRoom = function (selectedRoom, selectedGameRole) {
     webix.ajax().headers({
       'Content-Type' : 'application/json'
-    }).post('gameroom/join/' + selectedRoom.id, JSON.stringify({gameRole : selectedGameRole}), {
+    }).patch('gameroom/join/' + selectedRoom.id, JSON.stringify({gameRole : selectedGameRole}), {
       error : function (text) {
         var textJson = JSON.parse(text);
         webix.alert({
