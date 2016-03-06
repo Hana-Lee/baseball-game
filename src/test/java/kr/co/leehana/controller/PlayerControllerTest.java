@@ -254,6 +254,7 @@ public class PlayerControllerTest {
 		resultActions.andExpect(status().isNoContent());
 	}
 
+	// travis ci 에서 빌드 오류 발생하여 임시로 ignore 처리
 	@Ignore
 	@Test
 	public void getLoggedInPlayers() throws Exception {
