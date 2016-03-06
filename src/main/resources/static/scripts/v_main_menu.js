@@ -244,8 +244,34 @@ app.v_main_menu = (function () {
   };
 
   _joinRandomGameRoom = function () {
-    var randomGameRoomIndex = Math.floor(Math.random() * stateMap.game_room_list.length);
-    app.v_shell.showGameRoom(stateMap.game_room_list[randomGameRoomIndex]);
+    var url, data, dataString, randomGameRoomIndex, selectedGameRoom;
+    data = {
+      gameRole : 'ATTACKER'
+    };
+    dataString = JSON.stringify(data);
+
+    randomGameRoomIndex = Math.floor(Math.random() * stateMap.game_room_list.length);
+    selectedGameRoom = stateMap.game_room_list[randomGameRoomIndex];
+
+    url = 'gameroom/join/' + selectedGameRoom.id;
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).post(url, dataString, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        var joinedGameRoom = JSON.parse(text);
+        app.v_shell.showGameRoom(joinedGameRoom);
+      }
+    });
   };
 
   disableQuickBtn = function () {

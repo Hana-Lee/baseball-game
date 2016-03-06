@@ -111,7 +111,7 @@ app.v_game_room_menu = (function () {
                     oldOwnerId : gameRoomModel.owner.id,
                     newOwnerId : selectedPlayer.id
                   };
-                  url = 'gameroom/' + app.v_game_room.getGameRoomModel().id + '/change/owner';
+                  url = 'gameroom/change/owner/' + app.v_game_room.getGameRoomModel().id;
                   webix.ajax().headers({
                     'Content-Type' : 'application/json'
                   }).patch(url, JSON.stringify(data), {

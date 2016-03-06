@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -60,8 +59,7 @@ public class GameRoomController {
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
-	private static final String URL_QUICK_JOIN_VALUE = URL_VALUE + "/join/quick";
-	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/{id}/change/owner";
+	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
 
 	private final GameRoomService gameRoomService;
@@ -152,7 +150,7 @@ public class GameRoomController {
 	@NotifyClients(
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
 			operation = {"update", "update", "delete"})
-	@RequestMapping(value = {URL_JOIN_VALUE}, method = {POST})
+	@RequestMapping(value = {URL_JOIN_VALUE}, method = {PATCH})
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -179,37 +177,6 @@ public class GameRoomController {
 		gameRoomService.update(id, modelMapper.map(gameRoom, GameRoomDto.Update.class));
 
 		return new ResponseEntity<>(gameRoom, OK);
-	}
-
-	@NotifyClients(url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"}, operation = {"update",
-			"delete"})
-	@RequestMapping(value = {URL_QUICK_JOIN_VALUE}, method = {POST})
-	public ResponseEntity quickJoin(@RequestBody @Valid GameRoomDto.Join joinDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
-
-		Player player = getCurrentPlayer();
-		player.setGameRole(joinDto.getGameRole());
-
-		GameRoom selectedGameRoom;
-		List<GameRoom> gameRooms = gameRoomService.getAll();
-		if (gameRooms.size() > 1) {
-			Random random = new Random();
-			int randomInteger = random.nextInt(gameRooms.size());
-
-			selectedGameRoom = gameRooms.get(randomInteger);
-		} else if (gameRooms.size() == 1) {
-			selectedGameRoom = gameRooms.get(0);
-		} else {
-			throw new GameRoomNotFoundException("게임룸이 존재 하지 않습니다.");
-		}
-
-		selectedGameRoom.getPlayers().add(player);
-
-		gameRoomService.update(selectedGameRoom.getId(), modelMapper.map(selectedGameRoom, GameRoomDto.Update.class));
-
-		return new ResponseEntity<>(selectedGameRoom, OK);
 	}
 
 	@NotifyClients(
