@@ -38,9 +38,9 @@ app.v_game_room = (function () {
 
   _getSettingTemplate = function () {
     return [
-      '입력 : ', configMap.game_room_model.setting.limitGuessInputCount,
-      ', 갯수 : ', configMap.game_room_model.setting.generationNumberCount,
-      ', 오류 : ', configMap.game_room_model.setting.limitWrongInputCount
+      '입력 : ', configMap.game_room_model.setting.limitGuessInputCount, ', ',
+      '갯수 : ', configMap.game_room_model.setting.generationNumberCount, ', ',
+      '오류 : ', configMap.game_room_model.setting.limitWrongInputCount
     ];
   };
 
@@ -139,7 +139,7 @@ app.v_game_room = (function () {
         webix.detachEvent(eventItem);
       });
       stateMap.webix_events = [];
-      stateMap.subscribeObj.forEach(function(subscribe) {
+      stateMap.subscribeObj.forEach(function (subscribe) {
         subscribe.unsubscribe();
       });
     });
