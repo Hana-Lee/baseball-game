@@ -258,15 +258,14 @@ public class PlayerControllerTest {
 		Player firstPlayer = creator.createTestPlayer(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
 		Player secPlayer = creator.createTestPlayer(SEC_EMAIL, SEC_NICK, SEC_PASS);
 
-		ResultActions resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(firstPlayer
-				.getEmail(), TEST_PASSWORD)));
+		ResultActions resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(TEST_EMAIL,
+				TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath("$", hasSize(0)));
 		resultActions.andExpect(jsonPath(PLAYER_EMAIL_CONTAIN_PATH, is(empty())));
 
-		resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(secPlayer.getEmail(),
-				SEC_PASS)));
+		resultActions = mockMvc.perform(get(TEST_LOGGED_IN_PLAYERS_URL).with(httpBasic(SEC_EMAIL, SEC_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath("$", hasSize(1)));

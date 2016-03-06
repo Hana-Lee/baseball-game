@@ -343,17 +343,6 @@ public class GameRoomControllerTest {
 	}
 
 	@Test
-	public void nonAdminRoleDeleteGameRoomWithGameRoomDeleteException() throws Exception {
-		Player player = creator.createTestPlayer();
-		GameRoom gameRoom = createTestGameRoom(player);
-
-		ResultActions resultActions = mockMvc.perform(delete(BASE_URL + "/" + gameRoom.getId()).with(httpBasic(player
-				.getEmail(), DEFAULT_TEST_PASS)));
-		resultActions.andDo(print());
-		resultActions.andExpect(status().isForbidden());
-	}
-
-	@Test
 	public void deleteGameRoom() throws Exception {
 		Player player = creator.createTestAdminPlayer();
 		GameRoom gameRoom = createTestGameRoom(player);
