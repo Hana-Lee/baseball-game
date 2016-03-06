@@ -29,8 +29,10 @@ app.v_game_room = (function () {
     },
     stateMap = {
       container : null,
-      webix_events : []
-    }, webixMap = {}, _createView,
+      webix_events : [],
+      subscribeObj : []
+    }, webixMap = {},
+    _createView, _onOwnerChangeHandler,
     configModule, initModule, destructor, getGameRoomModel;
 
   _createView = function () {
@@ -119,7 +121,9 @@ app.v_game_room = (function () {
         webix.detachEvent(eventItem);
       });
       stateMap.webix_events = [];
-      stateMap.subsrcibeObj.unsubscribe();
+      stateMap.subscribeObj.forEach(function(subscribe) {
+        subscribe.unsubscribe();
+      });
     });
     stateMap.webix_events.push(webix.attachEvent('onLeaveGameRoom', function () {
       webix.ajax().headers({
@@ -164,7 +168,6 @@ app.v_game_room = (function () {
     }));
 
     app.v_game_room_menu.initModule(webixMap.menu_container);
-
     app.v_game_board.initModule(webixMap.board_container);
     app.v_game_pad.initModule(webixMap.pad_container);
     app.v_player_profile.initModule(webixMap.profile_container);
@@ -190,13 +193,36 @@ app.v_game_room = (function () {
     });
   };
 
+  _onOwnerChangeHandler = function (updatedGameRoom) {
+    if (updatedGameRoom.owner.id === app.m_player.getInfo().id) {
+      webix.alert({
+        title : '정보',
+        ok : '확인',
+        text : '지금부터 [<b>' + app.m_player.getInfo().nickname + '</b>] 님이<br/>방장입니다'
+      });
+
+      $$('owner-change').show();
+    } else {
+      $$('owner-change').hide();
+    }
+  };
+
   initModule = function (container) {
-    var header = {}, subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/updated';
+    var
+      header = {},
+      subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/updated';
+
     stateMap.container = container;
 
-    stateMap.subsrcibeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
-      configMap.game_room_model = JSON.parse(response.body).data;
-    }, header);
+    stateMap.subscribeObj.push(
+      app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
+        var updatedGameRoom = JSON.parse(response.body).data;
+        if (configMap.game_room_model.owner.email !== updatedGameRoom.owner.email) {
+          _onOwnerChangeHandler(updatedGameRoom);
+        }
+        configMap.game_room_model = updatedGameRoom;
+      }, header)
+    );
     _createView();
   };
 

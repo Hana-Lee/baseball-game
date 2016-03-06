@@ -61,7 +61,7 @@ public class GameRoomController {
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
 	private static final String URL_QUICK_JOIN_VALUE = URL_VALUE + "/join/quick";
-	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
+	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/{id}/change/owner";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
 
 	private final GameRoomService gameRoomService;
@@ -212,6 +212,9 @@ public class GameRoomController {
 		return new ResponseEntity<>(selectedGameRoom, OK);
 	}
 
+	@NotifyClients(
+			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated"},
+			operation = {"update", "update"})
 	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
 	public ResponseEntity changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
 			changeOwnerDto, BindingResult bindingResult) {
