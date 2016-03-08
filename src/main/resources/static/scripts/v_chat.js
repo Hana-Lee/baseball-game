@@ -45,10 +45,37 @@ app.v_chat = (function () {
       system_nickname : '시스템'
     },
     stateMap = {
-      container : null
+      container : null,
+      proxy : null
     }, webixMap = {},
     _sendMessage, _chatTemplate, _createView,
+    _resetWebixMap, _resetConfigMap, _resetStateMap,
     configModule, initModule;
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
+
+  _resetConfigMap = function () {
+    configMap.chat_height = 200;
+    configMap.chat_list_height = 'auto';
+    configMap.proxy_name = 'stomp';
+    configMap.data_url = '/chat';
+    configMap.system_message_list = [
+      '숫자 야구 게임에 오신걸 환영합니다 :-)',
+      '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
+    ];
+    configMap.player_model = {};
+    configMap.system_nickname = '시스템';
+  };
+
+  _resetStateMap = function () {
+    stateMap.proxy.game_room = undefined;
+
+    stateMap = {};
+    stateMap.container = null;
+    stateMap.proxy = null;
+  };
 
   _sendMessage = function () {
     var text = webixMap.chat_message.getValue();
@@ -107,12 +134,22 @@ app.v_chat = (function () {
           on : {
             onAfterRender : function () {
               webix.UIManager.setFocus(this);
+            },
+            onDestruct : function () {
+              console.log('chat destructor');
             }
           }
         }, {
           view : 'button', value : '전송', click : _sendMessage, hotkey : 'enter'
         }]
-      }]
+      }],
+      on : {
+        onDestruct : function () {
+          _resetWebixMap();
+          _resetConfigMap();
+          _resetStateMap();
+        }
+      }
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);

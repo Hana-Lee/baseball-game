@@ -20,9 +20,22 @@
 app.v_main_board = (function () {
   'use strict';
 
-  var stateMap = {
-    container : null
-  }, webixMap = {}, _createView, initModule, destructor;
+  var
+    stateMap = {
+      container : null
+    }, webixMap = {},
+    _resetWebixMap, _resetStateMap,
+    _createView,
+    initModule, destructor;
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
+
+  _resetStateMap = function () {
+    stateMap = {};
+    stateMap.container = null;
+  };
 
   _createView = function () {
     var mainTitle, playerListContainer, mainMenuContainer, playerProfileContainer,
@@ -103,7 +116,13 @@ app.v_main_board = (function () {
         mainMenuContainer,
         {height : 5},
         mainContentContainer
-      ]
+      ],
+      on : {
+        onDestruct : function () {
+          _resetWebixMap();
+          _resetStateMap();
+        }
+      }
     }];
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('main-board');
@@ -131,6 +150,10 @@ app.v_main_board = (function () {
     });
     app.v_chat.initModule(webixMap.main_chat_container);
     app.v_main_menu.initModule(webixMap.main_menu_container);
+
+    app.v_player_profile.configModule({
+      player_model : app.m_player.getInfo()
+    });
     app.v_player_profile.initModule(webixMap.player_profile_container);
     app.v_player_list.initModule(webixMap.player_list_container);
   };

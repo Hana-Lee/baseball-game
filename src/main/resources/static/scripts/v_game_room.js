@@ -21,6 +21,7 @@ app.v_game_room = (function () {
   'use strict';
 
   var
+    EVENT_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
     configMap = {
       settable_map : {
         game_room_model : null
@@ -32,12 +33,36 @@ app.v_game_room = (function () {
       webix_events : [],
       subscribeObj : []
     }, webixMap = {},
-    _createView, _onOwnerChangeHandler,
+    _createView, _onOwnerChangeHandler, _resetWebixMap, _resetConfigMap, _resetStateMap,
     _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
     configModule, initModule, destructor, getGameRoomModel;
 
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
+
+  _resetStateMap = function () {
+    stateMap.webix_events.forEach(function (eventItem) {
+      webix.detachEvent(eventItem);
+    });
+
+    stateMap.subscribeObj.forEach(function (subscribe) {
+      subscribe.unsubscribe();
+    });
+
+    stateMap = {};
+    stateMap.webix_events = [];
+    stateMap.subscribeObj = [];
+    stateMap.container = null;
+  };
+
+  _resetConfigMap = function () {
+    configMap.game_room_model = null;
+  };
+
   _getSettingTemplate = function () {
     return [
+      '입력지연 : ', '25초', ', ',
       '입력 : ', configMap.game_room_model.setting.limitGuessInputCount, ', ',
       '갯수 : ', configMap.game_room_model.setting.generationNumberCount, ', ',
       '오류 : ', configMap.game_room_model.setting.limitWrongInputCount
@@ -120,9 +145,18 @@ app.v_game_room = (function () {
       view : 'layout',
       rows : [
         gameRoomTitle,
+        {height : 5},
         menuContainer,
+        {height : 5},
         centerContainer
-      ]
+      ],
+      on : {
+        onDestruct : function () {
+          _resetConfigMap();
+          _resetStateMap();
+          _resetWebixMap();
+        }
+      }
     }];
 
     webixMap.top = webix.ui(mainView, stateMap.container);
@@ -134,15 +168,6 @@ app.v_game_room = (function () {
     webixMap.chat_container = $$('game-room-chat-container');
     webixMap.title = $$('game-room-title');
 
-    webixMap.main_view.attachEvent('onDestruct', function () {
-      stateMap.webix_events.forEach(function (eventItem) {
-        webix.detachEvent(eventItem);
-      });
-      stateMap.webix_events = [];
-      stateMap.subscribeObj.forEach(function (subscribe) {
-        subscribe.unsubscribe();
-      });
-    });
     stateMap.webix_events.push(webix.attachEvent('onLeaveGameRoom', function () {
       webix.ajax().headers({
         'Content-Type' : 'application/json'
@@ -190,6 +215,12 @@ app.v_game_room = (function () {
     app.v_game_room_menu.initModule(webixMap.menu_container);
     app.v_game_board.initModule(webixMap.board_container);
     app.v_game_pad.initModule(webixMap.pad_container);
+
+    app.v_player_profile.configModule({
+      height: 200,
+      avatar_width : 130,
+      player_model : app.m_player.getInfo()
+    });
     app.v_player_profile.initModule(webixMap.profile_container);
 
     app.v_chat.configModule({
@@ -250,6 +281,8 @@ app.v_game_room = (function () {
         configMap.game_room_model = updatedGameRoom;
 
         _updateGameRoomTitle();
+
+        webix.callEvent(EVENT_UPDATE_GAME_ROOM_INFO, []);
       }, header)
     );
     _createView();
@@ -264,6 +297,7 @@ app.v_game_room = (function () {
   };
 
   return {
+    EVENT_UPDATE_GAME_ROOM_INFO : EVENT_UPDATE_GAME_ROOM_INFO,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,
