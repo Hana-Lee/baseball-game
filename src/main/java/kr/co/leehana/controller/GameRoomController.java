@@ -211,7 +211,7 @@ public class GameRoomController {
 	}
 
 	@NotifyClients(
-			url = {"/topic/gameroom/list/updated", "/player/list/updated"},
+			url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"},
 			operation = {"delete", "insert"})
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {DELETE})
 	public ResponseEntity leaveAndDelete(@PathVariable Long id) throws JsonProcessingException {
