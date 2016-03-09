@@ -27,12 +27,26 @@ app.v_game_list = (function () {
     stateMap = {
       container : null
     }, webixMap = {
-      game_room_list : []
     },
     _createView, _getCreatedGameRoomList,
     _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate, _joinGameRoom,
-    _showGameRoleSelectWindow,
+    _showGameRoleSelectWindow, _resetConfigMap, _resetStateMap, _resetWebixMap,
     initModule;
+
+  _resetConfigMap = function () {
+    configMap.height = 128;
+  };
+
+  _resetStateMap = function () {
+    stateMap.game_room_list = null;
+    stateMap.proxy = null;
+    stateMap.container = null;
+    stateMap = {};
+  };
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
 
   _createView = function () {
     /**
@@ -86,8 +100,12 @@ app.v_game_list = (function () {
             roomId = target.getAttribute('data-room-id');
             selectedRoom = webixMap.main_view.getItem(roomId);
             _showGameRoleSelectWindow(selectedRoom);
-            //_joinGameRoom(selectedRoom);
           });
+        },
+        onDestruct : function () {
+          _resetConfigMap();
+          _resetStateMap();
+          _resetWebixMap();
         }
       }
     };

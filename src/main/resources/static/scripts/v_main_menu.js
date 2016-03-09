@@ -30,9 +30,24 @@ app.v_main_menu = (function () {
       },
       game_room_list : []
     }, webixMap = {},
-    _createView, _sendGameRoomDataToServer, _getCreatedGameRoomList,
-    _joinRandomGameRoom,
+    _createView, _sendGameRoomDataToServer, _getCreatedGameRoomList, _joinRandomGameRoom,
+    _resetConfigMap, _resetStateMap, _resetWebixMap,
     showCreateGameRoomDialog, disableQuickBtn, enableQuickBtn, initModule;
+
+  _resetConfigMap = function () {
+    configMap.height = 45;
+    configMap.button_width = 200;
+  };
+
+  _resetStateMap = function () {
+    stateMap.container = null;
+    stateMap.player = {};
+    stateMap = {};
+  };
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
 
   _createView = function () {
     console.log(stateMap.player);
@@ -45,41 +60,43 @@ app.v_main_menu = (function () {
     }, mainView;
 
     mainView = {
-      id : 'main-menu', height : configMap.height, cols : [
-        {
-          id : 'make-room', view : 'button', label : '방만들기', type : 'danger', width : configMap.button_width,
-          click : function () {
-            showCreateGameRoomDialog();
-          }
-        },
-        {
-          id : 'quick-join',
-          view : 'button',
-          label : '빠른입장',
-          disabled : isGameRoomsNotExist(),
-          width : configMap.button_width,
-          click : function () {
-            _joinRandomGameRoom();
-          }
-        },
-        {
-          id : 'game-room-admin',
-          hidden : isNotAdmin(),
-          view : 'button',
-          label : '관리',
-          type : 'form',
-          width : configMap.button_width
-        },
-        {
-          width : getDynamicWidth() - configMap.button_width
-        },
-        {
-          id : 'logout', view : 'button', label : '로그아웃', type : 'danger', width : configMap.button_width,
-          click : function () {
-            app.v_shell.logout();
-          }
+      id : 'main-menu', height : configMap.height,
+      on : {
+        onDestruct : function () {
+          _resetConfigMap();
+          _resetStateMap();
+          _resetWebixMap();
         }
-      ]
+      },
+      cols : [{
+        id : 'make-room', view : 'button', label : '방만들기', type : 'danger', width : configMap.button_width,
+        click : function () {
+          showCreateGameRoomDialog();
+        }
+      }, {
+        id : 'quick-join',
+        view : 'button',
+        label : '빠른입장',
+        disabled : isGameRoomsNotExist(),
+        width : configMap.button_width,
+        click : function () {
+          _joinRandomGameRoom();
+        }
+      }, {
+        id : 'game-room-admin',
+        hidden : isNotAdmin(),
+        view : 'button',
+        label : '관리',
+        type : 'form',
+        width : configMap.button_width
+      }, {
+        width : getDynamicWidth() - configMap.button_width
+      }, {
+        id : 'logout', view : 'button', label : '로그아웃', type : 'danger', width : configMap.button_width,
+        click : function () {
+          app.v_shell.logout();
+        }
+      }]
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
@@ -140,83 +157,73 @@ app.v_main_menu = (function () {
         id : 'create-game-room-form',
         view : 'form',
         borderless : true,
-        elements : [
-          {view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요'},
-          {
-            view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요', value : 'ATTACKER',
-            options : [
-              {id : 'ATTACKER', value : '공격'},
-              {id : 'DEFENDER', value : '수비'}
-            ]
-          },
-          {
-            view : 'fieldset', label : '게임 설정', name : 'setting',
-            body : {
-              rows : [
-                {
-                  view : 'richselect',
-                  label : '숫자갯수',
-                  name : 'generationNumberCount',
-                  invalidMessage : '숫자 갯수를 정해주세요',
-                  value : 3,
-                  options : [
-                    {id : 2, value : '2 개'},
-                    {id : 3, value : '3 개'},
-                    {id : 4, value : '4 개'},
-                    {id : 5, value : '5 개'}
-                  ]
-                },
-                {
-                  view : 'richselect',
-                  label : '입력횟수',
-                  name : 'limitGuessInputCount',
-                  invalidMessage : '입력 횟수를 정해주세요',
-                  value : 10,
-                  options : [
-                    {id : 1, value : '1 회'},
-                    {id : 5, value : '5 회'},
-                    {id : 10, value : '10 회'},
-                    {id : 15, value : '15 회'},
-                    {id : 20, value : '20 회'}
-                  ]
-                },
-                {
-                  view : 'richselect',
-                  label : '입력오류횟수',
-                  name : 'limitWrongInputCount',
-                  invalidMessage : '입력 오류 횟수를 정해주세요',
-                  value : 5,
-                  options : [
-                    {id : 5, value : '5 회'},
-                    {id : 10, value : '10 회'},
-                    {id : 15, value : '15 회'},
-                    {id : 20, value : '20 회'}
-                  ]
-                }
+        elements : [{
+          view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요'
+        }, {
+          view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요', value : 'ATTACKER',
+          options : [
+            {id : 'ATTACKER', value : '공격'},
+            {id : 'DEFENDER', value : '수비'}
+          ]
+        }, {
+          view : 'fieldset', label : '게임 설정', name : 'setting',
+          body : {
+            rows : [{
+              view : 'richselect',
+              label : '숫자갯수',
+              name : 'generationNumberCount',
+              invalidMessage : '숫자 갯수를 정해주세요',
+              value : 3,
+              options : [
+                {id : 2, value : '2 개'},
+                {id : 3, value : '3 개'},
+                {id : 4, value : '4 개'},
+                {id : 5, value : '5 개'}
               ]
-            }
-          },
-          {
-            cols : [
-              {
-                view : 'button', value : '생성', type : 'form', hotkey : 'enter',
-                click : function () {
-                  if ($$('create-game-room-form').validate()) { //validate form
-                    _sendGameRoomDataToServer($$('create-game-room-form').getValues());
-                  } else {
-                    webix.message({type : 'error', text : 'Form data is invalid'});
-                  }
-                }
-              },
-              {
-                view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
-                click : function () {
-                  this.getTopParentView().close();
-                }
-              }
-            ]
+            }, {
+              view : 'richselect',
+              label : '입력횟수',
+              name : 'limitGuessInputCount',
+              invalidMessage : '입력 횟수를 정해주세요',
+              value : 10,
+              options : [
+                {id : 1, value : '1 회'},
+                {id : 5, value : '5 회'},
+                {id : 10, value : '10 회'},
+                {id : 15, value : '15 회'},
+                {id : 20, value : '20 회'}
+              ]
+            }, {
+              view : 'richselect',
+              label : '입력오류횟수',
+              name : 'limitWrongInputCount',
+              invalidMessage : '입력 오류 횟수를 정해주세요',
+              value : 5,
+              options : [
+                {id : 5, value : '5 회'},
+                {id : 10, value : '10 회'},
+                {id : 15, value : '15 회'},
+                {id : 20, value : '20 회'}
+              ]
+            }]
           }
-        ],
+        }, {
+          cols : [{
+            view : 'button', value : '생성', type : 'form', hotkey : 'enter',
+            click : function () {
+              if ($$('create-game-room-form').validate()) { //validate form
+                _sendGameRoomDataToServer($$('create-game-room-form').getValues());
+              } else {
+                webix.message({type : 'error', text : 'Form data is invalid'});
+              }
+            }
+          }, {
+            view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
+            click : function () {
+              this.getTopParentView().close();
+            }
+          }]
+        }],
         rules : {
           name : webix.rules.isNotEmpty
         },

@@ -134,9 +134,6 @@ app.v_chat = (function () {
           on : {
             onAfterRender : function () {
               webix.UIManager.setFocus(this);
-            },
-            onDestruct : function () {
-              console.log('chat destructor');
             }
           }
         }, {

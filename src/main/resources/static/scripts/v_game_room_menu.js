@@ -30,12 +30,36 @@ app.v_game_room_menu = (function () {
       button_width : 200
     }, stateMap = {
       container : null
-    }, webixMap = {}, _createView, _showOwnerChangeWindow, _showSettingChangeWindow, _sendGameRoomSettingDataToServer,
+    }, webixMap = {},
+    _createView, _showOwnerChangeWindow, _showSettingChangeWindow, _sendGameRoomSettingDataToServer,
+    _resetConfigMap, _resetStateMap, _resetWebixMap,
     configModule, initModule;
+
+  _resetConfigMap = function () {
+    configMap = {};
+    configMap.height = 45;
+    configMap.button_width = 200;
+  };
+
+  _resetStateMap = function () {
+    stateMap.container = null;
+    stateMap = {};
+  };
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
 
   _createView = function () {
     var mainView = [{
       id : 'game-room-menu', height : configMap.height,
+      on : {
+        onDestruct : function () {
+          _resetConfigMap();
+          _resetStateMap();
+          _resetWebixMap();
+        }
+      },
       cols : [{
         id : 'exit-room', view : 'button', label : '방나가기', type : 'danger', width : configMap.button_width,
         on : {

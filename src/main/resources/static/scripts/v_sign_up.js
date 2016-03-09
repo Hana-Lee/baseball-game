@@ -25,10 +25,9 @@ app.v_sign_up = (function () {
     },
     stateMap = {
       container : ''
-    }, initModule;
+    }, _createView, initModule;
 
-  initModule = function (container) {
-    stateMap.container = container;
+  _createView = function () {
     webix.ui({
       id : 'sign-up-container',
       type : 'space',
@@ -44,139 +43,116 @@ app.v_sign_up = (function () {
         width : configMap.width,
         hidden : false,
         scroll : false,
-        elements : [
-          {
-            cols : [
-              {
-                rows : [
-                  {
-                    id : 'avatar',
-                    view : 'uploader',
-                    label : '아바타사진 등록',
-                    name : 'avatar',
-                    required : false,
-                    accept : 'image/png, image/gif, image/jpg',
-                    link : 'avatar-preview',
-                    click : function (/*id, */evt) {
-                      evt.preventDefault();
+        elements : [{
+          cols : [{
+            rows : [{
+              id : 'avatar',
+              view : 'uploader',
+              label : '아바타사진 등록',
+              name : 'avatar',
+              required : false,
+              accept : 'image/png, image/gif, image/jpg',
+              link : 'avatar-preview',
+              click : function (/*id, */evt) {
+                evt.preventDefault();
 
-                      webix.alert({
-                        title : '정보',
-                        ok : '확인',
-                        text : '아바타 설정은 준비중입니다'
-                      });
-                    }
-                  },
-                  {
-                    id : 'avatar-preview',
-                    template : '<img src="images/blank_character_2.gif" height="100%" width="100%">',
-                    width : 130,
-                    height : 173
-                  }
-                ]
-              },
-              {
-                width : 10
-              },
-              {
-                rows : [
-                  {
-                    height : 25
-                  },
-                  {
-                    id : 'email',
-                    view : 'text',
-                    type : 'email',
-                    label : '이메일',
-                    name : 'email',
-                    required : true,
-                    on : {
-                      onAfterRender : function () {
-                        $$('email').focus();
-                      }
-                    }
-                  },
-                  {
-                    height : 10
-                  },
-                  {
-                    id : 'nickname', view : 'text', label : '닉네임', name : 'nickname', required : true
-                  },
-                  {
-                    height : 10
-                  },
-                  {
-                    id : 'password',
-                    view : 'text',
-                    type : 'password',
-                    label : '비번',
-                    name : 'password',
-                    required : true
-                  },
-                  {
-                    height : 10
-                  },
-                  {
-                    id : 'matching-password',
-                    view : 'text',
-                    type : 'password',
-                    label : '비번 확인',
-                    name : 'matchingPassword',
-                    required : true
-                  },
-                  {
-                    height : 10
-                  },
-                  {
-                    margin : 5,
-                    cols : [
-                      {
-                        view : 'button', value : '가입', type : 'form', hotkey : 'enter',
-                        click : function () {
-                          var result = $$('sign-up-form').validate();
+                webix.alert({
+                  title : '정보',
+                  ok : '확인',
+                  text : '아바타 설정은 준비중입니다'
+                });
+              }
+            }, {
+              id : 'avatar-preview',
+              template : '<img src="images/blank_character_2.gif" height="100%" width="100%">',
+              width : 130,
+              height : 173
+            }]
+          }, {
+            width : 10
+          }, {
+            rows : [{
+              height : 25
+            }, {
+              id : 'email',
+              view : 'text',
+              type : 'email',
+              label : '이메일',
+              name : 'email',
+              required : true,
+              on : {
+                onAfterRender : function () {
+                  $$('email').focus();
+                }
+              }
+            }, {
+              height : 10
+            }, {
+              id : 'nickname', view : 'text', label : '닉네임', name : 'nickname', required : true
+            }, {
+              height : 10
+            }, {
+              id : 'password',
+              view : 'text',
+              type : 'password',
+              label : '비번',
+              name : 'password',
+              required : true
+            }, {
+              height : 10
+            }, {
+              id : 'matching-password',
+              view : 'text',
+              type : 'password',
+              label : '비번 확인',
+              name : 'matchingPassword',
+              required : true
+            }, {
+              height : 10
+            }, {
+              margin : 5,
+              cols : [{
+                view : 'button', value : '가입', type : 'form', hotkey : 'enter',
+                click : function () {
+                  var result = $$('sign-up-form').validate();
 
-                          if (result) {
-                            webix.ajax().headers({
-                              'Content-type' : 'application/json'
-                            }).post('player',
-                              JSON.stringify(
-                                $$('sign-up-form').getValues()
-                              ),
-                              {
-                                error : function (text/*, data, XmlHttpRequest */) {
-                                  var textJson = JSON.parse(text);
-                                  webix.alert({
-                                    title : '오류',
-                                    ok : '확인',
-                                    text : textJson.message
-                                  });
-                                },
-                                success : function (/* text, data, XmlHttpRequest */) {
-                                  webix.alert({
-                                    title : '정보',
-                                    ok : '확인',
-                                    text : '가입이 완료 되었습니다'
-                                  });
-                                  app.v_shell.showLogin();
-                                }
-                              }
-                            );
-                          }
-                        }
-                      },
+                  if (result) {
+                    webix.ajax().headers({
+                      'Content-type' : 'application/json'
+                    }).post('player',
+                      JSON.stringify(
+                        $$('sign-up-form').getValues()
+                      ),
                       {
-                        view : 'button', value : '취소', type : 'danger',
-                        click : function () {
+                        error : function (text/*, data, XmlHttpRequest */) {
+                          var textJson = JSON.parse(text);
+                          webix.alert({
+                            title : '오류',
+                            ok : '확인',
+                            text : textJson.message
+                          });
+                        },
+                        success : function (/* text, data, XmlHttpRequest */) {
+                          webix.alert({
+                            title : '정보',
+                            ok : '확인',
+                            text : '가입이 완료 되었습니다'
+                          });
                           app.v_shell.showLogin();
                         }
                       }
-                    ]
+                    );
                   }
-                ]
-              }
-            ]
-          }
-        ],
+                }
+              }, {
+                view : 'button', value : '취소', type : 'danger',
+                click : function () {
+                  app.v_shell.showLogin();
+                }
+              }]
+            }]
+          }]
+        }],
         rules : {
           $obj : function (data) {
             var nicknameKey = 'nickname', emailKey = 'email',
@@ -203,6 +179,11 @@ app.v_sign_up = (function () {
         }
       }]
     });
+  };
+
+  initModule = function (container) {
+    stateMap.container = container;
+    _createView();
   };
 
   return {

@@ -26,7 +26,22 @@ app.v_player_list = (function () {
       container : null
     }, webixMap = {},
     _getLoggedInPlayers, _createView, _createTemplate, _createContextMenu, _showPlayerInfoWindow, _calculateWinRate,
+    _resetConfigMap, _resetStateMap, _resetWebixMap,
     _loggedInPlayers, initModule;
+
+  _resetConfigMap = function () {
+    configMap.height = 62;
+  };
+
+  _resetStateMap = function () {
+    stateMap.container = null;
+    stateMap.proxy = null;
+    stateMap = {};
+  };
+
+  _resetWebixMap = function () {
+    webixMap = {};
+  };
 
   _getLoggedInPlayers = function (callback) {
     var serverResponse = '';
@@ -91,6 +106,10 @@ app.v_player_list = (function () {
           if (webixMap.profile_window) {
             webixMap.profile_window.destructor();
           }
+
+          _resetConfigMap();
+          _resetStateMap();
+          _resetWebixMap();
         }
       }
     };
@@ -143,32 +162,27 @@ app.v_player_list = (function () {
       id : 'player-profile-' + playerInfo.id,
       height : 260,
       type : 'space',
-      rows : [
-        {template : nickname + '님 ( ' + email + ' )', type : 'header'},
-        {
-          cols : [
-            {template : '<img src="' + avatarImagePath + '" height="100%" width="100%">', width : 130},
-            {
-              template : '<ul style="list-style:none;padding:0;margin:0;">' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">레벨: ' + level + '</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: ' + totalScore + '점</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: ' + totalGameCnt + '전 ' + winCnt + '승 ' + loseCnt + '패</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">승률: ' + winRate + '%</li>' +
-              '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">등수: ' + totalRank + '등</li></ul>'
-            }
-          ]
-        },
-        {
-          cols : [
-            {
-              view : 'button', type : 'form', label : '닫기', hotkey : 'esc',
-              click : function () {
-                webixMap.profile_window.close();
-              }
-            }
-          ]
-        }
-      ]
+      rows : [{
+        template : nickname + '님 ( ' + email + ' )', type : 'header'
+      }, {
+        cols : [{
+          template : '<img src="' + avatarImagePath + '" height="100%" width="100%">', width : 130
+        }, {
+          template : '<ul style="list-style:none;padding:0;margin:0;">' +
+          '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">레벨: ' + level + '</li>' +
+          '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">총점: ' + totalScore + '점</li>' +
+          '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">전적: ' + totalGameCnt + '전 ' + winCnt + '승 ' + loseCnt + '패</li>' +
+          '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">승률: ' + winRate + '%</li>' +
+          '<li style="border-bottom: 1px solid lightgray;margin-bottom: 10px;">등수: ' + totalRank + '등</li></ul>'
+        }]
+      }, {
+        cols : [{
+          view : 'button', type : 'form', label : '닫기', hotkey : 'esc',
+          click : function () {
+            webixMap.profile_window.close();
+          }
+        }]
+      }]
     };
 
     webix.ui({
