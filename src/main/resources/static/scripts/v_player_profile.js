@@ -63,7 +63,7 @@ app.v_player_profile = (function () {
 
   _createView = function () {
     var mainView, makeTemplate,
-      email, nickname, avatarImagePath, level, totalScore, totalGameCnt, winCnt, loseCnt, winRate, totalRank;
+      email, nickname, avatarImagePath, level, totalScore, totalGameCnt, winCnt, loseCnt, winRate, totalRank, status;
 
     email = configMap.player_model.email;
     nickname = configMap.player_model.nickname;
@@ -75,6 +75,11 @@ app.v_player_profile = (function () {
     loseCnt = configMap.player_model.matchRecord.lose.count;
     winRate = _calculateWinRate(totalGameCnt, winCnt);
     totalRank = configMap.player_model.totalRank.value;
+    status = configMap.player_model.status;
+
+    if (!status) {
+      status = '';
+    }
 
     makeTemplate = function () {
       var result = nickname + '님';
@@ -94,7 +99,7 @@ app.v_player_profile = (function () {
       css : 'player_profile',
       height : configMap.height,
       rows : [{
-        css : 'webix_header player_profile_header',
+        css : 'webix_header player_profile_header ' + status.toLowerCase(),
         template : makeTemplate,
         type : 'header'
       }, {

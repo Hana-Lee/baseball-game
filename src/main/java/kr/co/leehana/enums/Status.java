@@ -5,5 +5,5 @@ package kr.co.leehana.enums;
  * @since 2016-02-20 21:58
  */
 public enum Status {
-	NORMAL, RUNNING
+	NORMAL, RUNNING, READY_BEFORE, READY_DONE, INPUT, INPUT_DONE
 }

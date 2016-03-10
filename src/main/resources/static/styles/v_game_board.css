@@ -1,4 +1,4 @@
-.board_container .ready_done .player_profile_header .webix_template {
+.board_container .player_profile_header.ready_done .webix_template {
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f8ffe8+0,e3f5ab+33,b7df2d+100;Green+3D+%234 */
 	background: #f8ffe8; /* Old browsers */
 	background: -moz-linear-gradient(top,  #f8ffe8 0%, #e3f5ab 33%, #b7df2d 100%); /* FF3.6-15 */

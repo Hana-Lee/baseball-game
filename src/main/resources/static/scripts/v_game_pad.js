@@ -26,8 +26,36 @@ app.v_game_pad = (function () {
       isReady : false,
       selected_num : []
     }, webixMap = {}, _createView,
-    _resetWebixMap, _resetStateMap,
+    _resetWebixMap, _resetStateMap, _sendReadyDataToServer,
     initModule, showProgressBar;
+
+  _sendReadyDataToServer = function (callback) {
+    var sendData = {
+      status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE'
+    };
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch('gameroom/ready/' + app.v_game_room.getGameRoomModel().id, JSON.stringify(sendData), {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (/*text*/) {
+        webixMap.ready_button.refresh();
+        if (stateMap.isReady) {
+          webixMap.ready_button.config.label = '취소!!';
+          callback();
+        } else {
+          webixMap.ready_button.config.label = '준비!!';
+        }
+      }
+    });
+  };
 
   _resetStateMap = function () {
     stateMap.selected_num = [];
@@ -44,15 +72,16 @@ app.v_game_pad = (function () {
       cols : [{
         width : 120,
         rows : [{
+          id : 'ready-button',
           view : 'button',
           type : 'danger',
           height : 229,
-          label : '준비!!',
+          label : stateMap.isReady ? '취소!!' : '준비!!',
           css : 'ready_btn',
           on : {
             onItemClick : function () {
-              stateMap.isReady = true;
-              showProgressBar();
+              stateMap.isReady = !stateMap.isReady;
+              _sendReadyDataToServer(showProgressBar);
             }
           }
         }]
@@ -138,6 +167,7 @@ app.v_game_pad = (function () {
     };
 
     webixMap.top = webix.ui(mainView, stateMap.container);
+    webixMap.ready_button = $$('ready-button');
   };
 
   showProgressBar = function () {
@@ -151,6 +181,9 @@ app.v_game_pad = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
+    if (app.m_player.getInfo().status === 'READY_DONE') {
+      stateMap.isReady = true;
+    }
     _createView();
   };
 

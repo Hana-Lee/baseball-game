@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -61,6 +62,7 @@ public class GameRoomController {
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
 	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
+	private static final String URL_READY_VALUE = URL_VALUE + "/ready/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
@@ -134,7 +136,7 @@ public class GameRoomController {
 		if (updateDtoHasAllFieldNullValue(updateDto)) {
 			return createErrorResponseEntity("Update fields are must not be null", null);
 		}
-		
+
 		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
 		return new ResponseEntity<>(updatedGameRoom, OK);
 	}
@@ -270,6 +272,22 @@ public class GameRoomController {
 
 		gameRoomService.update(gameRoom);
 
+		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	@NotifyClients(url = {"/topic/gameroom/{id}/updated"}, operation = {"update"})
+	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
+	public ResponseEntity ready(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Ready readyDto, BindingResult
+			bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return createErrorResponseEntity(bindingResult);
+		}
+		Player readyPlayer = getCurrentPlayer();
+		GameRoom gameRoom = gameRoomService.getById(id);
+		gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getEmail(), readyPlayer.getEmail())).findFirst()
+				.get().setStatus(readyDto.getStatus());
+
+		gameRoomService.update(gameRoom);
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 

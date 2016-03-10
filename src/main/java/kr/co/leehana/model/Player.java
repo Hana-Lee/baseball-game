@@ -3,6 +3,7 @@ package kr.co.leehana.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.enums.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -99,6 +100,9 @@ public class Player implements Serializable {
 
 	@Enumerated(EnumType.STRING)
 	private GameRole gameRole;
+
+	@Enumerated(EnumType.STRING)
+	private Status status;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull

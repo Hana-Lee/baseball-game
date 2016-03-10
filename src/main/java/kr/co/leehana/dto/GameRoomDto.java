@@ -1,6 +1,7 @@
 package kr.co.leehana.dto;
 
 import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
 import lombok.Data;
@@ -57,5 +58,11 @@ public class GameRoomDto {
 
 		@NotNull
 		private Long newOwnerId;
+	}
+
+	@Data
+	public static class Ready {
+
+		private Status status;
 	}
 }

@@ -26,7 +26,7 @@ app.v_game_board = (function () {
       events : [],
       player_container_list : []
     }, webixMap = {},
-    _createView, _makeJoinedPlayersProfile, _resetJoinedPlayersProfile,
+    _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap,
     _onUpdateGameRoomInfoHandler,
     initModule;
@@ -48,7 +48,7 @@ app.v_game_board = (function () {
 
   _onUpdateGameRoomInfoHandler = function () {
     _resetJoinedPlayersProfile();
-    _makeJoinedPlayersProfile();
+    _makePlayersProfile();
   };
 
   _createView = function () {
@@ -147,7 +147,7 @@ app.v_game_board = (function () {
     stateMap.player_container_list.push(webixMap.left_bottom_player);
     stateMap.player_container_list.push(webixMap.right_bottom_player);
 
-    _makeJoinedPlayersProfile();
+    _makePlayersProfile();
   };
 
   _resetJoinedPlayersProfile = function () {
@@ -161,7 +161,7 @@ app.v_game_board = (function () {
     });
   };
 
-  _makeJoinedPlayersProfile = function () {
+  _makePlayersProfile = function () {
     var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, i;
     playerList = app.v_game_room.getGameRoomModel().players;
     playerList.forEach(function (player) {

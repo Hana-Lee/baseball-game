@@ -4,6 +4,7 @@ import kr.co.leehana.annotation.PasswordMatches;
 import kr.co.leehana.annotation.ValidEmail;
 import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.Avatar;
 import kr.co.leehana.model.DefenderRoleCount;
@@ -59,6 +60,7 @@ public class PlayerDto {
 		private AttackerRoleCount attackerRoleCount;
 		private GameRole gameRole;
 		private Boolean admin;
+		private Status status;
 		private Date joined;
 		private Date updated;
 		private Date deleted;
