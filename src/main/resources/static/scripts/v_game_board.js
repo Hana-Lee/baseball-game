@@ -46,13 +46,18 @@ app.v_game_board = (function () {
     stateMap.player_container_list = [];
   };
 
-  _onUpdateGameRoomInfoHandler = function () {
+  _onUpdateGameRoomInfoHandler = function (operation) {
+    if (operation === 'ready' && app.v_game_room.getGameRoomModel().status === 'RUNNING') {
+      webixMap.game_progress_board.add({
+        message : '게임이 시작 되었습니다'
+      });
+    }
     _resetJoinedPlayersProfile();
     _makePlayersProfile();
   };
 
   _createView = function () {
-    var leftTopPlayer, rightTopPlayer, leftBottomPlayer, rightBottomPlayer,  mainView;
+    var leftTopPlayer, rightTopPlayer, leftBottomPlayer, rightBottomPlayer, mainView;
 
     leftTopPlayer = {
       id : 'left-top-player',
@@ -95,23 +100,19 @@ app.v_game_board = (function () {
       }, {
         id : 'game-progress-container',
         rows : [{template : '진행상황', type : 'header'}, {
+          id : 'game-progress-board',
           view : 'list',
           template : '#message#',
           data : [
             {message : '환영합니다.'},
-            {message : '2/5 대기중입니다'},
-            {message : '준비를 눌러주세요'},
-            {message : '1번째 턴!!!'},
-            {message : '숫자를 입력해주세요...'},
-            {message : '1S 0B'},
-            {message : '다른유저의 입력을 기다립니다'}
+            {message : '시작하려면 준비를 눌러주세요'}
           ],
-          ready : function () {
-            this.attachEvent('onAfterAdd', function (id) {
+          on : {
+            onAfterAdd : function (id) {
               webix.delay(function () {
                 this.showItem(id);
               }, this);
-            });
+            }
           }
         }]
       }, {
@@ -141,6 +142,7 @@ app.v_game_board = (function () {
     webixMap.left_bottom_player = $$('left-bottom-player');
     webixMap.right_top_player = $$('right-top-player');
     webixMap.right_bottom_player = $$('right-bottom-player');
+    webixMap.game_progress_board = $$('game-progress-board');
 
     stateMap.player_container_list.push(webixMap.left_top_player);
     stateMap.player_container_list.push(webixMap.right_top_player);

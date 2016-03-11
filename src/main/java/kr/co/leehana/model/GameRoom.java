@@ -81,10 +81,10 @@ public class GameRoom implements Serializable {
 
 	private Integer gameCount = 0;
 
-	private String generationNumbers;
+	@OneToOne(cascade = {PERSIST, MERGE, REMOVE, REFRESH, DETACH}, optional = true, fetch = EAGER, orphanRemoval = false)
+	@JoinColumn(name = "random_number_id")
+	private RandomNumber randomNumber;
 
-//	@OneToMany(cascade = {MERGE, REFRESH, DETACH}, fetch = EAGER, orphanRemoval = false)
-//	@MapKeyColumn(name = "player_rank")
 	@Transient
 	private Map<Integer, Player> playerRankMap = new HashMap<>();
 

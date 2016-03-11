@@ -217,7 +217,7 @@ app.v_game_room = (function () {
     app.v_game_pad.initModule(webixMap.pad_container);
 
     app.v_player_profile.configModule({
-      height: 200,
+      height : 200,
       avatar_width : 130,
       player_model : app.m_player.getInfo()
     });
@@ -274,7 +274,9 @@ app.v_game_room = (function () {
 
     stateMap.subscribeObj.push(
       app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
-        var updatedGameRoom = JSON.parse(response.body).data;
+        var responseBody = JSON.parse(response.body), updatedGameRoom = responseBody.data,
+          operation = responseBody.operation;
+
         if (configMap.game_room_model.owner.email !== updatedGameRoom.owner.email) {
           _onOwnerChangeHandler(updatedGameRoom);
         }
@@ -283,7 +285,7 @@ app.v_game_room = (function () {
 
         _updateGameRoomTitle();
 
-        webix.callEvent(EVENT_UPDATE_GAME_ROOM_INFO, []);
+        webix.callEvent(EVENT_UPDATE_GAME_ROOM_INFO, [operation]);
       }, header)
     );
     _createView();

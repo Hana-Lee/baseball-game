@@ -266,7 +266,7 @@ app.v_main_menu = (function () {
 
     webix.ajax().headers({
       'Content-Type' : 'application/json'
-    }).post(url, dataString, {
+    }).patch(url, dataString, {
       error : function (text) {
         console.log(text);
         var textJson = JSON.parse(text);

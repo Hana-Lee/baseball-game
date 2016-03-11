@@ -63,6 +63,8 @@ public class GameRoomDto {
 	@Data
 	public static class Ready {
 
+		@NotNull
 		private Status status;
+		private String number;
 	}
 }

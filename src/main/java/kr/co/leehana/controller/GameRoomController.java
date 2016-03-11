@@ -8,13 +8,17 @@ import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
+import kr.co.leehana.exception.GameRoomRunningException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayerNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayersNotEmpty;
 import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
+import kr.co.leehana.model.AttackerRoleCount;
+import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
+import kr.co.leehana.model.RandomNumber;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
@@ -61,19 +65,24 @@ public class GameRoomController {
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
-	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change/owner/{id}";
+	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change-owner/{id}";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
 	private static final String URL_READY_VALUE = URL_VALUE + "/ready/{id}";
+	private static final String URL_SET_RANDOM_NUMBER_VALUE = URL_VALUE + "/random-number/{id}";
+	private static final String URL_ALL_READY_DONE_VALUE = URL_VALUE + "/gameroom/all-ready-done/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
 	private final ModelMapper modelMapper;
+	private final GenerationNumberStrategy generationNumberStrategy;
 
 	@Autowired
-	public GameRoomController(GameRoomService gameRoomService, PlayerService playerService, ModelMapper modelMapper) {
+	public GameRoomController(GameRoomService gameRoomService, PlayerService playerService, ModelMapper modelMapper,
+	                          GenerationNumberStrategy generationNumberStrategy) {
 		this.gameRoomService = gameRoomService;
 		this.playerService = playerService;
 		this.modelMapper = modelMapper;
+		this.generationNumberStrategy = generationNumberStrategy;
 	}
 
 	/*
@@ -110,6 +119,7 @@ public class GameRoomController {
 				.getPrincipal();
 		PlayerDto.Update playerUpdateDto = new PlayerDto.Update();
 		playerUpdateDto.setGameRole(createDto.getGameRole());
+		playerUpdateDto.setStatus(Status.READY_BEFORE);
 		createDto.setOwner(playerService.updateByEmail(owner.getEmail(), playerUpdateDto));
 	}
 
@@ -156,7 +166,7 @@ public class GameRoomController {
 
 	@NotifyClients(
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
-			operation = {"update", "update", "delete"})
+			operation = {"update", "join", "delete"})
 	@RequestMapping(value = {URL_JOIN_VALUE}, method = {PATCH})
 	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
 			bindingResult) {
@@ -165,6 +175,10 @@ public class GameRoomController {
 		}
 
 		GameRoom gameRoom = gameRoomService.getById(id);
+
+		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
+			throw new GameRoomRunningException("Do not join already running game room");
+		}
 
 		if (joinDto.getGameRole().equals(GameRole.DEFENDER)) {
 			Long defenderCount = gameRoom.getPlayers().stream().filter(p -> p.getGameRole().equals(GameRole.DEFENDER))
@@ -178,6 +192,13 @@ public class GameRoomController {
 				.getPrincipal();
 		Player joinPlayer = playerService.getByEmail(joinPlayerImpl.getEmail());
 		joinPlayer.setGameRole(joinDto.getGameRole());
+		joinPlayer.setStatus(Status.READY_BEFORE);
+
+		if (joinPlayer.getGameRole().equals(GameRole.DEFENDER)) {
+			joinPlayer.setDefenderRoleCount(new DefenderRoleCount(joinPlayer.getDefenderRoleCount().getValue() + 1));
+		} else if (joinPlayer.getGameRole().equals(GameRole.ATTACKER)) {
+			joinPlayer.setAttackerRoleCount(new AttackerRoleCount(joinPlayer.getAttackerRoleCount().getValue() + 1));
+		}
 
 		gameRoom.getPlayers().add(joinPlayer);
 
@@ -188,7 +209,7 @@ public class GameRoomController {
 
 	@NotifyClients(
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated"},
-			operation = {"update", "update"})
+			operation = {"update", "changeOwner"})
 	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
 	public ResponseEntity changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
 			changeOwnerDto, BindingResult bindingResult) {
@@ -220,6 +241,10 @@ public class GameRoomController {
 	public ResponseEntity leaveAndDelete(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
 
+		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
+			throw new GameRoomRunningException("Game room still running");
+		}
+
 		Player player = getCurrentPlayer();
 
 		if (!gameRoom.getPlayers().contains(player)) {
@@ -227,6 +252,7 @@ public class GameRoomController {
 		}
 
 		player.setGameRole(null);
+		player.setStatus(null);
 
 		gameRoom.getPlayers().remove(player);
 
@@ -242,10 +268,15 @@ public class GameRoomController {
 
 	@NotifyClients(
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
-			operation = {"update", "update", "insert"})
+			operation = {"update", "leave", "insert"})
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {PATCH})
 	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
+
+		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
+			throw new GameRoomRunningException("Game room still running");
+		}
+
 		Player player = getCurrentPlayer();
 
 		if (!gameRoom.getPlayers().contains(player)) {
@@ -253,6 +284,7 @@ public class GameRoomController {
 		}
 
 		player.setGameRole(null);
+		player.setStatus(null);
 
 		gameRoom.getPlayers().remove(player);
 
@@ -276,25 +308,51 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@NotifyClients(url = {"/topic/gameroom/{id}/updated"}, operation = {"update"})
+	@NotifyClients(url = {"/topic/gameroom/{id}/updated"}, operation = {"ready"})
 	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
-	public ResponseEntity ready(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Ready readyDto, BindingResult
-			bindingResult) {
+	public ResponseEntity readyAndSetNumber(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Ready readyDto,
+	                                        BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return createErrorResponseEntity(bindingResult);
 		}
-		Player readyPlayer = getCurrentPlayer();
 		GameRoom gameRoom = gameRoomService.getById(id);
+
+		if (gameRoom.getStatus().equals(Status.RUNNING)) {
+			throw new GameRoomRunningException("Game room is already running");
+		}
+
+		Player readyPlayer = getCurrentPlayer();
 		gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getEmail(), readyPlayer.getEmail())).findFirst()
 				.get().setStatus(readyDto.getStatus());
 
-		if (gameRoom.getPlayers().stream().filter(p -> p.getStatus().equals(Status.READY_DONE)).count() == gameRoom
-				.getPlayers().size()) {
-			gameRoom.setStatus(Status.ALL_READY_DONE);
+		if (isAllPlayersReadyDone(gameRoom)) {
+			makeRandomNumber(gameRoom, readyDto, readyPlayer);
+			gameRoom.setGameCount(gameRoom.getGameCount() + 1);
+			gameRoom.setStatus(Status.RUNNING);
+		} else {
+			gameRoom.setStatus(Status.NORMAL);
 		}
 
 		gameRoomService.update(gameRoom);
 		return new ResponseEntity<>(gameRoom, OK);
+	}
+
+	private boolean isAllPlayersReadyDone(GameRoom gameRoom) {
+		return gameRoom.getPlayers().stream().filter(p -> Status.READY_DONE.equals(p.getStatus())).count() == gameRoom
+				.getPlayers().size();
+	}
+
+	private void makeRandomNumber(GameRoom gameRoom, GameRoomDto.Ready readyDto, Player currentPlayer) {
+		if (isDefenderPlayer(gameRoom, currentPlayer) && StringUtils.isNotBlank(readyDto.getNumber())) {
+			gameRoom.setRandomNumber(new RandomNumber(readyDto.getNumber()));
+		} else {
+			gameRoom.setRandomNumber(new RandomNumber(generationNumberStrategy.generate(gameRoom.getSetting())));
+		}
+	}
+
+	private boolean isDefenderPlayer(GameRoom gameRoom, Player currentPlayer) {
+		return gameRoom.getPlayers().stream().filter(p -> GameRole.DEFENDER.equals(p.getGameRole()) && p.getEmail()
+				.equals(currentPlayer.getEmail())).count() > 0;
 	}
 
 	private Player getCurrentPlayer() {
@@ -367,6 +425,11 @@ public class GameRoomController {
 	@ExceptionHandler(GameRoomPlayersNotEmpty.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoomPlayersNotEmptyException(GameRoomPlayersNotEmpty ex) {
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
+	}
+
+	@ExceptionHandler(GameRoomRunningException.class)
+	public ErrorResponse handleGameRoomAlreadyRunningException(GameRoomRunningException ex) {
 		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
 	}
 

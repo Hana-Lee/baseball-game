@@ -79,6 +79,7 @@ public class PlayerDto {
 		private DefenderRoleCount defenderRoleCount;
 		private AttackerRoleCount attackerRoleCount;
 		private GameRole gameRole;
+		private Status status;
 	}
 
 	@Data

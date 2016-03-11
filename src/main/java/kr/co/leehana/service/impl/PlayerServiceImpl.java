@@ -111,32 +111,45 @@ public class PlayerServiceImpl implements PlayerService {
 	}
 
 	private Player update(PlayerDto.Update updateDto, Player player) {
-		if (updateDto.getEmail() != null)
+		if (updateDto.getEmail() != null) {
 			player.setEmail(updateDto.getEmail());
+		}
 
-		if (updateDto.getNickname() != null)
+		if (updateDto.getNickname() != null) {
 			player.setNickname(updateDto.getNickname());
+		}
 
-		if (updateDto.getPassword() != null)
+		if (updateDto.getPassword() != null) {
 			player.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+		}
 
-		if (updateDto.getLevel() != null)
+		if (updateDto.getLevel() != null) {
 			player.setLevel(updateDto.getLevel());
+		}
 
-		if (updateDto.getMatchRecord() != null)
+		if (updateDto.getMatchRecord() != null) {
 			player.setMatchRecord(updateDto.getMatchRecord());
+		}
 
-		if (updateDto.getTotalRank() != null)
+		if (updateDto.getTotalRank() != null) {
 			player.setTotalRank(updateDto.getTotalRank());
+		}
 
-		if (updateDto.getAttackerRoleCount() != null)
+		if (updateDto.getAttackerRoleCount() != null) {
 			player.setAttackerRoleCount(updateDto.getAttackerRoleCount());
+		}
 
-		if (updateDto.getDefenderRoleCount() != null)
+		if (updateDto.getDefenderRoleCount() != null) {
 			player.setDefenderRoleCount(updateDto.getDefenderRoleCount());
+		}
 
-		if (updateDto.getGameRole() != null)
+		if (updateDto.getGameRole() != null) {
 			player.setGameRole(updateDto.getGameRole());
+		}
+
+		if (updateDto.getStatus() != null) {
+			player.setStatus(updateDto.getStatus());
+		}
 
 		player.setUpdated(new Date());
 
