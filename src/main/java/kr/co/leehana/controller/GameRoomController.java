@@ -5,6 +5,7 @@ import kr.co.leehana.annotation.NotifyClients;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.enums.GameRole;
+import kr.co.leehana.enums.Status;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
 import kr.co.leehana.exception.GameRoomNotFoundException;
@@ -286,6 +287,11 @@ public class GameRoomController {
 		GameRoom gameRoom = gameRoomService.getById(id);
 		gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getEmail(), readyPlayer.getEmail())).findFirst()
 				.get().setStatus(readyDto.getStatus());
+
+		if (gameRoom.getPlayers().stream().filter(p -> p.getStatus().equals(Status.READY_DONE)).count() == gameRoom
+				.getPlayers().size()) {
+			gameRoom.setStatus(Status.ALL_READY_DONE);
+		}
 
 		gameRoomService.update(gameRoom);
 		return new ResponseEntity<>(gameRoom, OK);
