@@ -278,6 +278,7 @@ app.v_game_room = (function () {
         if (configMap.game_room_model.owner.email !== updatedGameRoom.owner.email) {
           _onOwnerChangeHandler(updatedGameRoom);
         }
+
         configMap.game_room_model = updatedGameRoom;
 
         _updateGameRoomTitle();
