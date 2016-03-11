@@ -21,15 +21,25 @@ app.v_game_pad = (function () {
   'use strict';
 
   var
+    configMap = {
+      settable_map : {
+        input_delay : null
+      },
+      input_delay : 25000
+    },
     stateMap = {
       container : null,
       isReady : false,
-      selected_num : []
-    }, webixMap = {}, _createView,
-    _resetWebixMap, _resetStateMap, _sendReadyDataToServer,
-    initModule, showProgressBar;
+      selected_num : [],
+      events : [],
+      input_count : 0,
+      progress_timer : -1
+    }, webixMap = {},
+    _createView, _showMakeNumberWindow,
+    _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _updateGameRoomInfo,
+    initModule, _showProgressBar, _hideProgressBar;
 
-  _sendReadyDataToServer = function (callback) {
+  _sendReadyDataToServer = function () {
     var sendData = {
       status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE'
     };
@@ -46,24 +56,95 @@ app.v_game_pad = (function () {
         });
       },
       success : function (/*text*/) {
-        webixMap.ready_button.refresh();
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
-          callback();
+          webixMap.ready_button.refresh();
         } else {
           webixMap.ready_button.config.label = '준비!!';
+          webixMap.ready_button.refresh();
         }
       }
     });
   };
 
   _resetStateMap = function () {
+    stateMap.events.forEach(function (event) {
+      webix.detachEvent(event);
+    });
+
+    stateMap.events = [];
+
+    if (stateMap.progress_timer) {
+      clearInterval(stateMap.progress_timer);
+      stateMap.progress_timer = -1;
+    }
+    stateMap.input_count = 0;
     stateMap.selected_num = [];
     stateMap.isReady = false;
   };
 
   _resetWebixMap = function () {
     webixMap = {};
+  };
+
+  _showMakeNumberWindow = function () {
+    webix.ui({
+      id : 'make-number-window',
+      view : 'window',
+      head : '숫자 생성 (' + app.v_game_room.getGameRoomModel().setting.generationNumberCount + '자리)',
+      modal : true,
+      height : 300,
+      width : 200,
+      position : 'center',
+      body : {
+        id : 'make-number-form',
+        view : 'form',
+        rules : {
+          'random-number' : function (value) {
+            console.log(value);
+            return false;
+          }
+        },
+        elements : [{
+          rows : [{
+            view : 'text',
+            name : 'random-number',
+            label : '생성숫자',
+            validateMessage : '입력을 확인해주세요',
+            attributes : {
+              maxlength : app.v_game_room.getGameRoomModel().setting.generationNumberCount,
+              required : true
+            }
+          }, {
+            cols : [{
+              view : 'button',
+              value : '생성',
+              type : 'form',
+              hotkey : 'enter',
+              on : {
+                onItemClick : function () {
+                  if ($$('make-number-form').validate()) {
+                    webixMap.make_number_window.close();
+                  }
+                }
+              }
+            }, {
+              view : 'button',
+              value : '취소',
+              type : 'danger',
+              hotkey : 'esc',
+              on : {
+                onItemClick : function () {
+                  webixMap.make_number_window.close();
+                }
+              }
+            }]
+          }]
+        }]
+      }
+    }).show();
+
+    webixMap.make_number_window = $$('make-number-window');
   };
 
   _createView = function () {
@@ -80,8 +161,19 @@ app.v_game_pad = (function () {
           css : 'ready_btn',
           on : {
             onItemClick : function () {
+              if (stateMap.isReady) {
+                clearInterval(stateMap.progress_timer);
+                _hideProgressBar();
+                stateMap.progress_timer = -1;
+              }
+
               stateMap.isReady = !stateMap.isReady;
-              _sendReadyDataToServer(showProgressBar);
+
+              if (stateMap.isReady && app.m_player.getInfo().gameRole === 'DEFENDER') {
+                _showMakeNumberWindow();
+              } else {
+                _sendReadyDataToServer();
+              }
             }
           }
         }]
@@ -170,13 +262,43 @@ app.v_game_pad = (function () {
     webixMap.ready_button = $$('ready-button');
   };
 
-  showProgressBar = function () {
+  _showProgressBar = function () {
+    stateMap.input_count++;
+    // TODO stateMap.input_count 번째 입력이라는 알림 보내기
+
     $$('game-pad').showProgress({
       type : 'top',
-      delay : 25000,
-      hide : false,
+      delay : configMap.input_delay,
+      hide : true,
       position : 0
     });
+
+    if (stateMap.input_count === app.v_game_room.getGameRoomModel().setting.limitGuessInputCount) {
+      clearInterval(stateMap.progress_timer);
+      stateMap.progress_timer = -1;
+      // TODO 게임 입력 횟수 초과로 게임 종료 알림 보내기
+    }
+  };
+
+  _hideProgressBar = function () {
+    $$('game-pad').hideProgress();
+  };
+
+  _updateGameRoomInfo = function (operation) {
+    if (operation === 'ready') {
+      if (app.v_game_room.getGameRoomModel().status === 'RUNNING') {
+        _showProgressBar();
+        stateMap.progress_timer = setInterval(_showProgressBar, configMap.input_delay + 100);
+        webixMap.ready_button.disable();
+      } else if (app.v_game_room.getGameRoomModel().status === 'NORMAL') {
+        if (stateMap.progress_timer) {
+          clearInterval(stateMap.progress_timer);
+          _hideProgressBar();
+        }
+
+        webixMap.ready_button.enable();
+      }
+    }
   };
 
   initModule = function (container) {
@@ -185,6 +307,8 @@ app.v_game_pad = (function () {
       stateMap.isReady = true;
     }
     _createView();
+
+    stateMap.events.push(webix.attachEvent(app.v_game_room.EVENT_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfo));
   };
 
   return {

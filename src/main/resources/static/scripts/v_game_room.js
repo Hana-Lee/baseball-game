@@ -35,7 +35,7 @@ app.v_game_room = (function () {
     }, webixMap = {},
     _createView, _onOwnerChangeHandler, _resetWebixMap, _resetConfigMap, _resetStateMap,
     _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
-    configModule, initModule, destructor, getGameRoomModel;
+    configModule, initModule, destructor, getGameRoomModel, leaveAndGameRoomDelete, leaveGameRoom;
 
   _resetWebixMap = function () {
     webixMap = {};
@@ -168,50 +168,6 @@ app.v_game_room = (function () {
     webixMap.chat_container = $$('game-room-chat-container');
     webixMap.title = $$('game-room-title');
 
-    stateMap.webix_events.push(webix.attachEvent('onLeaveGameRoom', function () {
-      webix.ajax().headers({
-        'Content-Type' : 'application/json'
-      }).patch('gameroom/leave/' + configMap.game_room_model.id, {}, {
-        error : function (text) {
-          console.log(text);
-          var textJson = JSON.parse(text);
-          webix.alert({
-            title : '오류',
-            ok : '확인',
-            text : textJson.message
-          });
-        },
-        success : function (text) {
-          console.log(text);
-          var from = 'game-room';
-          app.m_player.getInfo().gameRole = null;
-          app.v_shell.showMainBoard(from);
-        }
-      });
-    }));
-
-    stateMap.webix_events.push(webix.attachEvent('onLeaveAndGameRoomDelete', function () {
-      webix.ajax().headers({
-        'Content-Type' : 'application/json'
-      }).del('gameroom/leave/' + configMap.game_room_model.id, {}, {
-        error : function (text) {
-          console.log(text);
-          var textJson = JSON.parse(text);
-          webix.alert({
-            title : '오류',
-            ok : '확인',
-            text : textJson.message
-          });
-        },
-        success : function (text) {
-          console.log(text);
-          var from = 'game-room';
-          app.m_player.getInfo().gameRole = null;
-          app.v_shell.showMainBoard(from);
-        }
-      });
-    }));
-
     app.v_game_room_menu.initModule(webixMap.menu_container);
     app.v_game_board.initModule(webixMap.board_container);
     app.v_game_pad.initModule(webixMap.pad_container);
@@ -299,11 +255,57 @@ app.v_game_room = (function () {
     return configMap.game_room_model;
   };
 
+  leaveAndGameRoomDelete = function () {
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).del('gameroom/leave/' + configMap.game_room_model.id, {}, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        console.log(text);
+        var from = 'game-room';
+        app.m_player.getInfo().gameRole = null;
+        app.v_shell.showMainBoard(from);
+      }
+    });
+  };
+
+  leaveGameRoom = function () {
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch('gameroom/leave/' + configMap.game_room_model.id, {}, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        console.log(text);
+        var from = 'game-room';
+        app.m_player.getInfo().gameRole = null;
+        app.v_shell.showMainBoard(from);
+      }
+    });
+  };
+
   return {
     EVENT_UPDATE_GAME_ROOM_INFO : EVENT_UPDATE_GAME_ROOM_INFO,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,
-    getGameRoomModel : getGameRoomModel
+    getGameRoomModel : getGameRoomModel,
+    leaveAndGameRoomDelete : leaveAndGameRoomDelete,
+    leaveGameRoom : leaveGameRoom
   };
 }());

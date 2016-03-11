@@ -67,10 +67,10 @@ app.v_game_room_menu = (function () {
             var gameRoomModel = app.v_game_room.getGameRoomModel();
             if (gameRoomModel.players.length === 1) {
               if (gameRoomModel.players[0].email === app.m_player.getInfo().email) {
-                webix.callEvent('onLeaveAndGameRoomDelete', []);
+                app.v_game_room.leaveAndGameRoomDelete();
               }
             } else {
-              webix.callEvent('onLeaveGameRoom', []);
+              app.v_game_room.leaveGameRoom();
             }
           }
         }

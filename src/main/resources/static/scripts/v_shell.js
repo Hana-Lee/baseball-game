@@ -132,6 +132,11 @@ app.v_shell = (function () {
         if (callback) {
           callback();
         }
+        stateMap.stomp_client.subscribe('/topic/player/updated', function (response) {
+          console.log('player updated', response);
+          var player = JSON.parse(response).data;
+          app.m_player.initModule(player);
+        }, {});
       },
       function (error) {
         console.log(error);

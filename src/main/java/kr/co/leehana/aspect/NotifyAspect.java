@@ -2,6 +2,7 @@ package kr.co.leehana.aspect;
 
 import kr.co.leehana.annotation.NotifyClients;
 import kr.co.leehana.dto.MessagingDto;
+import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.PlayerService;
@@ -63,8 +64,12 @@ public class NotifyAspect {
 				} else {
 					messagingDto.setData(responseEntity.getBody());
 				}
-				messagingDto.setOperation(operation[i]);
+			} else if (returnValue instanceof PlayerDto.Response) {
+				PlayerDto.Response responseDto = (PlayerDto.Response) returnValue;
+				messagingDto.setData(responseDto);
 			}
+
+			messagingDto.setOperation(operation[i]);
 
 			String url;
 			if (topicUrl[i].contains("{id}")) {

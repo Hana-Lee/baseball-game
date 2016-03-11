@@ -166,6 +166,7 @@ app.v_game_list = (function () {
       },
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
+        app.m_player.getInfo().gameRole = selectedGameRole;
         app.v_shell.showGameRoom(joinedGameRoom);
       }
     });
