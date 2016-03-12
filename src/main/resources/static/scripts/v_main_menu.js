@@ -158,7 +158,11 @@ app.v_main_menu = (function () {
         view : 'form',
         borderless : true,
         elements : [{
-          id : 'game-room-name-field', view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요',
+          id : 'game-room-name-field', view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력 오류입니다',
+          required : true,
+          attributes : {
+            minlength : 2
+          },
           on : {
             onAfterRender : function () {
               webix.delay(function () {
@@ -233,7 +237,22 @@ app.v_main_menu = (function () {
           }]
         }],
         rules : {
-          name : webix.rules.isNotEmpty
+          name : function (value) {
+            var result = false, invalidMessage;
+            if (webix.rules.isEmpty(value)) {
+              invalidMessage = '이름이 비었습니다';
+            } else if (value.length < 2) {
+              invalidMessage = '이름은 2글자 이상이어야 합니다';
+            } else {
+              result = true;
+            }
+
+            if (invalidMessage && !result) {
+              webixMap.game_room_name_field.config.invalidMessage = invalidMessage;
+            }
+
+            return result;
+          }
         },
         elementsConfig : {
           labelPosition : 'left'
