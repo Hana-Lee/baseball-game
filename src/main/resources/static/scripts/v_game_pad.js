@@ -88,10 +88,11 @@ app.v_game_pad = (function () {
   };
 
   _showMakeNumberWindow = function () {
+    var numberCount = app.v_game_room.getGameRoomModel().setting.generationNumberCount;
     webix.ui({
       id : 'make-number-window',
       view : 'window',
-      head : '숫자 생성 (' + app.v_game_room.getGameRoomModel().setting.generationNumberCount + '자리)',
+      head : '게임 숫자 생성 (' + numberCount + '자리)',
       modal : true,
       height : 300,
       width : 200,
@@ -101,18 +102,38 @@ app.v_game_pad = (function () {
         view : 'form',
         rules : {
           'random-number' : function (value) {
-            console.log(value);
-            return false;
+            var valid = false, invalidMessage;
+
+            if (webix.rules.isEmpty(value) === true) {
+              invalidMessage = '입력이 없습니다';
+            } else if (webix.rules.isNumber(value) === false) {
+              invalidMessage = '숫자만 입력가능';
+            } else if (webix.rules.isInputCountCorrect(value, numberCount) === false) {
+              invalidMessage = '숫자 갯수 확인';
+            } else if (webix.rules.containsSameNumber(value) === true) {
+              invalidMessage = '중복 숫자는 불가';
+            } else {
+              valid = true;
+            }
+
+            if (invalidMessage && !valid) {
+              webixMap.game_number_field.config.invalidMessage = invalidMessage;
+              webix.message(invalidMessage, 'error', 2000);
+            }
+
+            return valid;
           }
         },
         elements : [{
           rows : [{
+            id : 'game-number-field',
             view : 'text',
             name : 'random-number',
-            label : '생성숫자',
-            validateMessage : '입력을 확인해주세요',
+            label : '게임숫자',
+            invalidMessage : '입력을 확인해주세요',
+            required : true,
             attributes : {
-              maxlength : app.v_game_room.getGameRoomModel().setting.generationNumberCount,
+              maxlength : numberCount,
               required : true
             }
           }, {
@@ -125,6 +146,8 @@ app.v_game_pad = (function () {
                 onItemClick : function () {
                   if ($$('make-number-form').validate()) {
                     webixMap.make_number_window.close();
+                  } else {
+                    webixMap.game_number_field.focus();
                   }
                 }
               }
@@ -135,6 +158,7 @@ app.v_game_pad = (function () {
               hotkey : 'esc',
               on : {
                 onItemClick : function () {
+                  stateMap.isReady = false;
                   webixMap.make_number_window.close();
                 }
               }
@@ -145,6 +169,8 @@ app.v_game_pad = (function () {
     }).show();
 
     webixMap.make_number_window = $$('make-number-window');
+    webixMap.game_number_field = $$('game-number-field');
+    webixMap.game_number_field.focus();
   };
 
   _createView = function () {

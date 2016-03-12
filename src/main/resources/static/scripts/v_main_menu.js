@@ -158,7 +158,14 @@ app.v_main_menu = (function () {
         view : 'form',
         borderless : true,
         elements : [{
-          view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요'
+          id : 'game-room-name-field', view : 'text', label : '이름', name : 'name', invalidMessage : '이름을 입력해주세요',
+          on : {
+            onAfterRender : function () {
+              webix.delay(function () {
+                webixMap.game_room_name_field.focus();
+              }, this);
+            }
+          }
         }, {
           view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요', value : 'ATTACKER',
           options : [
@@ -211,10 +218,11 @@ app.v_main_menu = (function () {
           cols : [{
             view : 'button', value : '생성', type : 'form', hotkey : 'enter',
             click : function () {
-              if ($$('create-game-room-form').validate()) { //validate form
+              if ($$('create-game-room-form').validate()) {
                 _sendGameRoomDataToServer($$('create-game-room-form').getValues());
               } else {
-                webix.message({type : 'error', text : 'Form data is invalid'});
+                webix.message({type : 'error', text : '오류가 있습니다.'});
+                webixMap.game_room_name_field.focus();
               }
             }
           }, {
@@ -234,6 +242,7 @@ app.v_main_menu = (function () {
     }).show();
 
     webixMap.create_game_room_window = $$('create-game-room-window');
+    webixMap.game_room_name_field = $$('game-room-name-field');
   };
 
   _getCreatedGameRoomList = function (callback) {

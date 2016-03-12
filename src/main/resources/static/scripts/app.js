@@ -21,7 +21,7 @@ var app = (function () {
   'use strict';
   var stateMap = {
     container : null
-  }, initModule, _registerWebixStompProxy, _registerWebixAjaxMethod;
+  }, initModule, _registerWebixStompProxy, _registerWebixAjaxMethod, _extendWebixRules;
 
   _registerWebixStompProxy = function () {
     webix.proxy.stomp = {
@@ -90,11 +90,63 @@ var app = (function () {
     };
   };
 
+  _extendWebixRules = function () {
+    webix.extend(webix.rules, {
+      /**
+       * 입력된 값이 비었는지 확인 한다
+       * @param {String} value 사용자 입력 값
+       * @returns {Boolean} 값이 비었으면 true
+       */
+      isEmpty : function (value) {
+        return (value === undefined || value === null || value.replace(/\s/g, '') === '');
+      },
+      /**
+       * 입력된 값이 비어있지 않은지 확인 한다
+       *
+       * @param {String} value 사용자 입력 값
+       * @returns {Boolean} 입력값이 비었으면 false
+       */
+      isNotEmpty : function (value) {
+        return (value !== undefined && value !== null && value.replace(/\s/g, '') !== '');
+      },
+      /**
+       * 중복된 숫자가 있는지 확인 한다.
+       *
+       * @param {String} value 사용자 입력 값
+       * @returns {Boolean} 중복된 숫자가 있으면 true, 없으면 false
+       */
+      containsSameNumber : function (value) {
+        var valueList, result = false, temp = {};
+        value = value.replace(/\s/g, '');
+        valueList = value.split('');
+        valueList.forEach(function (v) {
+          temp[v] = v;
+        });
+
+        if (Object.keys(temp).length < value.length) {
+          result = true;
+        }
+
+        return result;
+      },
+      /**
+       * 입력된 값의 길이가 설정된 값이랑 동일한지 확인한다
+       * @param {String} value 사용자 입력 값
+       * @param {Number} correctCount 비교할 숫자
+       * @return {Boolean} 사용자 입력값의 갯수와 비교대상의 수가 같으면 true
+       */
+      isInputCountCorrect : function (value, correctCount) {
+        return value.length === correctCount;
+      }
+    }, true);
+  };
+
   initModule = function (container) {
     stateMap.container = container;
 
     _registerWebixStompProxy();
     _registerWebixAjaxMethod();
+    _extendWebixRules();
 
     app.v_shell.initModule(stateMap.container);
   };
