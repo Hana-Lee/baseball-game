@@ -30,7 +30,7 @@ app.v_main_menu = (function () {
       },
       game_room_list : []
     }, webixMap = {},
-    _createView, _sendGameRoomDataToServer, _getCreatedGameRoomList, _joinRandomGameRoom,
+    _createView, _getCreatedGameRoomList,
     _resetConfigMap, _resetStateMap, _resetWebixMap,
     showCreateGameRoomDialog, disableQuickBtn, enableQuickBtn, initModule;
 
@@ -80,7 +80,7 @@ app.v_main_menu = (function () {
         disabled : isGameRoomsNotExist(),
         width : configMap.button_width,
         click : function () {
-          _joinRandomGameRoom();
+          app.v_shell.joinRandomGameRoom();
         }
       }, {
         id : 'game-room-admin',
@@ -102,46 +102,6 @@ app.v_main_menu = (function () {
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('main-menu');
     webixMap.quick_join_btn = $$('quick-join');
-  };
-
-  _sendGameRoomDataToServer = function (data) {
-    var sendData = {
-      name : data.name,
-      gameRole : data.gameRole,
-      setting : {
-        generationNumberCount : data.generationNumberCount,
-        limitGuessInputCount : data.limitGuessInputCount,
-        limitWrongInputCount : data.limitWrongInputCount
-      }
-    };
-
-    sendData = JSON.stringify(sendData);
-
-    webix.ajax().headers({
-      'Content-Type' : 'application/json'
-    }).post('gameroom', sendData, {
-      error : function (text) {
-        console.log(text);
-        var textJson = JSON.parse(text);
-        webix.alert({
-          title : '오류',
-          ok : '확인',
-          text : textJson.message
-        });
-
-        if (webixMap.create_game_room_window) {
-          webixMap.create_game_room_window.close();
-        }
-      },
-      success : function (text) {
-        var gameRoomJson = JSON.parse(text);
-        if (webixMap.create_game_room_window) {
-          webixMap.create_game_room_window.close();
-        }
-        app.m_player.getInfo().gameRole = gameRoomJson.owner.gameRole;
-        app.v_shell.showGameRoom(gameRoomJson);
-      }
-    });
   };
 
   showCreateGameRoomDialog = function () {
@@ -223,7 +183,9 @@ app.v_main_menu = (function () {
             view : 'button', value : '생성', type : 'form', hotkey : 'enter',
             click : function () {
               if ($$('create-game-room-form').validate()) {
-                _sendGameRoomDataToServer($$('create-game-room-form').getValues());
+                app.v_shell.createGameRoom($$('create-game-room-form').getValues());
+
+                $$('create-game-room-window').close();
               } else {
                 webix.message({type : 'error', text : '오류가 있습니다.'});
                 webixMap.game_room_name_field.focus();
@@ -260,7 +222,6 @@ app.v_main_menu = (function () {
       }
     }).show();
 
-    webixMap.create_game_room_window = $$('create-game-room-window');
     webixMap.game_room_name_field = $$('game-room-name-field');
   };
 
@@ -275,39 +236,6 @@ app.v_main_menu = (function () {
         var serverResponse = JSON.parse(text);
         stateMap.game_room_list = serverResponse.content;
         callback();
-      }
-    });
-  };
-
-  _joinRandomGameRoom = function () {
-    var url, data, dataString, randomGameRoomIndex, selectedGameRoom;
-
-    data = {
-      gameRole : 'ATTACKER'
-    };
-    dataString = JSON.stringify(data);
-
-    randomGameRoomIndex = Math.floor(Math.random() * stateMap.game_room_list.length);
-    selectedGameRoom = stateMap.game_room_list[randomGameRoomIndex];
-
-    url = 'gameroom/join/' + selectedGameRoom.id;
-
-    webix.ajax().headers({
-      'Content-Type' : 'application/json'
-    }).patch(url, dataString, {
-      error : function (text) {
-        console.log(text);
-        var textJson = JSON.parse(text);
-        webix.alert({
-          title : '오류',
-          ok : '확인',
-          text : textJson.message
-        });
-      },
-      success : function (text) {
-        var joinedGameRoom = JSON.parse(text);
-        app.m_player.getInfo().gameRole = data.gameRole;
-        app.v_shell.showGameRoom(joinedGameRoom);
       }
     });
   };

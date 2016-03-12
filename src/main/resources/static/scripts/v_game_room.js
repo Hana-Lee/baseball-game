@@ -253,57 +253,11 @@ app.v_game_room = (function () {
     return configMap.game_room_model;
   };
 
-  leaveAndGameRoomDelete = function () {
-    webix.ajax().headers({
-      'Content-Type' : 'application/json'
-    }).del('gameroom/leave/' + configMap.game_room_model.id, {}, {
-      error : function (text) {
-        console.log(text);
-        var textJson = JSON.parse(text);
-        webix.alert({
-          title : '오류',
-          ok : '확인',
-          text : textJson.message
-        });
-      },
-      success : function (text) {
-        console.log(text);
-        var from = 'game-room';
-        app.m_player.getInfo().gameRole = null;
-        app.v_shell.showMainBoard(from);
-      }
-    });
-  };
-
-  leaveGameRoom = function () {
-    webix.ajax().headers({
-      'Content-Type' : 'application/json'
-    }).patch('gameroom/leave/' + configMap.game_room_model.id, {}, {
-      error : function (text) {
-        console.log(text);
-        var textJson = JSON.parse(text);
-        webix.alert({
-          title : '오류',
-          ok : '확인',
-          text : textJson.message
-        });
-      },
-      success : function (text) {
-        console.log(text);
-        var from = 'game-room';
-        app.m_player.getInfo().gameRole = null;
-        app.v_shell.showMainBoard(from);
-      }
-    });
-  };
-
   return {
     EVENT_UPDATE_GAME_ROOM_INFO : EVENT_UPDATE_GAME_ROOM_INFO,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,
-    getGameRoomModel : getGameRoomModel,
-    leaveAndGameRoomDelete : leaveAndGameRoomDelete,
-    leaveGameRoom : leaveGameRoom
+    getGameRoomModel : getGameRoomModel
   };
 }());

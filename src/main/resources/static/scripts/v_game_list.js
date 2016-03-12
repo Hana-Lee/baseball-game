@@ -29,7 +29,7 @@ app.v_game_list = (function () {
     }, webixMap = {
     },
     _createView, _getCreatedGameRoomList,
-    _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate, _joinGameRoom,
+    _createTemplate, _createTitleTemplate, _createJoinButtonTemplate, _createSettingTemplate,
     _showGameRoleSelectWindow, _resetConfigMap, _resetStateMap, _resetWebixMap,
     initModule;
 
@@ -138,7 +138,7 @@ app.v_game_list = (function () {
           cols : [{
             view : 'button', value : '확인', hotkey : 'enter', type : 'form',
             click : function () {
-              _joinGameRoom(selectedGameRoom, $$('role-selector').getValue());
+              app.v_shell.joinGameRoom(selectedGameRoom, $$('role-selector').getValue());
               this.getTopParentView().close();
             }
           }, {
@@ -150,26 +150,6 @@ app.v_game_list = (function () {
         }]
       }
     }).show();
-  };
-
-  _joinGameRoom = function (selectedRoom, selectedGameRole) {
-    webix.ajax().headers({
-      'Content-Type' : 'application/json'
-    }).patch('gameroom/join/' + selectedRoom.id, JSON.stringify({gameRole : selectedGameRole}), {
-      error : function (text) {
-        var textJson = JSON.parse(text);
-        webix.alert({
-          title : '오류',
-          ok : '확인',
-          text : textJson.message
-        });
-      },
-      success : function (text) {
-        var joinedGameRoom = JSON.parse(text);
-        app.m_player.getInfo().gameRole = selectedGameRole;
-        app.v_shell.showGameRoom(joinedGameRoom);
-      }
-    });
   };
 
   _getCreatedGameRoomList = function (callback) {

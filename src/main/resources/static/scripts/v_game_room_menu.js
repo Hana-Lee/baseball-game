@@ -67,10 +67,10 @@ app.v_game_room_menu = (function () {
             var gameRoomModel = app.v_game_room.getGameRoomModel();
             if (gameRoomModel.players.length === 1) {
               if (gameRoomModel.players[0].email === app.m_player.getInfo().email) {
-                app.v_game_room.leaveAndGameRoomDelete();
+                app.v_shell.leaveAndGameRoomDelete(gameRoomModel);
               }
             } else {
-              app.v_game_room.leaveGameRoom();
+              app.v_shell.leaveGameRoom(gameRoomModel);
             }
           }
         }
@@ -293,7 +293,7 @@ app.v_game_room_menu = (function () {
             view : 'button', value : '닫기', hotkey : 'esc', type : 'danger',
             on : {
               onItemClick : function () {
-                this.getTopParentView().close();
+                $$('owner-change-window').close();
               }
             }
           }]

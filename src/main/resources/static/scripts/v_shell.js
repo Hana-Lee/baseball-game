@@ -28,8 +28,9 @@ app.v_shell = (function () {
       container : null,
       stomp_client : null
     }, webixMap = {},
-    showSignUp, showLogin, showGameRoom, showMainBoard, logout, getStompClient,
-    _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification,
+    showSignUp, showLogin, createGameRoom, showMainBoard, logout, getStompClient, joinGameRoom, joinRandomGameRoom,
+    leaveGameRoom, leaveAndGameRoomDelete,
+    _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
     initModule;
 
   showSignUp = function () {
@@ -42,11 +43,102 @@ app.v_shell = (function () {
     app.v_login.initModule(stateMap.container);
   };
 
-  showGameRoom = function (gameRoomInfo) {
+  joinGameRoom = function (selectedRoom, selectedGameRole) {
     app.v_main_board.destructor();
 
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch('gameroom/join/' + selectedRoom.id, JSON.stringify({gameRole : selectedGameRole}), {
+      error : function (text) {
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        var joinedGameRoom = JSON.parse(text);
+        app.m_player.getInfo().gameRole = selectedGameRole;
+        _showGameRoom(joinedGameRoom);
+      }
+    });
+  };
+
+  joinRandomGameRoom = function (gameRoomModelList) {
+    var url, data, dataString, randomGameRoomIndex, selectedGameRoom;
+
+    app.v_main_board.destructor();
+
+    data = {
+      gameRole : 'ATTACKER'
+    };
+    dataString = JSON.stringify(data);
+
+    randomGameRoomIndex = Math.floor(Math.random() * gameRoomModelList.length);
+    selectedGameRoom = gameRoomModelList[randomGameRoomIndex];
+
+    url = 'gameroom/join/' + selectedGameRoom.id;
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch(url, dataString, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        var joinedGameRoom = JSON.parse(text);
+        app.m_player.getInfo().gameRole = data.gameRole;
+
+        _showGameRoom(joinedGameRoom);
+      }
+    });
+  };
+
+  createGameRoom = function (data) {
+    app.v_main_board.destructor();
+
+    var sendData = {
+      name : data.name,
+      gameRole : data.gameRole,
+      setting : {
+        generationNumberCount : data.generationNumberCount,
+        limitGuessInputCount : data.limitGuessInputCount,
+        limitWrongInputCount : data.limitWrongInputCount
+      }
+    };
+
+    sendData = JSON.stringify(sendData);
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).post('gameroom', sendData, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (text) {
+        var gameRoomJson = JSON.parse(text);
+        app.m_player.getInfo().gameRole = gameRoomJson.owner.gameRole;
+        _showGameRoom(gameRoomJson);
+      }
+    });
+  };
+
+  _showGameRoom = function (gameRoomModel) {
     app.v_game_room.configModule({
-      game_room_model : gameRoomInfo
+      game_room_model : gameRoomModel
     });
     app.v_game_room.initModule(webixMap.top);
   };
@@ -61,9 +153,53 @@ app.v_shell = (function () {
         initModule(stateMap.container);
       });
     } else {
-      app.v_game_room.destructor();
+      //app.v_game_room.destructor();
       app.v_main_board.initModule(webixMap.top);
     }
+  };
+
+  leaveGameRoom = function (gameRoomModel) {
+    app.v_game_room.destructor();
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch('gameroom/leave/' + gameRoomModel.id, {}, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (/*text*/) {
+        app.m_player.getInfo().gameRole = null;
+        app.v_main_board.initModule(webixMap.top);
+      }
+    });
+  };
+
+  leaveAndGameRoomDelete = function (gameRoomModel) {
+    app.v_game_room.destructor();
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).del('gameroom/leave/' + gameRoomModel.id, {}, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (/*text*/) {
+        app.m_player.getInfo().gameRole = null;
+        app.v_main_board.initModule(webixMap.top);
+      }
+    });
   };
 
   logout = function () {
@@ -187,9 +323,13 @@ app.v_shell = (function () {
     initModule : initModule,
     showSignUp : showSignUp,
     showLogin : showLogin,
-    showGameRoom : showGameRoom,
     showMainBoard : showMainBoard,
     logout : logout,
-    getStompClient : getStompClient
+    getStompClient : getStompClient,
+    joinGameRoom : joinGameRoom,
+    joinRandomGameRoom : joinRandomGameRoom,
+    createGameRoom : createGameRoom,
+    leaveGameRoom : leaveGameRoom,
+    leaveAndGameRoomDelete : leaveAndGameRoomDelete
   };
 }());
