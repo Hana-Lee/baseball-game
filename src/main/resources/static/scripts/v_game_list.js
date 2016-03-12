@@ -176,7 +176,7 @@ app.v_game_list = (function () {
 
   _createTitleTemplate = function (obj) {
     var userCount = obj.players.length, status = obj.status.toLowerCase();
-    return '<div class="webix_strong title ' + status + '">[' + obj.id + '] ' + obj.name + ' (' + userCount + '/5)</div>';
+    return '<div class="webix_strong title ' + status + '">[' + obj.roomNumber + '] ' + obj.name + ' (' + userCount + '/5)</div>';
   };
 
   _createJoinButtonTemplate = function (obj) {

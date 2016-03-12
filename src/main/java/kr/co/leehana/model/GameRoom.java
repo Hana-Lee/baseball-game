@@ -61,6 +61,9 @@ public class GameRoom implements Serializable {
 	@NotNull
 	private String name;
 
+	@NotNull
+	private Integer roomNumber;
+
 	private Integer limitPlayerCount = 5;
 
 	@Enumerated(EnumType.STRING)

@@ -79,7 +79,7 @@ public class GameController {
 	}
 
 	public String generateNumber(Setting setting) {
-		return generationNumberStrategy.generate(setting);
+		return generationNumberStrategy.generateRandomNumber(setting);
 	}
 
 	public boolean isGameEnd(Result result) {

@@ -35,7 +35,7 @@ app.v_game_room = (function () {
     }, webixMap = {},
     _createView, _onOwnerChangeHandler, _resetWebixMap, _resetConfigMap, _resetStateMap,
     _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
-    configModule, initModule, destructor, getGameRoomModel, leaveAndGameRoomDelete, leaveGameRoom;
+    configModule, initModule, destructor, getGameRoomModel;
 
   _resetWebixMap = function () {
     webixMap = {};
@@ -71,7 +71,7 @@ app.v_game_room = (function () {
 
   _getTitleTemplate = function () {
     return [
-      '[', configMap.game_room_model.id, '번방] ', configMap.game_room_model.name
+      '[', configMap.game_room_model.roomNumber, '번방] ', configMap.game_room_model.name
     ];
   };
 
@@ -183,7 +183,7 @@ app.v_game_room = (function () {
       chat_height : 450,
       data_url : '/chat/gameroom/' + configMap.game_room_model.id,
       system_message_list : [
-        '[' + configMap.game_room_model.id + '번 ' + configMap.game_room_model.name + '] 방에 입장 하셨습니다',
+        '[' + configMap.game_room_model.roomNumber + '번 ' + configMap.game_room_model.name + '] 방에 입장 하셨습니다',
         '즐거운 게임 즐기시기 바랍니다 :-)'
       ]
     });

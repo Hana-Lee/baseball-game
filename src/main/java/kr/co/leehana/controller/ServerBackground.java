@@ -55,7 +55,7 @@ public class ServerBackground {
 				final Socket bgMessageClientSocket = bgMessageServer.accept();
 				System.out.println("Background Message Server: accepted.");
 
-				final GenerationNumberStrategy strategy = new RandomNumberGenerator();
+				final GenerationNumberStrategy strategy = new NumberGenerator(null);
 				final ServerController receiver = new ServerController(new GameController(strategy), clientSocket,
 						bgMessageClientSocket);
 				receiver.start();

@@ -30,6 +30,8 @@ public class GameRoomDto {
 
 		private Player owner;
 
+		private Integer roomNumber;
+
 		@NotNull
 		private Setting setting;
 	}

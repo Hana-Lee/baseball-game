@@ -4,5 +4,7 @@ import kr.co.leehana.model.Setting;
 
 public interface GenerationNumberStrategy {
 
-	String generate(final Setting setting);
+	String generateRandomNumber(final Setting setting);
+
+	Integer generateRoomNumber();
 }

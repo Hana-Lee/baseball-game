@@ -1,7 +1,7 @@
 package kr.co.leehana;
 
 import kr.co.leehana.controller.GameController;
-import kr.co.leehana.controller.RandomNumberGenerator;
+import kr.co.leehana.controller.NumberGenerator;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.Result;
 import kr.co.leehana.model.Setting;
@@ -25,7 +25,7 @@ public class GameControllerTest {
 
 	@Before
 	public void setUp() throws Exception {
-		gameController = new GameController(setting -> "123");
+		gameController = new GameController(new NumberGenerator(null));
 	}
 
 	// 숫자를 잘못 입력했을때 IllegalArgumentException 이 발생하는지 테스트
@@ -78,8 +78,8 @@ public class GameControllerTest {
 	public void 랜덤생성된숫자의자리수확인테스트() {
 		Setting setting = new Setting();
 		int generateNumberCount = setting.getGenerationNumberCount();
-		RandomNumberGenerator generator = new RandomNumberGenerator();
-		String generatedNumber = generator.generate(setting);
+		NumberGenerator generator = new NumberGenerator(null);
+		String generatedNumber = generator.generateRandomNumber(setting);
 
 		assertEquals("랜덤숫자는 " + generateNumberCount + "자리여야 합니다", generateNumberCount, generatedNumber.length());
 	}
@@ -90,10 +90,10 @@ public class GameControllerTest {
 		Setting setting = new Setting();
 		setting.setGenerationNumberCount(3);
 
-		RandomNumberGenerator generator = new RandomNumberGenerator();
+		NumberGenerator generator = new NumberGenerator(null);
 
 		for (int i = 0; i < 1000; i++) {
-			String generatedNumber = generator.generate(setting);
+			String generatedNumber = generator.generateRandomNumber(setting);
 
 			ErrorMessage errorMessage = new ErrorMessage();
 			gameController.generatedNumbersValidator(generatedNumber, errorMessage);

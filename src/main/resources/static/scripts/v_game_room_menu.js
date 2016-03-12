@@ -157,24 +157,21 @@ app.v_game_room_menu = (function () {
             }]
           }
         }, {
-          cols : [
-            {
-              view : 'button', value : '생성', type : 'form', hotkey : 'enter',
-              click : function () {
-                if ($$('setting-change-form').validate()) { //validate form
-                  _sendGameRoomSettingDataToServer($$('setting-change-form').getValues());
-                } else {
-                  webix.message({type : 'error', text : 'Form data is invalid'});
-                }
-              }
-            },
-            {
-              view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
-              click : function () {
-                this.getTopParentView().close();
+          cols : [{
+            view : 'button', value : '저장', type : 'form', hotkey : 'enter',
+            click : function () {
+              if ($$('setting-change-form').validate()) { //validate form
+                _sendGameRoomSettingDataToServer($$('setting-change-form').getValues());
+              } else {
+                webix.message({type : 'error', text : 'Form data is invalid'});
               }
             }
-          ]
+          }, {
+            view : 'button', value : '닫기', type : 'danger', hotkey : 'esc',
+            click : function () {
+              this.getTopParentView().close();
+            }
+          }]
         }],
         rules : {
           name : webix.rules.isNotEmpty

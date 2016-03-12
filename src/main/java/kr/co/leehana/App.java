@@ -1,8 +1,6 @@
 package kr.co.leehana;
 
 import kr.co.leehana.aspect.NotifyAspect;
-import kr.co.leehana.controller.GenerationNumberStrategy;
-import kr.co.leehana.controller.RandomNumberGenerator;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -73,8 +71,8 @@ public class App extends SpringBootServletInitializer {
 		return new NotifyAspect();
 	}
 
-	@Bean
-	public GenerationNumberStrategy generationNumberStrategy() {
-		return new RandomNumberGenerator();
-	}
+//	@Bean
+//	public GenerationNumberStrategy generationNumberStrategy() {
+//		return new NumberGenerator();
+//	}
 }

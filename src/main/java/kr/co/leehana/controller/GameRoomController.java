@@ -107,6 +107,8 @@ public class GameRoomController {
 
 		ownerSetting(createDto);
 
+		createDto.setRoomNumber(generationNumberStrategy.generateRoomNumber());
+
 		GameRoom newGameRoom = gameRoomService.create(createDto);
 
 		return new ResponseEntity<>(newGameRoom, CREATED);
@@ -346,7 +348,7 @@ public class GameRoomController {
 		if (isDefenderPlayer(gameRoom, currentPlayer) && StringUtils.isNotBlank(readyDto.getNumber())) {
 			gameRoom.setRandomNumber(new RandomNumber(readyDto.getNumber()));
 		} else {
-			gameRoom.setRandomNumber(new RandomNumber(generationNumberStrategy.generate(gameRoom.getSetting())));
+			gameRoom.setRandomNumber(new RandomNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
 		}
 	}
 
