@@ -185,9 +185,7 @@ app.v_game_room = (function () {
       system_message_list : [
         '[' + configMap.game_room_model.id + '번 ' + configMap.game_room_model.name + '] 방에 입장 하셨습니다',
         '즐거운 게임 즐기시기 바랍니다 :-)'
-      ],
-      player_model : app.m_player.getInfo(),
-      game_room_model : configMap.game_room_model
+      ]
     });
     app.v_chat.initModule(webixMap.chat_container);
   };

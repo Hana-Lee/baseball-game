@@ -27,9 +27,7 @@ app.v_chat = (function () {
         chat_list_height : 0,
         proxy_name : null,
         data_url : null,
-        system_message_list : null,
-        player_model : null,
-        game_room_model : null
+        system_message_list : null
       },
       chat_height : 240,
       chat_list_height : 'auto',
@@ -39,8 +37,6 @@ app.v_chat = (function () {
         '숫자 야구 게임에 오신걸 환영합니다 :-)',
         '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
       ],
-      player_model : {},
-      game_room_model : null,
 
       system_nickname : '시스템'
     },
@@ -65,7 +61,6 @@ app.v_chat = (function () {
       '숫자 야구 게임에 오신걸 환영합니다 :-)',
       '건전한 채팅 문화는 우리의 미래 입니다 ㅋㅋㅋ'
     ];
-    configMap.player_model = {};
     configMap.system_nickname = '시스템';
   };
 
@@ -82,8 +77,7 @@ app.v_chat = (function () {
 
     if (text) {
       webixMap.chat_list.add({
-        player : configMap.player_model,
-        //nickname : configMap.player_model.nickname,
+        player : app.m_player.getInfo(),
         message : text
       });
     }
@@ -98,9 +92,9 @@ app.v_chat = (function () {
   _chatTemplate = function (obj) {
     var className;
 
-    if (obj.player.nickname === configMap.system_nickname) {
+    if (obj.nickname === configMap.system_nickname) {
       className = 'system';
-    } else if (obj.player.nickname !== configMap.player_model.nickname) {
+    } else if (obj.player.nickname !== app.m_player.getInfo().nickname) {
       className = 'from';
     } else {
       className = 'to';
@@ -177,8 +171,8 @@ app.v_chat = (function () {
     stateMap.proxy = webix.proxy(configMap.proxy_name, configMap.data_url);
     stateMap.proxy.clientId = app.utils.guid();
 
-    if (configMap.game_room_model) {
-      stateMap.proxy.game_room = configMap.game_room_model;
+    if (app.v_game_room.getGameRoomModel()) {
+      stateMap.proxy.game_room = app.v_game_room.getGameRoomModel();
     }
 
     _createView();
