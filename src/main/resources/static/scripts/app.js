@@ -72,6 +72,7 @@ var app = (function () {
           delete update.data.id;
         }
 
+        // TODO 게임룸에서의 채팅이라는것 구분 및 데이터 전달이 목적인데 더 나은 방법 고민해보기...
         if (this.game_room) {
           update.data.gameRoom = this.game_room;
         }
