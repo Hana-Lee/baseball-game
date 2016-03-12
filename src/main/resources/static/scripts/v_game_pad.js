@@ -39,13 +39,19 @@ app.v_game_pad = (function () {
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _updateGameRoomInfo,
     initModule, _showProgressBar, _hideProgressBar;
 
-  _sendReadyDataToServer = function () {
-    var sendData = {
-      status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE'
+  _sendReadyDataToServer = function (send_data) {
+    var gameRoomId = app.v_game_room.getGameRoomModel().id, sendData = {
+      status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE',
+      gameRoomId : gameRoomId
     };
+
+    if (send_data && (send_data.number !== undefined || send_data.number !== null)) {
+      sendData.number = send_data.number;
+    }
+
     webix.ajax().headers({
       'Content-Type' : 'application/json'
-    }).patch('gameroom/ready/' + app.v_game_room.getGameRoomModel().id, JSON.stringify(sendData), {
+    }).patch('gameroom/ready/' + gameRoomId, JSON.stringify(sendData), {
       error : function (text) {
         console.log(text);
         var textJson = JSON.parse(text);
@@ -54,6 +60,10 @@ app.v_game_pad = (function () {
           ok : '확인',
           text : textJson.message
         });
+
+        if (webixMap.game_number_field) {
+          webixMap.game_number_field.focus();
+        }
       },
       success : function (/*text*/) {
         if (stateMap.isReady) {
@@ -62,6 +72,10 @@ app.v_game_pad = (function () {
         } else {
           webixMap.ready_button.config.label = '준비!!';
           webixMap.ready_button.refresh();
+        }
+
+        if (webixMap.make_number_window) {
+          webixMap.make_number_window.close();
         }
       }
     });
@@ -101,7 +115,7 @@ app.v_game_pad = (function () {
         id : 'make-number-form',
         view : 'form',
         rules : {
-          'random-number' : function (value) {
+          number : function (value) {
             var valid = false, invalidMessage;
 
             if (webix.rules.isEmpty(value) === true) {
@@ -128,7 +142,7 @@ app.v_game_pad = (function () {
           rows : [{
             id : 'game-number-field',
             view : 'text',
-            name : 'random-number',
+            name : 'number',
             label : '게임숫자',
             invalidMessage : '입력을 확인해주세요',
             required : true,
@@ -144,8 +158,8 @@ app.v_game_pad = (function () {
               hotkey : 'enter',
               on : {
                 onItemClick : function () {
-                  if ($$('make-number-form').validate()) {
-                    webixMap.make_number_window.close();
+                  if (webixMap.form.validate()) {
+                    _sendReadyDataToServer(webixMap.form.getValues());
                   } else {
                     webixMap.game_number_field.focus();
                   }
@@ -169,6 +183,7 @@ app.v_game_pad = (function () {
     }).show();
 
     webixMap.make_number_window = $$('make-number-window');
+    webixMap.form = $$('make-number-form');
     webixMap.game_number_field = $$('game-number-field');
     webixMap.game_number_field.focus();
   };
@@ -264,6 +279,7 @@ app.v_game_pad = (function () {
         }, {
           id : 'number-submit',
           view : 'button',
+          css : 'submit_btn',
           label : '제출',
           height : 58,
           disabled : true,

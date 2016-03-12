@@ -18,7 +18,7 @@ import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
-import kr.co.leehana.model.RandomNumber;
+import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
@@ -345,10 +345,10 @@ public class GameRoomController {
 	}
 
 	private void makeRandomNumber(GameRoom gameRoom, GameRoomDto.Ready readyDto, Player currentPlayer) {
-		if (isDefenderPlayer(gameRoom, currentPlayer) && StringUtils.isNotBlank(readyDto.getNumber())) {
-			gameRoom.setRandomNumber(new RandomNumber(readyDto.getNumber()));
+		if (isDefenderPlayer(gameRoom, currentPlayer) && readyDto.getNumber() != null && StringUtils.isNotBlank(readyDto.getNumber().getValue())) {
+			gameRoom.setGameNumber(readyDto.getNumber());
 		} else {
-			gameRoom.setRandomNumber(new RandomNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
+			gameRoom.setGameNumber(new GameNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
 		}
 	}
 

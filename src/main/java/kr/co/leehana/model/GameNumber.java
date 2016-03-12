@@ -25,7 +25,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(of = {"id"})
 @ToString
-public class RandomNumber implements Serializable {
+public class GameNumber implements Serializable {
 
 	private static final long serialVersionUID = 8956584647637765700L;
 
@@ -37,7 +37,7 @@ public class RandomNumber implements Serializable {
 
 	private String value;
 
-	public RandomNumber(String value) {
+	public GameNumber(String value) {
 		this.value = value;
 	}
 }
