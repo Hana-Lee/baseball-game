@@ -21,6 +21,12 @@ app.v_game_board = (function () {
   'use strict';
 
   var
+    configMap = {
+      welcome_messages : [
+        {message : '환영합니다.', type : 'normal'},
+        {message : '시작하려면 준비를 눌러주세요', type : 'focus'}
+      ]
+    },
     stateMap = {
       container : null,
       events : [],
@@ -101,14 +107,18 @@ app.v_game_board = (function () {
         width : 5
       }, {
         id : 'game-progress-container',
-        rows : [{template : '진행상황', type : 'header'}, {
+        rows : [{
+          template : '진행상황', type : 'header'
+        }, {
           id : 'game-progress-board',
+          css : 'game_progress_board',
           view : 'list',
-          template : '#message#',
-          data : [
-            {message : '환영합니다.'},
-            {message : '시작하려면 준비를 눌러주세요'}
-          ],
+          select : false,
+          template : function (obj) {
+            var className = obj.type || 'normal';
+            return '<span class="' + className + '">' + obj.message + '</span>';
+          },
+          data : [],
           url : stateMap.proxy,
           on : {
             onAfterAdd : function (id) {
@@ -146,6 +156,12 @@ app.v_game_board = (function () {
     webixMap.right_top_player = $$('right-top-player');
     webixMap.right_bottom_player = $$('right-bottom-player');
     webixMap.game_progress_board = $$('game-progress-board');
+
+    webix.dp(webixMap.game_progress_board).ignore(function () {
+      configMap.welcome_messages.forEach(function (msgObj) {
+        webixMap.game_progress_board.add(msgObj);
+      });
+    });
 
     stateMap.player_container_list.push(webixMap.left_top_player);
     stateMap.player_container_list.push(webixMap.right_top_player);

@@ -40,10 +40,11 @@ app.v_game_pad = (function () {
     initModule, _showProgressBar, _hideProgressBar;
 
   _sendReadyDataToServer = function (send_data) {
-    var gameRoomId = app.v_game_room.getGameRoomModel().id, sendData = {
-      status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE',
-      gameRoomId : gameRoomId
-    };
+    var gameRoomId = app.v_game_room.getGameRoomModel().id,
+      sendData = {
+        status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE',
+        gameRoomId : gameRoomId
+      };
 
     if (send_data && (send_data.number !== undefined || send_data.number !== null)) {
       sendData.number = send_data.number;

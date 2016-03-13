@@ -20,15 +20,16 @@
 app.v_main_menu = (function () {
   'use strict';
 
-  var configMap = {
+  var
+    configMap = {
       height : 45,
-      button_width : 200
-    }, stateMap = {
-      container : null,
-      player : {
+      button_width : 200,
+      player_model : {
         admin : false
       },
       game_room_list : []
+    }, stateMap = {
+      container : null
     }, webixMap = {},
     _createView, _getCreatedGameRoomList,
     _resetConfigMap, _resetStateMap, _resetWebixMap,
@@ -37,11 +38,12 @@ app.v_main_menu = (function () {
   _resetConfigMap = function () {
     configMap.height = 45;
     configMap.button_width = 200;
+    configMap.player_model = {};
+    configMap.game_room_list = [];
   };
 
   _resetStateMap = function () {
     stateMap.container = null;
-    stateMap.player = {};
     stateMap = {};
   };
 
@@ -50,13 +52,12 @@ app.v_main_menu = (function () {
   };
 
   _createView = function () {
-    console.log(stateMap.player);
     var isNotAdmin = function () {
-      return stateMap.player.admin !== true;
+      return configMap.player_model.admin !== true;
     }, getDynamicWidth = function () {
       return isNotAdmin() ? 609 : 409;
     }, isGameRoomsNotExist = function () {
-      return stateMap.game_room_list.length === 0;
+      return configMap.game_room_list.length === 0;
     }, mainView;
 
     mainView = {
@@ -80,7 +81,7 @@ app.v_main_menu = (function () {
         disabled : isGameRoomsNotExist(),
         width : configMap.button_width,
         click : function () {
-          app.v_shell.joinRandomGameRoom();
+          app.v_shell.joinRandomGameRoom(configMap.game_room_list);
         }
       }, {
         id : 'game-room-admin',
@@ -229,12 +230,12 @@ app.v_main_menu = (function () {
     webix.ajax().get('gameroom/all', {
       error : function (text) {
         console.log(text);
-        stateMap.game_room_list = [];
+        configMap.game_room_list = [];
         callback();
       },
       success : function (text) {
         var serverResponse = JSON.parse(text);
-        stateMap.game_room_list = serverResponse.content;
+        configMap.game_room_list = serverResponse.content;
         callback();
       }
     });
@@ -250,7 +251,7 @@ app.v_main_menu = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    stateMap.player = app.m_player.getInfo();
+    configMap.player_model = app.m_player.getInfo();
     _getCreatedGameRoomList(_createView);
   };
 
