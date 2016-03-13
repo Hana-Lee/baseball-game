@@ -38,13 +38,10 @@ public class GameNumberValidator implements ConstraintValidator<ValidGameNumber,
 	public boolean isValid(GameRoomDto.Ready readyDto, ConstraintValidatorContext context) {
 		boolean result = true;
 		final GameNumber gameNumber = readyDto.getNumber();
+		gameRoomId = readyDto.getGameRoomId();
 		if (gameNumber == null) {
 			result = true;
-		}
-
-		gameRoomId = readyDto.getGameRoomId();
-
-		if (!validate(gameNumber) && StringUtils.isNotBlank(message)) {
+		} else if (!validate(gameNumber) && StringUtils.isNotBlank(message)) {
 			context.disableDefaultConstraintViolation();
 			context.buildConstraintViolationWithTemplate(message).addConstraintViolation();
 			result = false;
