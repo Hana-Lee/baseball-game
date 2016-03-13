@@ -20,7 +20,9 @@
 app.v_shell = (function () {
   'use strict';
 
-  var configMap = {
+  var
+    ON_PLAYER_INFO_UPDATED = 'onPlayerInfoUpdated',
+    configMap = {
       width : 1024,
       height : 750
     }, stateMap = {
@@ -175,6 +177,7 @@ app.v_shell = (function () {
       },
       success : function (/*text*/) {
         app.m_player.getInfo().gameRole = null;
+        app.m_player.getInfo().status = null;
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -197,6 +200,7 @@ app.v_shell = (function () {
       },
       success : function (/*text*/) {
         app.m_player.getInfo().gameRole = null;
+        app.m_player.getInfo().status = null;
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -268,10 +272,16 @@ app.v_shell = (function () {
         if (callback) {
           callback();
         }
+
         stateMap.stomp_client.subscribe('/topic/player/updated', function (response) {
-          console.log('player updated', response);
-          var player = JSON.parse(response).data;
-          app.m_player.initModule(player);
+          var responseJson = JSON.parse(response.body),
+          player = responseJson.data;
+
+          if (player.id === app.m_player.getInfo().id) {
+            app.m_player.initModule(player);
+          }
+
+          webix.callEvent(ON_PLAYER_INFO_UPDATED, [responseJson.operation, player]);
         }, {});
       },
       function (error) {
@@ -330,6 +340,7 @@ app.v_shell = (function () {
     joinRandomGameRoom : joinRandomGameRoom,
     createGameRoom : createGameRoom,
     leaveGameRoom : leaveGameRoom,
-    leaveAndGameRoomDelete : leaveAndGameRoomDelete
+    leaveAndGameRoomDelete : leaveAndGameRoomDelete,
+    ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED
   };
 }());

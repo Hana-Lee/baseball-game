@@ -20,7 +20,7 @@ import java.util.Set;
  * @since 2016-03-13 00:48
  */
 @Component
-public class GameNumberValidator implements ConstraintValidator<ValidGameNumber, GameRoomDto.Ready> {
+public class GameNumberValidator implements ConstraintValidator<ValidGameNumber, GameRoomDto.GameNumber> {
 
 	@Autowired
 	private GameRoomService gameRoomService;
@@ -35,10 +35,10 @@ public class GameNumberValidator implements ConstraintValidator<ValidGameNumber,
 	}
 
 	@Override
-	public boolean isValid(GameRoomDto.Ready readyDto, ConstraintValidatorContext context) {
+	public boolean isValid(GameRoomDto.GameNumber gameNumberDto, ConstraintValidatorContext context) {
 		boolean result = true;
-		final GameNumber gameNumber = readyDto.getNumber();
-		gameRoomId = readyDto.getGameRoomId();
+		final GameNumber gameNumber = gameNumberDto.getNumber();
+		gameRoomId = gameNumberDto.getGameRoomId();
 		if (gameNumber == null) {
 			result = true;
 		} else if (!validate(gameNumber) && StringUtils.isNotBlank(message)) {

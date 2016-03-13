@@ -20,6 +20,8 @@ public interface PlayerService {
 
 	Player updateByEmail(String email, PlayerDto.Update updateDto);
 
+	Player update(Player player);
+
 	Player getById(Long id);
 
 	Player getByIdAndEnabled(Long id, Enabled enabled);

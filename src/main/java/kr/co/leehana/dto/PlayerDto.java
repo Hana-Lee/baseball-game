@@ -89,4 +89,9 @@ public class PlayerDto {
 		private String id;
 		private PlayerDto.Response data;
 	}
+
+	@Data
+	public static class Ready {
+		private Status status;
+	}
 }

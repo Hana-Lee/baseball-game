@@ -3,6 +3,7 @@ package kr.co.leehana.annotation;
 import kr.co.leehana.validator.GameNumberValidator;
 
 import javax.validation.Constraint;
+import javax.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,4 +29,6 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ValidGameNumber {
 	String message() default "Invalid game number";
+	Class<?>[] groups() default {};
+	Class<? extends Payload>[] payload() default {};
 }

@@ -18,7 +18,6 @@ import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.Player;
-import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
@@ -67,7 +66,7 @@ public class GameRoomController {
 	private static final String URL_JOIN_VALUE = URL_VALUE + "/join/{id}";
 	private static final String URL_CHANGE_OWNER_VALUE = URL_VALUE + "/change-owner/{id}";
 	private static final String URL_LEAVE_VALUE = URL_VALUE + "/leave/{id}";
-	private static final String URL_READY_VALUE = URL_VALUE + "/ready/{id}";
+	private static final String URL_SET_GAME_NUMBER_VALUE = URL_VALUE + "/set-game-number/{id}";
 
 	private final GameRoomService gameRoomService;
 	private final PlayerService playerService;
@@ -308,48 +307,28 @@ public class GameRoomController {
 		return new ResponseEntity<>(gameRoom, OK);
 	}
 
-	@NotifyClients(
-			url = {"/topic/gameroom/{id}/updated", "/topic/gameroom/list/updated"},
-			operation = {"ready", "update"})
-	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
-	public ResponseEntity readyAndSetNumber(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Ready readyDto,
-	                                        BindingResult bindingResult) {
+	@NotifyClients(url = {"/topic/gameroom/{id}/updated"}, operation = {"setGameNumber"})
+	@RequestMapping(value = {URL_SET_GAME_NUMBER_VALUE}, method = {PATCH})
+	public ResponseEntity setGameNumber(@PathVariable Long id, @RequestBody @Valid GameRoomDto.GameNumber
+			gameNumberDto, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return createErrorResponseEntity(bindingResult);
 		}
 		GameRoom gameRoom = gameRoomService.getById(id);
 
 		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
-			throw new GameRoomRunningException("Game room is already running");
+//			throw new GameRoomRunningException("Game room is already running");
 		}
 
-		Player readyPlayer = getCurrentPlayer();
-		gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getEmail(), readyPlayer.getEmail())).findFirst()
-				.get().setStatus(readyDto.getStatus());
+		Player player = getCurrentPlayer();
 
-		if (isAllPlayersReadyDone(gameRoom)) {
-			makeRandomNumber(gameRoom, readyDto, readyPlayer);
-			gameRoom.setGameCount(gameRoom.getGameCount() + 1);
-			gameRoom.setStatus(Status.RUNNING);
-		} else {
-			gameRoom.setStatus(Status.NORMAL);
+		if (isDefenderPlayer(gameRoom, player) && gameNumberDto.getNumber() != null && StringUtils.isNotBlank
+				(gameNumberDto.getNumber().getValue())) {
+			gameRoom.setGameNumber(gameNumberDto.getNumber());
 		}
 
 		gameRoomService.update(gameRoom);
 		return new ResponseEntity<>(gameRoom, OK);
-	}
-
-	private boolean isAllPlayersReadyDone(GameRoom gameRoom) {
-		return gameRoom.getPlayers().stream().filter(p -> Objects.equals(Status.READY_DONE, p.getStatus())).count() ==
-				gameRoom.getPlayers().size();
-	}
-
-	private void makeRandomNumber(GameRoom gameRoom, GameRoomDto.Ready readyDto, Player currentPlayer) {
-		if (isDefenderPlayer(gameRoom, currentPlayer) && readyDto.getNumber() != null && StringUtils.isNotBlank(readyDto.getNumber().getValue())) {
-			gameRoom.setGameNumber(readyDto.getNumber());
-		} else {
-			gameRoom.setGameNumber(new GameNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
-		}
 	}
 
 	private boolean isDefenderPlayer(GameRoom gameRoom, Player currentPlayer) {

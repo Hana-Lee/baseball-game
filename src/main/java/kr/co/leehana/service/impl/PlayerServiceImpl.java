@@ -110,6 +110,11 @@ public class PlayerServiceImpl implements PlayerService {
 		return update(updateDto, player);
 	}
 
+	@Override
+	public Player update(Player player) {
+		return playerRepository.save(player);
+	}
+
 	private Player update(PlayerDto.Update updateDto, Player player) {
 		if (updateDto.getEmail() != null) {
 			player.setEmail(updateDto.getEmail());

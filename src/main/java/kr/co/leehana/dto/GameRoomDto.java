@@ -2,8 +2,6 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.annotation.ValidGameNumber;
 import kr.co.leehana.enums.GameRole;
-import kr.co.leehana.enums.Status;
-import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
 import lombok.Data;
@@ -66,14 +64,11 @@ public class GameRoomDto {
 
 	@Data
 	@ValidGameNumber
-	public static class Ready {
+	public static class GameNumber {
 
 		@NotNull
 		private Long gameRoomId;
 
-		@NotNull
-		private Status status;
-
-		private GameNumber number;
+		private kr.co.leehana.model.GameNumber number;
 	}
 }

@@ -171,7 +171,7 @@ app.v_chat = (function () {
     stateMap.proxy = webix.proxy(configMap.proxy_name, configMap.data_url);
     stateMap.proxy.clientId = app.utils.guid();
 
-    if (app.v_game_room.getGameRoomModel()) {
+    if (app.v_game_room && app.v_game_room.getGameRoomModel()) {
       stateMap.proxy.game_room = app.v_game_room.getGameRoomModel();
     }
 

@@ -1,5 +1,6 @@
 package kr.co.leehana.controller;
 
+import kr.co.leehana.annotation.NotifyClients;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.PlayerDuplicatedException;
@@ -8,6 +9,7 @@ import kr.co.leehana.exception.PlayerNotLoggedInException;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.PlayerService;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -35,6 +37,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -49,6 +52,7 @@ public class PlayerController {
 	private static final String URL_ALL_VALUE = URL_VALUE + "/all";
 	private static final String URL_WITH_ID_VALUE = URL_VALUE + "/{id}";
 	private static final String URL_LOGGED_IN_USERS_VALUE = URL_VALUE + "/login/true";
+	private static final String URL_READY_VALUE = URL_VALUE + "/ready";
 
 	private PlayerService playerService;
 	private ModelMapper modelMapper;
@@ -149,6 +153,25 @@ public class PlayerController {
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.Response.class), OK);
 	}
 
+	@NotifyClients(url = {"/topic/player/updated"}, operation = {"ready"})
+	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
+	public ResponseEntity readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return createErrorResponseEntity(bindingResult);
+		}
+		final Player player = getCurrentPlayer();
+		player.setStatus(readyDto.getStatus());
+		playerService.update(player);
+		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.Response.class), OK);
+	}
+
+	private Player getCurrentPlayer() {
+		UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+				.getPrincipal();
+
+		return playerService.getByEmail(userDetails.getEmail());
+	}
+
 	@ExceptionHandler(PlayerDuplicatedException.class)
 	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException e) {
@@ -172,5 +195,25 @@ public class PlayerController {
 		errorResponse.setMessage(message);
 		errorResponse.setErrorCode(errorCode);
 		return errorResponse;
+	}
+
+	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
+		String message;
+		if (bindingResult.getFieldError() != null) {
+			message = bindingResult.getFieldError().getDefaultMessage();
+		} else if (bindingResult.getGlobalError() != null) {
+			message = bindingResult.getGlobalError().getDefaultMessage();
+		} else {
+			message = "Binding error";
+		}
+		return createErrorResponseEntity(message, null);
+	}
+
+	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
+		if (StringUtils.isBlank(errorCode)) {
+			errorCode = "player.bad.request";
+		}
+
+		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
 	}
 }

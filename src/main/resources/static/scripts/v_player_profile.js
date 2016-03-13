@@ -91,7 +91,7 @@ app.v_player_profile = (function () {
         result += ' ' + configMap.custom_text;
       }
 
-      return result;
+      return '<span data-email="' + email + '">' + result + '</span>';
     };
 
     mainView = [{

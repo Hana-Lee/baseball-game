@@ -21,7 +21,7 @@ app.v_game_room = (function () {
   'use strict';
 
   var
-    EVENT_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
+    ON_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
     configMap = {
       settable_map : {
         game_room_model : null
@@ -220,9 +220,7 @@ app.v_game_room = (function () {
   };
 
   initModule = function (container) {
-    var
-      header = {},
-      subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/updated';
+    var subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/updated';
 
     stateMap.container = container;
 
@@ -239,8 +237,20 @@ app.v_game_room = (function () {
 
         _updateGameRoomTitle();
 
-        webix.callEvent(EVENT_UPDATE_GAME_ROOM_INFO, [operation]);
-      }, header)
+        webix.callEvent(ON_UPDATE_GAME_ROOM_INFO, [operation]);
+      }, {})
+    );
+
+    subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/player-ready-status-updated';
+    stateMap.subscribeObj.push(
+      app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
+        var responseBody = JSON.parse(response.body),
+          operation = responseBody.operation;
+
+        configMap.game_room_model = responseBody.data;
+
+        webix.callEvent(ON_UPDATE_GAME_ROOM_INFO, [operation]);
+      }, {})
     );
     _createView();
   };
@@ -254,7 +264,7 @@ app.v_game_room = (function () {
   };
 
   return {
-    EVENT_UPDATE_GAME_ROOM_INFO : EVENT_UPDATE_GAME_ROOM_INFO,
+    ON_UPDATE_GAME_ROOM_INFO : ON_UPDATE_GAME_ROOM_INFO,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,

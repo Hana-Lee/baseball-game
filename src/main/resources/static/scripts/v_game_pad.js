@@ -33,16 +33,16 @@ app.v_game_pad = (function () {
       selected_num : [],
       events : [],
       input_count : 0,
-      progress_timer : -1
+      game_status : null
     }, webixMap = {},
     _createView, _showMakeNumberWindow,
-    _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _updateGameRoomInfo,
-    initModule, _showProgressBar, _hideProgressBar;
+    _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _updateGameRoomInfo, _sendCreatedNumber,
+    _showProgressBar, _hideProgressBar, _playerReadyNotification,
+    initModule;
 
-  _sendReadyDataToServer = function (send_data) {
+  _sendCreatedNumber = function (send_data) {
     var gameRoomId = app.v_game_room.getGameRoomModel().id,
       sendData = {
-        status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE',
         gameRoomId : gameRoomId
       };
 
@@ -52,7 +52,7 @@ app.v_game_pad = (function () {
 
     webix.ajax().headers({
       'Content-Type' : 'application/json'
-    }).patch('gameroom/ready/' + gameRoomId, JSON.stringify(sendData), {
+    }).patch('gameroom/set-game-number/' + gameRoomId, JSON.stringify(sendData), {
       error : function (text) {
         console.log(text);
         var textJson = JSON.parse(text);
@@ -67,19 +67,58 @@ app.v_game_pad = (function () {
         }
       },
       success : function (/*text*/) {
+        _sendReadyDataToServer();
+      }
+    });
+  };
+
+  _sendReadyDataToServer = function () {
+    var sendData = {
+      status : stateMap.isReady ? 'READY_DONE' : 'READY_BEFORE'
+    };
+
+    webix.ajax().headers({
+      'Content-Type' : 'application/json'
+    }).patch('player/ready', JSON.stringify(sendData), {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
+      },
+      success : function (/*text*/) {
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
+          _showProgressBar();
         } else {
           webixMap.ready_button.config.label = '준비!!';
           webixMap.ready_button.refresh();
+          _hideProgressBar();
         }
 
         if (webixMap.make_number_window) {
           webixMap.make_number_window.close();
         }
+
+        _playerReadyNotification();
       }
     });
+  };
+
+  _playerReadyNotification = function () {
+    var header = {}, data = {};
+    app.v_shell.getStompClient().send(
+      '/app/player/ready/' + app.v_game_room.getGameRoomModel().id,
+      header, JSON.stringify(data)
+    );
+    app.v_shell.getStompClient().send(
+      '/app/player/ready/' + app.v_game_room.getGameRoomModel().id + '/gameroom/notification',
+      header, JSON.stringify(data)
+    );
   };
 
   _resetStateMap = function () {
@@ -89,13 +128,11 @@ app.v_game_pad = (function () {
 
     stateMap.events = [];
 
-    if (stateMap.progress_timer) {
-      clearInterval(stateMap.progress_timer);
-      stateMap.progress_timer = -1;
-    }
+    stateMap.container = null;
     stateMap.input_count = 0;
     stateMap.selected_num = [];
     stateMap.isReady = false;
+    stateMap.game_status = null;
   };
 
   _resetWebixMap = function () {
@@ -160,7 +197,7 @@ app.v_game_pad = (function () {
               on : {
                 onItemClick : function () {
                   if (webixMap.form.validate()) {
-                    _sendReadyDataToServer(webixMap.form.getValues());
+                    _sendCreatedNumber(webixMap.form.getValues());
                   } else {
                     webixMap.game_number_field.focus();
                   }
@@ -203,12 +240,6 @@ app.v_game_pad = (function () {
           css : 'ready_btn',
           on : {
             onItemClick : function () {
-              if (stateMap.isReady) {
-                clearInterval(stateMap.progress_timer);
-                _hideProgressBar();
-                stateMap.progress_timer = -1;
-              }
-
               stateMap.isReady = !stateMap.isReady;
 
               if (stateMap.isReady && app.m_player.getInfo().gameRole === 'DEFENDER') {
@@ -289,6 +320,7 @@ app.v_game_pad = (function () {
               stateMap.selected_num = [];
               $$('game-pad').unselectAll();
               this.disable();
+              _hideProgressBar();
             }
           }
         }]
@@ -317,8 +349,6 @@ app.v_game_pad = (function () {
     });
 
     if (stateMap.input_count === app.v_game_room.getGameRoomModel().setting.limitGuessInputCount) {
-      clearInterval(stateMap.progress_timer);
-      stateMap.progress_timer = -1;
       // TODO 게임 입력 횟수 초과로 게임 종료 알림 보내기
     }
   };
@@ -327,20 +357,18 @@ app.v_game_pad = (function () {
     $$('game-pad').hideProgress();
   };
 
-  _updateGameRoomInfo = function (operation) {
-    if (operation === 'ready') {
-      if (app.v_game_room.getGameRoomModel().status === 'RUNNING') {
-        _showProgressBar();
-        stateMap.progress_timer = setInterval(_showProgressBar, configMap.input_delay + 100);
-        webixMap.ready_button.disable();
-      } else if (app.v_game_room.getGameRoomModel().status === 'NORMAL') {
-        if (stateMap.progress_timer) {
-          clearInterval(stateMap.progress_timer);
-          _hideProgressBar();
-        }
-
-        webixMap.ready_button.enable();
+  _updateGameRoomInfo = function () {
+    if (app.v_game_room.getGameRoomModel().status === 'RUNNING') {
+      stateMap.game_status = app.v_game_room.getGameRoomModel().status;
+      _showProgressBar();
+      webixMap.ready_button.disable();
+    } else if (app.v_game_room.getGameRoomModel().status === 'NORMAL') {
+      if (stateMap.game_status) {
+        _hideProgressBar();
+        stateMap.game_status = null;
       }
+
+      webixMap.ready_button.enable();
     }
   };
 
@@ -351,7 +379,7 @@ app.v_game_pad = (function () {
     }
     _createView();
 
-    stateMap.events.push(webix.attachEvent(app.v_game_room.EVENT_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfo));
+    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfo));
   };
 
   return {
