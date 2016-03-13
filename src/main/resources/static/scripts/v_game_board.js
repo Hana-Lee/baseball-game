@@ -24,7 +24,8 @@ app.v_game_board = (function () {
     stateMap = {
       container : null,
       events : [],
-      player_container_list : []
+      player_container_list : [],
+      proxy : null
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap,
@@ -44,6 +45,7 @@ app.v_game_board = (function () {
     stateMap.container = null;
     stateMap.events = [];
     stateMap.player_container_list = [];
+    stateMap.proxy = null;
   };
 
   _onUpdateGameRoomInfoHandler = function (operation) {
@@ -107,6 +109,7 @@ app.v_game_board = (function () {
             {message : '환영합니다.'},
             {message : '시작하려면 준비를 눌러주세요'}
           ],
+          url : stateMap.proxy,
           on : {
             onAfterAdd : function (id) {
               webix.delay(function () {
@@ -188,6 +191,8 @@ app.v_game_board = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
+    stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.v_game_room.getGameRoomModel().id + '/progress/updated');
+    stateMap.proxy.clientId = app.utils.guid();
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.EVENT_UPDATE_GAME_ROOM_INFO, _onUpdateGameRoomInfoHandler));
 

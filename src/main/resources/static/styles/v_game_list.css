@@ -1,6 +1,5 @@
 .game_room_list {
-	background-image: url('../images/baseball-bg.png');
-	background-size: 100%;
+	background-image: url('../images/game-list-bg.png');
 }
 
 .game_room_list fieldset.setting {
