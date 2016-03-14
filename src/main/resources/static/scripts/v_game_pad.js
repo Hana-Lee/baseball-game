@@ -36,8 +36,8 @@ app.v_game_pad = (function () {
       game_status : null
     }, webixMap = {},
     _createView, _showMakeNumberWindow,
-    _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _updateGameRoomInfo, _sendCreatedNumber,
-    _showProgressBar, _hideProgressBar, _playerReadyNotification,
+    _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
+    _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler,
     initModule;
 
   _sendCreatedNumber = function (send_data) {
@@ -350,6 +350,7 @@ app.v_game_pad = (function () {
 
     if (stateMap.input_count === app.v_game_room.getGameRoomModel().setting.limitGuessInputCount) {
       // TODO 게임 입력 횟수 초과로 게임 종료 알림 보내기
+      console.log('입력 횟수 초과!!');
     }
   };
 
@@ -357,12 +358,18 @@ app.v_game_pad = (function () {
     $$('game-pad').hideProgress();
   };
 
-  _updateGameRoomInfo = function () {
-    if (app.v_game_room.getGameRoomModel().status === 'RUNNING') {
+  _gameStartHandler = function () {
+    var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
+    if (gameRoomStatus === app.const.status.RUNNING) {
       stateMap.game_status = app.v_game_room.getGameRoomModel().status;
       _showProgressBar();
       webixMap.ready_button.disable();
-    } else if (app.v_game_room.getGameRoomModel().status === 'NORMAL') {
+    }
+  };
+
+  _gameOverHandler = function () {
+    var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
+    if (gameRoomStatus === app.const.status.NORMAL || gameRoomStatus === app.const.status.GAME_OVER) {
       if (stateMap.game_status) {
         _hideProgressBar();
         stateMap.game_status = null;
@@ -374,12 +381,13 @@ app.v_game_pad = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    if (app.m_player.getInfo().status === 'READY_DONE') {
+    if (app.m_player.getInfo().status === app.const.status.READY_DONE) {
       stateMap.isReady = true;
     }
     _createView();
 
-    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfo));
+    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_START, _gameStartHandler));
+    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_OVER, _gameOverHandler));
   };
 
   return {

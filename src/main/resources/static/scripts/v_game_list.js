@@ -181,7 +181,7 @@ app.v_game_list = (function () {
 
   _createJoinButtonTemplate = function (obj) {
     var disabledValue = '', disabledViewValue = '', disabledBoxValue = '', disabledElem = '';
-    if (obj.status.toLowerCase() === 'running') {
+    if (obj.status.toUpperCase() === app.const.status.RUNNING) {
       disabledViewValue = ' webix_disabled_view';
       disabledBoxValue = ' webix_disabled_box';
       disabledElem = '<div class="webix_disabled"></div>';

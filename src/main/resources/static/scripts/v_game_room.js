@@ -22,6 +22,8 @@ app.v_game_room = (function () {
 
   var
     ON_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
+    ON_GAME_START = 'onGameStart',
+    ON_GAME_OVER = 'onGameOver',
     configMap = {
       settable_map : {
         game_room_model : null
@@ -31,7 +33,8 @@ app.v_game_room = (function () {
     stateMap = {
       container : null,
       webix_events : [],
-      subscribeObj : []
+      subscribeObj : [],
+      input_count : 0
     }, webixMap = {},
     _createView, _onOwnerChangeHandler, _resetWebixMap, _resetConfigMap, _resetStateMap,
     _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
@@ -265,6 +268,8 @@ app.v_game_room = (function () {
 
   return {
     ON_UPDATE_GAME_ROOM_INFO : ON_UPDATE_GAME_ROOM_INFO,
+    ON_GAME_START : ON_GAME_START,
+    ON_GAME_OVER : ON_GAME_OVER,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,

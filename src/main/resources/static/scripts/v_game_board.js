@@ -35,16 +35,8 @@ app.v_game_board = (function () {
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap,
-    _updateGameRoomInfoHandler, _playerReadyHandler,
+    _updateGameRoomInfoHandler,
     initModule;
-
-  _playerReadyHandler = function (operation, readyPlayer) {
-    if (operation === 'ready') {
-      if (readyPlayer.status === 'READY_DONE') {
-        webixMap.game_progress_board.add();
-      }
-    }
-  };
 
   _resetWebixMap = function () {
     webixMap = {};
@@ -63,10 +55,17 @@ app.v_game_board = (function () {
   };
 
   _updateGameRoomInfoHandler = function () {
-    if (app.v_game_room.getGameRoomModel().status === 'RUNNING') {
+    var gameStatus = app.v_game_room.getGameRoomModel().status;
+    if (gameStatus === app.const.status.RUNNING) {
       webixMap.game_progress_board.add({
         message : '게임이 시작 되었습니다', type : 'alert'
       });
+      webix.callEvent(app.v_game_room.ON_GAME_START, []);
+    } else if (gameStatus === app.const.status.GAME_OVER) {
+      webixMap.game_progress_board.add({
+        message : '게임이 종료 되었습니다', type : 'alert'
+      });
+      webix.callEvent(app.v_game_room.ON_GAME_OVER, []);
     }
     _resetJoinedPlayersProfile();
     _makePlayersProfile();
