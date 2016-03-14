@@ -32,6 +32,10 @@ app.m_player = (function () {
 
   initModule = function (playerObject) {
     info = playerObject;
+
+    if (info && !info.gameRoomId) {
+      info.gameRoomId = null;
+    }
   };
 
   return {

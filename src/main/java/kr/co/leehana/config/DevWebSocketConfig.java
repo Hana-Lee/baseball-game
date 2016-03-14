@@ -22,6 +22,7 @@ public class DevWebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer
 		config.enableSimpleBroker("/topic");
 		// send prefix
 		config.setApplicationDestinationPrefixes("/app");
+		config.setUserDestinationPrefix("/user");
 	}
 
 	@Override

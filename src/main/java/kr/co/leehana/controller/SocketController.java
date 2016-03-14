@@ -17,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -107,6 +109,29 @@ public class SocketController {
 		final MessagingDto dto = new MessagingDto();
 		dto.setData(gameRoom);
 		dto.setOperation("update");
+		return dto;
+	}
+
+	@MessageMapping(value = {"/player/guess-number/{id}"})
+	@SendToUser(value = {"/topic/gameroom/{id}/progress/updated", "/topic/player/updated"}, broadcast = false)
+	public MessagingDto inputGuessNumber(@DestinationVariable Long id, @Valid PlayerDto.Update updateDto, Principal principal) {
+		final GameRoom gameRoom = gameRoomService.getById(id);
+		updateDto.setGuessNumber(updateDto.getGuessNumber().replaceAll(" ", ""));
+//		userInputValidation(updateDto.getGuessNumber(), gameRoom.getSetting());
+
+		updateDto.setInputCount(updateDto.getInputCount() + 1);
+		Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
+
+		Map<String, String> messageData = new HashMap<>();
+		messageData.put("message", "1s 2b 입니다");
+		messageData.put("type", "alert");
+		MessagingDto dto = new MessagingDto();
+		dto.setObject(modelMapper.map(updatedPlayer, PlayerDto.Response.class));
+		dto.setObjectOperation("guessNumber");
+		dto.setId(String.valueOf(id));
+		dto.setData(messageData);
+		dto.setOperation("insert");
+
 		return dto;
 	}
 

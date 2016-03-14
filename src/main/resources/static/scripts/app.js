@@ -32,11 +32,9 @@ var app = (function () {
       },
       load : function (view) {
         var selfId = this.clientId, subscribeUrl = '/topic' + this.source,
-          headers = {
-            id : 'sub-' + this.clientId
-          }, subscribeObj;
+          subscribeList = [], _responseHandler;
 
-        subscribeObj = app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
+        _responseHandler = function (response) {
           var update = {};
           update = JSON.parse(response.body);
 
@@ -57,10 +55,19 @@ var app = (function () {
               }
             }
           });
-        }, headers);
+        };
+
+        subscribeList.push(
+          app.v_shell.getStompClient().subscribe(subscribeUrl, _responseHandler, {id : 'sub-' + this.clientId})
+        );
+        subscribeList.push(
+          app.v_shell.getStompClient().subscribe('/user' + subscribeUrl, _responseHandler, {id : 'sub-' + this.clientId})
+        );
 
         view.attachEvent('onDestruct', function () {
-          subscribeObj.unsubscribe();
+          subscribeList.forEach(function (sub) {
+            sub.unsubscribe();
+          });
         });
       },
       save : function (view, update/*, dp, callback*/) {

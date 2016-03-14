@@ -13,4 +13,6 @@ public class MessagingDto {
 	private String operation;
 	private String id;
 	private Object data;
+	private String objectOperation;
+	private Object object;
 }

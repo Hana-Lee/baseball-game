@@ -38,7 +38,7 @@ app.v_game_pad = (function () {
     _createView, _showMakeNumberWindow,
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
     _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler, _sendGuessNumbers,
-    _guessNumbersValidate,
+    _guessNumberValidate, _playerInfoUpdatedHandler,
     initModule;
 
   _sendCreatedNumber = function (send_data) {
@@ -94,7 +94,7 @@ app.v_game_pad = (function () {
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
-          _showProgressBar();
+          //_showProgressBar();
         } else {
           webixMap.ready_button.config.label = '준비!!';
           webixMap.ready_button.refresh();
@@ -110,8 +110,10 @@ app.v_game_pad = (function () {
     });
   };
 
-  _sendGuessNumbers = function (guessNumbers) {
-    var header = {}, data = {guessNumber : guessNumbers};
+  _sendGuessNumbers = function (guessNumber) {
+    app.m_player.getInfo().guessNumber = guessNumber;
+    app.m_player.getInfo().gameRoomId = app.v_game_room.getGameRoomModel().id;
+    var header = {}, data = app.m_player.getInfo();
     app.v_shell.getStompClient().send(
       '/app/player/guess-number/' + app.v_game_room.getGameRoomModel().id,
       header, JSON.stringify(data)
@@ -326,13 +328,14 @@ app.v_game_pad = (function () {
           disabled : true,
           on : {
             onItemClick : function (/*id, evt*/) {
-              var guessNumbers = stateMap.selected_num.join('');
-              if (_guessNumbersValidate(guessNumbers)) {
-                _sendGuessNumbers(guessNumbers);
+              var guessNumber = stateMap.selected_num.join('');
+              if (_guessNumberValidate(guessNumber)) {
+                _sendGuessNumbers(guessNumber);
+
                 stateMap.selected_num = [];
                 $$('game-pad').unselectAll();
                 this.disable();
-                _hideProgressBar();
+                _hideProgressBar(true);
               }
             }
           }
@@ -350,13 +353,13 @@ app.v_game_pad = (function () {
     webixMap.ready_button = $$('ready-button');
   };
 
-  _guessNumbersValidate = function (guessNumbers) {
+  _guessNumberValidate = function (guessNumber) {
     var result = false, message = '';
-    if (webix.rules.isEmpty(guessNumbers)) {
-      message = '빈값은 입력할 수 없습니다.';
-    } else if (webix.rules.isInputCountCorrect(guessNumbers, app.v_game_room.getGameRoomModel().setting.limitGuessInputCount)) {
+    if (webix.rules.isEmpty(guessNumber)) {
+      message = '빈값은 입력할 수 없습니다';
+    } else if (webix.rules.isInputCountCorrect(guessNumber, app.v_game_room.getGameRoomModel().setting.limitGuessInputCount)) {
       message = '입력 갯수를 확인 해주세요';
-    } else if (webix.rules.containsSameNumber(guessNumbers)) {
+    } else if (webix.rules.containsSameNumber(guessNumber)) {
       message = '중복된 숫자는 입력할 수 없습니다';
     } else {
       result = true;
@@ -390,8 +393,8 @@ app.v_game_pad = (function () {
     }
   };
 
-  _hideProgressBar = function () {
-    $$('game-pad').hideProgress();
+  _hideProgressBar = function (now) {
+    $$('game-pad').hideProgress(now);
   };
 
   _gameStartHandler = function () {
@@ -415,6 +418,12 @@ app.v_game_pad = (function () {
     }
   };
 
+  _playerInfoUpdatedHandler = function (operation) {
+    if (operation === 'guessNumber') {
+      _showProgressBar();
+    }
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     if (app.m_player.getInfo().status === app.const.status.READY_DONE) {
@@ -424,6 +433,7 @@ app.v_game_pad = (function () {
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_START, _gameStartHandler));
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_OVER, _gameOverHandler));
+    stateMap.events.push(webix.attachEvent(app.v_shell.ON_PLAYER_INFO_UPDATED, _playerInfoUpdatedHandler));
   };
 
   return {

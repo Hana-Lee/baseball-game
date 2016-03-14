@@ -252,6 +252,8 @@ public class GameRoomController {
 
 		player.setGameRole(null);
 		player.setStatus(null);
+		player.setInputCount(0);
+		player.setGuessNumber(null);
 
 		gameRoom.getPlayers().remove(player);
 
@@ -284,6 +286,8 @@ public class GameRoomController {
 
 		player.setGameRole(null);
 		player.setStatus(null);
+		player.setInputCount(0);
+		player.setGuessNumber(null);
 
 		gameRoom.getPlayers().remove(player);
 

@@ -2,6 +2,7 @@ package kr.co.leehana.dto;
 
 import kr.co.leehana.annotation.PasswordMatches;
 import kr.co.leehana.annotation.ValidEmail;
+import kr.co.leehana.annotation.ValidGuessNumber;
 import kr.co.leehana.enums.Enabled;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.enums.Status;
@@ -66,22 +67,29 @@ public class PlayerDto {
 		private Date deleted;
 		private Enabled enabled;
 		private Integer inputCount;
-		private Integer guessNumber;
+		private String guessNumber;
 	}
 
 	@Data
+	@ValidGuessNumber
 	public static class Update {
-		private String email;
-		private String password;
+		private Long gameRoomId;
+		private Long id;
 		private String nickname;
+		private String password;
+		private String email;
 		private Avatar avatar;
 		private Level level;
+		private TotalScore totalScore;
 		private TotalRank totalRank;
 		private MatchRecord matchRecord;
 		private DefenderRoleCount defenderRoleCount;
 		private AttackerRoleCount attackerRoleCount;
 		private GameRole gameRole;
+		private Boolean admin;
 		private Status status;
+		private Integer inputCount;
+		private String guessNumber;
 	}
 
 	@Data

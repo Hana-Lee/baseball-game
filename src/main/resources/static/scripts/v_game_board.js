@@ -34,7 +34,7 @@ app.v_game_board = (function () {
       proxy : null
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
-    _resetWebixMap, _resetStateMap,
+    _resetWebixMap, _resetStateMap, _playerInfoUpdatedHandler,
     _updateGameRoomInfoHandler,
     initModule;
 
@@ -54,15 +54,28 @@ app.v_game_board = (function () {
     stateMap.proxy = null;
   };
 
+  _playerInfoUpdatedHandler = function (operation) {
+    var gameStatus = app.v_game_room.getGameRoomModel().status,
+      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    if (operation === 'guessNumber' && gameStatus === app.const.status.RUNNING) {
+      webixMap.game_progress_board.add({
+        message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+        type : 'normal'
+      });
+    }
+  };
+
   _updateGameRoomInfoHandler = function () {
     var gameStatus = app.v_game_room.getGameRoomModel().status,
       inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
     if (gameStatus === app.const.status.RUNNING) {
-      app.m_player.getInfo().inputCount += 1;
+      app.m_player.getInfo().inputCount = 0;
+
       webixMap.game_progress_board.add({
         message : '게임이 시작 되었습니다', type : 'alert'
-      }, {
-        message : app.m_player.getInfo().inputCount + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+      });
+      webixMap.game_progress_board.add({
+        message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
         type : 'normal'
       });
       webix.callEvent(app.v_game_room.ON_GAME_START, []);
@@ -223,6 +236,7 @@ app.v_game_board = (function () {
     stateMap.proxy.clientId = app.utils.guid();
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfoHandler));
+    stateMap.events.push(webix.attachEvent(app.v_shell.ON_PLAYER_INFO_UPDATED, _playerInfoUpdatedHandler));
 
     _createView();
   };

@@ -33,6 +33,7 @@ app.v_shell = (function () {
     showSignUp, showLogin, createGameRoom, showMainBoard, logout, getStompClient, joinGameRoom, joinRandomGameRoom,
     leaveGameRoom, leaveAndGameRoomDelete,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
+    _updatePlayerHandler,
     initModule;
 
   showSignUp = function () {
@@ -62,6 +63,7 @@ app.v_shell = (function () {
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
         app.m_player.getInfo().gameRole = selectedGameRole;
+        app.m_player.getInfo().gameRoomId = joinedGameRoom.id;
         _showGameRoom(joinedGameRoom);
       }
     });
@@ -97,6 +99,7 @@ app.v_shell = (function () {
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
         app.m_player.getInfo().gameRole = data.gameRole;
+        app.m_player.getInfo().gameRoomId = joinedGameRoom.id;
 
         _showGameRoom(joinedGameRoom);
       }
@@ -133,6 +136,7 @@ app.v_shell = (function () {
       success : function (text) {
         var gameRoomJson = JSON.parse(text);
         app.m_player.getInfo().gameRole = gameRoomJson.owner.gameRole;
+        app.m_player.getInfo().gameRoomId = gameRoomJson.id;
         _showGameRoom(gameRoomJson);
       }
     });
@@ -178,6 +182,7 @@ app.v_shell = (function () {
       success : function (/*text*/) {
         app.m_player.getInfo().gameRole = null;
         app.m_player.getInfo().status = null;
+        app.m_player.getInfo().gameRoomId = null;
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -201,6 +206,7 @@ app.v_shell = (function () {
       success : function (/*text*/) {
         app.m_player.getInfo().gameRole = null;
         app.m_player.getInfo().status = null;
+        app.m_player.getInfo().gameRoomId = null;
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -273,21 +279,29 @@ app.v_shell = (function () {
           callback();
         }
 
-        stateMap.stomp_client.subscribe('/topic/player/updated', function (response) {
-          var responseJson = JSON.parse(response.body),
-          player = responseJson.data;
-
-          if (player.id === app.m_player.getInfo().id) {
-            app.m_player.initModule(player);
-          }
-
-          webix.callEvent(ON_PLAYER_INFO_UPDATED, [responseJson.operation, player]);
-        }, {});
+        stateMap.stomp_client.subscribe('/topic/player/updated', _updatePlayerHandler, {});
+        stateMap.stomp_client.subscribe('/user/topic/player/updated', _updatePlayerHandler, {});
       },
       function (error) {
         console.log(error);
       }
     );
+  };
+
+  _updatePlayerHandler = function (response) {
+    var responseJson = JSON.parse(response.body),
+      player = responseJson.data, operation = responseJson.operation;
+
+    if (!player || !player.id) {
+      player = responseJson.object;
+      operation = responseJson.objectOperation;
+    }
+
+    if (player.id === app.m_player.getInfo().id) {
+      app.m_player.initModule(player);
+    }
+
+    webix.callEvent(ON_PLAYER_INFO_UPDATED, [operation, player]);
   };
 
   _createView = function () {

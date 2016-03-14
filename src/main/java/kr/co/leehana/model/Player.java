@@ -123,7 +123,6 @@ public class Player implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private Enabled enabled;
 
-	@Transient
 	private Integer inputCount = 0;
 
 	@Transient

@@ -156,6 +156,14 @@ public class PlayerServiceImpl implements PlayerService {
 			player.setStatus(updateDto.getStatus());
 		}
 
+		if (updateDto.getInputCount() != null) {
+			player.setInputCount(updateDto.getInputCount());
+		}
+
+		if (updateDto.getGuessNumber() != null) {
+			player.setGuessNumber(updateDto.getGuessNumber());
+		}
+
 		player.setUpdated(new Date());
 
 		return playerRepository.save(player);

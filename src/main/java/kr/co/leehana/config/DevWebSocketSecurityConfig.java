@@ -20,6 +20,7 @@ public class DevWebSocketSecurityConfig extends AbstractSecurityWebSocketMessage
 				.simpDestMatchers("/sock/**").hasRole("USER")
 				.simpDestMatchers("/app/**").hasRole("USER")
 				.simpSubscribeDestMatchers("/topic/**").hasRole("USER")
+				.simpSubscribeDestMatchers("/user/**").hasRole("USER")
 				.simpTypeMatchers(SimpMessageType.MESSAGE, SimpMessageType.SUBSCRIBE).denyAll()
 				.anyMessage().denyAll();
 	}
