@@ -55,10 +55,15 @@ app.v_game_board = (function () {
   };
 
   _updateGameRoomInfoHandler = function () {
-    var gameStatus = app.v_game_room.getGameRoomModel().status;
+    var gameStatus = app.v_game_room.getGameRoomModel().status,
+      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
     if (gameStatus === app.const.status.RUNNING) {
+      app.m_player.getInfo().inputCount += 1;
       webixMap.game_progress_board.add({
         message : '게임이 시작 되었습니다', type : 'alert'
+      }, {
+        message : app.m_player.getInfo().inputCount + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+        type : 'normal'
       });
       webix.callEvent(app.v_game_room.ON_GAME_START, []);
     } else if (gameStatus === app.const.status.GAME_OVER) {

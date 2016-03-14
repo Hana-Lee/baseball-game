@@ -65,6 +65,8 @@ public class PlayerDto {
 		private Date updated;
 		private Date deleted;
 		private Enabled enabled;
+		private Integer inputCount;
+		private Integer guessNumber;
 	}
 
 	@Data

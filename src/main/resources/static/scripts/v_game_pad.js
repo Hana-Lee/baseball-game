@@ -37,7 +37,8 @@ app.v_game_pad = (function () {
     }, webixMap = {},
     _createView, _showMakeNumberWindow,
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
-    _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler,
+    _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler, _sendGuessNumbers,
+    _guessNumbersValidate,
     initModule;
 
   _sendCreatedNumber = function (send_data) {
@@ -107,6 +108,14 @@ app.v_game_pad = (function () {
         _playerReadyNotification();
       }
     });
+  };
+
+  _sendGuessNumbers = function (guessNumbers) {
+    var header = {}, data = {guessNumber : guessNumbers};
+    app.v_shell.getStompClient().send(
+      '/app/player/guess-number/' + app.v_game_room.getGameRoomModel().id,
+      header, JSON.stringify(data)
+    );
   };
 
   _playerReadyNotification = function () {
@@ -317,10 +326,14 @@ app.v_game_pad = (function () {
           disabled : true,
           on : {
             onItemClick : function (/*id, evt*/) {
-              stateMap.selected_num = [];
-              $$('game-pad').unselectAll();
-              this.disable();
-              _hideProgressBar();
+              var guessNumbers = stateMap.selected_num.join('');
+              if (_guessNumbersValidate(guessNumbers)) {
+                _sendGuessNumbers(guessNumbers);
+                stateMap.selected_num = [];
+                $$('game-pad').unselectAll();
+                this.disable();
+                _hideProgressBar();
+              }
             }
           }
         }]
@@ -335,6 +348,29 @@ app.v_game_pad = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.ready_button = $$('ready-button');
+  };
+
+  _guessNumbersValidate = function (guessNumbers) {
+    var result = false, message = '';
+    if (webix.rules.isEmpty(guessNumbers)) {
+      message = '빈값은 입력할 수 없습니다.';
+    } else if (webix.rules.isInputCountCorrect(guessNumbers, app.v_game_room.getGameRoomModel().setting.limitGuessInputCount)) {
+      message = '입력 갯수를 확인 해주세요';
+    } else if (webix.rules.containsSameNumber(guessNumbers)) {
+      message = '중복된 숫자는 입력할 수 없습니다';
+    } else {
+      result = true;
+    }
+    if (result === false && message !== '') {
+      webix.alert({
+        title : '오류',
+        ok : '확인',
+        text : message
+      });
+      webix.message(message, 'error');
+    }
+
+    return result;
   };
 
   _showProgressBar = function () {
