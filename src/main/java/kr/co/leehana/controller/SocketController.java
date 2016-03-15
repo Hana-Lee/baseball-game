@@ -21,7 +21,6 @@ import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,10 +113,8 @@ public class SocketController {
 
 	@MessageMapping(value = {"/player/guess-number/{id}"})
 	@SendToUser(value = {"/topic/gameroom/{id}/progress/updated", "/topic/player/updated"}, broadcast = false)
-	public MessagingDto inputGuessNumber(@DestinationVariable Long id, @Valid PlayerDto.Update updateDto, Principal principal) {
-		final GameRoom gameRoom = gameRoomService.getById(id);
+	public MessagingDto inputGuessNumber(@DestinationVariable Long id, PlayerDto.Update updateDto, Principal principal) {
 		updateDto.setGuessNumber(updateDto.getGuessNumber().replaceAll(" ", ""));
-//		userInputValidation(updateDto.getGuessNumber(), gameRoom.getSetting());
 
 		updateDto.setInputCount(updateDto.getInputCount() + 1);
 		Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
