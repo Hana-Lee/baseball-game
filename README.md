@@ -1,4 +1,4 @@
-# 야구 게임 [![Build Status](https://travis-ci.org/Hana-Lee/baseball-game.svg?branch=master)](https://travis-ci.org/Hana-Lee/baseball-game)  [![Stories in Ready](https://badge.waffle.io/Hana-Lee/baseball-game.svg?label=ready&title=Ready)](http://waffle.io/Hana-Lee/baseball-game) 
+# 야구 게임 [![Build Status](https://travis-ci.org/Hana-Lee/baseball-game.svg?branch=master)](https://travis-ci.org/Hana-Lee/baseball-game)  [![Build Status](https://semaphoreci.com/api/v1/voyaging/baseball-game/branches/master/badge.svg)](https://semaphoreci.com/voyaging/baseball-game)  [![Stories in Ready](https://badge.waffle.io/Hana-Lee/baseball-game.svg?label=ready&title=Ready)](http://waffle.io/Hana-Lee/baseball-game)
 * 자바를 공부하며 만들어 보는 야구 게임 서버 및 클라이언트
 * 서버는 Spring Boot 를 이용한 웹 서버 및 웹소켓을 이용한다
 * 클라이언트는 SPA 방식으로 처리한다
