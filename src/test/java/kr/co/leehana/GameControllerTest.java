@@ -3,7 +3,7 @@ package kr.co.leehana;
 import kr.co.leehana.controller.GameController;
 import kr.co.leehana.controller.NumberGenerator;
 import kr.co.leehana.model.ErrorMessage;
-import kr.co.leehana.model.Result;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Setting;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,7 +105,7 @@ public class GameControllerTest {
 	// 게임 종료 여부 확인 테스트
 	@Test
 	public void testGameEndWithMatchingNumber() {
-		Result result = gameController.compareNumber("123", "123");
+		GuessNumberComparedResult result = gameController.compareNumber("123", "123");
 		boolean isGameEnd = gameController.isGameEnd(result);
 		assertTrue("게임 종료값은 true 여야 합니다", isGameEnd);
 	}
@@ -120,7 +120,7 @@ public class GameControllerTest {
 
 	private void assertGuessResult(String generatedNumber, String guessNumbers, boolean solved, int expectedStrikes,
 	                               int expectedBalls) {
-		Result guessResult = gameController.compareNumber(generatedNumber, guessNumbers);
+		GuessNumberComparedResult guessResult = gameController.compareNumber(generatedNumber, guessNumbers);
 		assertThat(guessResult.getSettlement().isSolved(), equalTo(solved));
 		assertThat(guessResult.getStrike().getValue(), equalTo(expectedStrikes));
 		assertThat(guessResult.getBall().getValue(), equalTo(expectedBalls));

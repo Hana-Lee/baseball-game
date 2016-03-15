@@ -419,7 +419,9 @@ app.v_game_pad = (function () {
   };
 
   _playerInfoUpdatedHandler = function (operation) {
-    if (operation === 'guessNumber') {
+    if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
+      _hideProgressBar();
+    } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'guessNumberPlayer') {
       _showProgressBar();
     }
   };

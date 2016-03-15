@@ -6,6 +6,7 @@ import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.model.GameRoom;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.service.ChatService;
 import kr.co.leehana.service.GameRoomService;
@@ -56,6 +57,9 @@ public class SocketController {
 	@Autowired
 	private GenerationNumberStrategy generationNumberStrategy;
 
+	@Autowired
+	private GameController gameController;
+
 	@MessageMapping(value = {"/chat"})
 	@SendTo(value = {"/topic/chat"})
 	public ChatDto.Message chat(ChatDto.Message message) {
@@ -82,6 +86,8 @@ public class SocketController {
 	@SendTo(value = {"/topic/gameroom/{id}/progress/updated"})
 	public MessagingDto gameRoomProgressUpdate(@DestinationVariable Long id, Principal principal) {
 		final Player player = playerService.getByEmail(principal.getName());
+		player.setInputCount(0);
+		player.setGuessNumber(null);
 		String message = "";
 		String type = "";
 		if (Objects.equals(player.getStatus(), Status.READY_DONE)) {
@@ -123,14 +129,26 @@ public class SocketController {
 		updateDto.setGuessNumber(updateDto.getGuessNumber().replaceAll(" ", ""));
 
 		updateDto.setInputCount(updateDto.getInputCount() + 1);
-		Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
+
+		final GameRoom gameRoom = gameRoomService.getById(id);
+
+		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(),
+				updateDto.getGuessNumber());
+
+		String guessResultMessage = gameController.makeGuessResultMessage(result, updateDto);
+
+		if (gameController.isGameEnd(result)) {
+			updateDto.setStatus(Status.GAME_OVER);
+		}
+
+		final Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
 
 		Map<String, String> messageData = new HashMap<>();
-		messageData.put("message", "1s 2b 입니다");
+		messageData.put("message", guessResultMessage);
 		messageData.put("type", "alert");
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(modelMapper.map(updatedPlayer, PlayerDto.Response.class));
-		dto.setObjectOperation("guessNumber");
+		dto.setObjectOperation("guessNumberPlayer");
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
 		dto.setOperation("insert");
@@ -166,7 +184,7 @@ public class SocketController {
 			gameRoom.setStatus(Status.RUNNING);
 
 			if (gameRoom.getGameNumber() == null || StringUtils.isBlank(gameRoom.getGameNumber().getValue())) {
-				makeRandomNumber(gameRoom);
+				gameRoom.setGameNumber(new GameNumber(gameController.generateNumber(gameRoom.getSetting())));
 			}
 		} else {
 			gameRoom.setStatus(Status.NORMAL);
@@ -180,10 +198,6 @@ public class SocketController {
 			gameRoom.getPlayers().stream().forEach(p -> p.setStatus(Status.INPUT));
 			gameRoom.getOwner().setStatus(Status.INPUT);
 		}
-	}
-
-	private void makeRandomNumber(GameRoom gameRoom) {
-		gameRoom.setGameNumber(new GameNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
 	}
 
 	private boolean isAllPlayersReadyDone(GameRoom gameRoom) {

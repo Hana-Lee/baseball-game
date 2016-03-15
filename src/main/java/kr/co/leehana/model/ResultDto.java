@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ResultDto {
 
-	private Result result;
+	private GuessNumberComparedResult result;
 	private OldUser user;
 	private OldGameRoom gameRoom;
 	private Score score;

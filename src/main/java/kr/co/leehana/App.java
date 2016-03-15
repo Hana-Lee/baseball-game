@@ -70,9 +70,4 @@ public class App extends SpringBootServletInitializer {
 	public NotifyAspect notifyAspect() {
 		return new NotifyAspect();
 	}
-
-//	@Bean
-//	public GenerationNumberStrategy generationNumberStrategy() {
-//		return new NumberGenerator();
-//	}
 }

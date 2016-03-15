@@ -32,7 +32,7 @@ public class OldUser {
 	private Boolean gameOver = false;
 	private Rank rank;
 	private int wrongCount = 0;
-	private Result result;
+	private GuessNumberComparedResult result;
 	private boolean guessCompleted;
 	private Score totalScore;
 	private String guessNum;

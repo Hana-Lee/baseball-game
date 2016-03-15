@@ -6,7 +6,7 @@ import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Rank;
-import kr.co.leehana.model.Result;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
@@ -230,7 +230,7 @@ public class ServerBackground {
 											"/" + gameRoom.getSetting().getLimitWrongInputCount());
 								}
 
-								Result result = null;
+								GuessNumberComparedResult result = null;
 								if (errorMessage.getMessage() == null || errorMessage.getMessage().isEmpty()) {
 									user.setWrongCount(0);
 									user.setGuessCount(user.getGuessCount() + 1);

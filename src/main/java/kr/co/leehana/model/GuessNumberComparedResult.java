@@ -11,7 +11,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @Getter
-public class Result {
+public class GuessNumberComparedResult {
 
 	private Settlement settlement;
 	private Strike strike;

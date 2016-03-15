@@ -2,10 +2,10 @@ package kr.co.leehana;
 
 import kr.co.leehana.controller.ScoreCalculator;
 import kr.co.leehana.model.Ball;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Rank;
-import kr.co.leehana.model.Result;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
@@ -153,9 +153,9 @@ public class ScoreCalculatorTest {
 		for (int i = 1; i <= attackUserCount; i++) {
 			OldUser newUser = new OldUser("이하나" + i, new Role(GameRole.ATTACKER), new Score());
 			if (count < solvedUserCount) {
-				newUser.setResult(new Result(new Settlement(true), new Strike(2), new Ball(0)));
+				newUser.setResult(new GuessNumberComparedResult(new Settlement(true), new Strike(2), new Ball(0)));
 			} else {
-				newUser.setResult(new Result(new Settlement(false), new Strike(2), new Ball(0)));
+				newUser.setResult(new GuessNumberComparedResult(new Settlement(false), new Strike(2), new Ball(0)));
 			}
 			this.gameRoom.getUsers().add(newUser);
 
@@ -173,7 +173,7 @@ public class ScoreCalculatorTest {
 		final OldUser depender = new OldUser("이하나", new Role(GameRole.DEFENDER), new Score());
 		final OldUser attacker = new OldUser("이두나", new Role(GameRole.ATTACKER), new Score());
 		attacker.setGameOver(true);
-		attacker.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
+		attacker.setResult(new GuessNumberComparedResult(new Settlement(true), new Strike(3), new Ball(0)));
 
 		this.gameRoom.getUsers().add(depender);
 		this.gameRoom.getUsers().add(attacker);
@@ -276,7 +276,7 @@ public class ScoreCalculatorTest {
 	private void assertAttackerScoreCalculation(String userId, Setting setting, Rank rank, int userCount, List<Integer>
 			expectedScores) {
 		// 공동으로 사용할 result 인스턴스
-		final Result result = new Result(new Settlement(true), new Strike(3), new Ball(0));
+		final GuessNumberComparedResult result = new GuessNumberComparedResult(new Settlement(true), new Strike(3), new Ball(0));
 		this.gameRoom.setSetting(setting);
 		// 총 1명
 		final OldUser newUser = new OldUser(userId, new Role(GameRole.ATTACKER), new Score());
@@ -343,7 +343,7 @@ public class ScoreCalculatorTest {
 	}
 
 	private void assertNotFocusedScoreCalculation(int guessLevel, int generationLevel, int expectedScore) {
-		final Result result = new Result(new Settlement(false), new Strike(2), new Ball(1));
+		final GuessNumberComparedResult result = new GuessNumberComparedResult(new Settlement(false), new Strike(2), new Ball(1));
 		final Setting setting = new Setting(5, guessLevel, generationLevel);
 		gameRoom.setSetting(setting);
 
@@ -364,7 +364,7 @@ public class ScoreCalculatorTest {
 	@Test
 	public void testWrongNumberScoreCalculation() {
 		final OldUser user = new OldUser("이하나", new Role(GameRole.ATTACKER), new Score());
-		user.setResult(new Result(new Settlement(false), new Strike(0), new Ball(0)));
+		user.setResult(new GuessNumberComparedResult(new Settlement(false), new Strike(0), new Ball(0)));
 		user.setGuessCount(0);
 		user.setWrongCount(5);
 		gameRoom.setSetting(new Setting());
@@ -380,7 +380,7 @@ public class ScoreCalculatorTest {
 	@Test
 	public void testTotalScoreCalculation() {
 		final OldUser user = new OldUser("이하나", new Role(GameRole.ATTACKER), new Score());
-		user.setResult(new Result(new Settlement(true), new Strike(3), new Ball(0)));
+		user.setResult(new GuessNumberComparedResult(new Settlement(true), new Strike(3), new Ball(0)));
 		user.setGuessCount(2);
 		user.setRank(new Rank(1));
 

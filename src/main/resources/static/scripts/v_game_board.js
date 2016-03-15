@@ -57,7 +57,8 @@ app.v_game_board = (function () {
   _playerInfoUpdatedHandler = function (operation) {
     var gameStatus = app.v_game_room.getGameRoomModel().status,
       inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
-    if (operation === 'guessNumber' && gameStatus === app.const.status.RUNNING) {
+    if (app.m_player.getInfo().status === app.const.status.INPUT
+      && operation === 'guessNumberPlayer' && gameStatus === app.const.status.RUNNING) {
       webixMap.game_progress_board.add({
         message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
         type : 'normal'
@@ -81,7 +82,7 @@ app.v_game_board = (function () {
       webix.callEvent(app.v_game_room.ON_GAME_START, []);
     } else if (gameStatus === app.const.status.GAME_OVER) {
       webixMap.game_progress_board.add({
-        message : '게임이 종료 되었습니다', type : 'alert'
+        message : '모든 게임이 종료 되었습니다', type : 'alert'
       });
       webix.callEvent(app.v_game_room.ON_GAME_OVER, []);
     }

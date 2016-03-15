@@ -1,17 +1,22 @@
 package kr.co.leehana.controller;
 
+import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.model.Ball;
 import kr.co.leehana.model.ErrorMessage;
-import kr.co.leehana.model.Result;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Component
 public class GameController {
 
+	@Autowired
 	private GenerationNumberStrategy generationNumberStrategy;
 
 	public GameController(GenerationNumberStrategy generationNumberStrategy) {
@@ -43,7 +48,7 @@ public class GameController {
 		}
 	}
 
-	public Result compareNumber(String generatedNumbers, String guessNumbers) {
+	public GuessNumberComparedResult compareNumber(String generatedNumbers, String guessNumbers) {
 		int strikes = 0;
 		int balls = 0;
 		int genNumCount = generatedNumbers.length();
@@ -56,11 +61,20 @@ public class GameController {
 			}
 		}
 
-		return new Result(new Settlement(isSolved(genNumCount, strikes)), new Strike(strikes), new Ball(balls));
+		return new GuessNumberComparedResult(new Settlement(isSolved(genNumCount, strikes)), new Strike(strikes), new Ball(balls));
 	}
 
 	private boolean isSolved(int generatedNumberCount, int strikes) {
 		return strikes == generatedNumberCount;
+	}
+
+	public String makeGuessResultMessage(final GuessNumberComparedResult result, final PlayerDto.Update player) {
+		final String message = "[" + player.getGuessNumber() + "]:";
+		if (isGameEnd(result)) {
+			return message + "숫자를 맞췄습니다";
+		} else {
+			return message + result.getStrike().getValue() + "스트라이크, " + result.getBall().getValue() + "볼";
+		}
 	}
 
 	public void generatedNumbersValidator(String numbers, ErrorMessage errorMessage) {
@@ -82,7 +96,7 @@ public class GameController {
 		return generationNumberStrategy.generateRandomNumber(setting);
 	}
 
-	public boolean isGameEnd(Result result) {
+	public boolean isGameEnd(GuessNumberComparedResult result) {
 		return result.getSettlement() != null && result.getSettlement().isSolved();
 	}
 }
