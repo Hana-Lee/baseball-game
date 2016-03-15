@@ -27,8 +27,7 @@ app.const = (function () {
       GAME_OVER : 'GAME_OVER',
       READY_BEFORE : 'READY_BEFORE',
       READY_DONE : 'READY_DONE',
-      INPUT : 'INPUT',
-      INPUT_DONE : 'INPUT_DONE'
+      INPUT : 'INPUT'
     };
 
   return {

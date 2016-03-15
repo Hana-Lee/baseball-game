@@ -108,6 +108,7 @@ public class SocketController {
 		final GameRoom gameRoom = gameRoomService.getById(id);
 
 		updateGameRoomStatus(gameRoom);
+		gameRoomService.update(gameRoom);
 
 		final MessagingDto dto = new MessagingDto();
 		dto.setData(gameRoom);
@@ -169,6 +170,15 @@ public class SocketController {
 			}
 		} else {
 			gameRoom.setStatus(Status.NORMAL);
+		}
+
+		updatePlayersStatus(gameRoom);
+	}
+
+	private void updatePlayersStatus(GameRoom gameRoom) {
+		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
+			gameRoom.getPlayers().stream().forEach(p -> p.setStatus(Status.INPUT));
+			gameRoom.getOwner().setStatus(Status.INPUT);
 		}
 	}
 
