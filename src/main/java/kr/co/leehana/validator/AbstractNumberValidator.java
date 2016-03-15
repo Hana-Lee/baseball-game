@@ -58,8 +58,11 @@ public class AbstractNumberValidator {
 		boolean result = false;
 		for (Character ch : numberString.toCharArray()) {
 			if (ch < '0' || ch > '9') {
-				message = "0 ~ 9 사이의 숫자만 입력 가능합니다";
 				result = true;
+			}
+
+			if (result) {
+				break;
 			}
 		}
 		return result;

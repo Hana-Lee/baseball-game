@@ -22,6 +22,7 @@ app.v_shell = (function () {
 
   var
     ON_PLAYER_INFO_UPDATED = 'onPlayerInfoUpdated',
+    ON_WEB_SOCKET_ERROR = 'onWebSocketError',
     configMap = {
       width : 1024,
       height : 750
@@ -33,7 +34,7 @@ app.v_shell = (function () {
     showSignUp, showLogin, createGameRoom, showMainBoard, logout, getStompClient, joinGameRoom, joinRandomGameRoom,
     leaveGameRoom, leaveAndGameRoomDelete,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
-    _updatePlayerHandler,
+    _updatePlayerHandler, _socketErrorHandler,
     initModule;
 
   showSignUp = function () {
@@ -281,11 +282,26 @@ app.v_shell = (function () {
 
         stateMap.stomp_client.subscribe('/topic/player/updated', _updatePlayerHandler, {});
         stateMap.stomp_client.subscribe('/user/topic/player/updated', _updatePlayerHandler, {});
+        stateMap.stomp_client.subscribe('/user/topic/errors', _socketErrorHandler, {});
       },
       function (error) {
         console.log(error);
       }
     );
+  };
+
+  _socketErrorHandler = function (response) {
+    console.log('error response', response);
+    var responseJson = JSON.parse(response.body);
+    if (responseJson.errorMessage) {
+      webix.alert({
+        title : '오류',
+        ok : '확인',
+        text : responseJson.errorMessage
+      });
+    }
+
+    webix.callEvent(ON_WEB_SOCKET_ERROR, [responseJson]);
   };
 
   _updatePlayerHandler = function (response) {
@@ -355,6 +371,7 @@ app.v_shell = (function () {
     createGameRoom : createGameRoom,
     leaveGameRoom : leaveGameRoom,
     leaveAndGameRoomDelete : leaveAndGameRoomDelete,
-    ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED
+    ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED,
+    ON_WEB_SOCKET_ERROR : ON_WEB_SOCKET_ERROR
   };
 }());

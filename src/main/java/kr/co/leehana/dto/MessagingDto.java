@@ -15,4 +15,6 @@ public class MessagingDto {
 	private Object data;
 	private String objectOperation;
 	private Object object;
+	private String errorMessage;
+	private String errorCode;
 }

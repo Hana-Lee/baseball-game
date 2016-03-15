@@ -15,12 +15,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.stereotype.Controller;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,9 +115,10 @@ public class SocketController {
 		return dto;
 	}
 
-	@MessageMapping(value = {"/player/guess-number/{id}"})
+	@MessageMapping(value = {"/gameroom/{id}/player-guess-number"})
 	@SendToUser(value = {"/topic/gameroom/{id}/progress/updated", "/topic/player/updated"}, broadcast = false)
-	public MessagingDto inputGuessNumber(@DestinationVariable Long id, PlayerDto.Update updateDto, Principal principal) {
+	public MessagingDto inputGuessNumber(@DestinationVariable Long id, @Payload @Valid PlayerDto.Update updateDto,
+	                                     Principal principal) throws Exception {
 		updateDto.setGuessNumber(updateDto.getGuessNumber().replaceAll(" ", ""));
 
 		updateDto.setInputCount(updateDto.getInputCount() + 1);
@@ -132,6 +137,29 @@ public class SocketController {
 		return dto;
 	}
 
+	/**
+	 * {code @Valid} 어노테이션에 의해 검증 오류가 발생하면 처리 하는 핸들러
+	 *
+	 * @param exception MethodArgumentNotValidException Class 검증 오류
+	 * @return 검증 오류의 메세지를 담은 객체
+	 */
+	@MessageExceptionHandler(value = {MethodArgumentNotValidException.class})
+	@SendToUser(value = {"/topic/errors"}, broadcast = false)
+	public MessagingDto handleMethodArgumentNotValidException(MethodArgumentNotValidException exception) {
+		// TODO Exception Handler 들을 ControllerAdvice 로 모두 옮겨서 관리 할 것
+		String message = null;
+		if (exception.getBindingResult().getGlobalError() != null) {
+			message = exception.getBindingResult().getGlobalError().getDefaultMessage();
+		} else if (exception.getBindingResult().getFieldError() != null) {
+			message = exception.getBindingResult().getFieldError().getDefaultMessage();
+		}
+
+		MessagingDto dto = new MessagingDto();
+		dto.setErrorMessage(message);
+		dto.setErrorCode(exception.getBindingResult().getGlobalError().getCode());
+		return dto;
+	}
+
 	private void updateGameRoomStatus(GameRoom gameRoom) {
 		if (isAllPlayersReadyDone(gameRoom)) {
 			gameRoom.setStatus(Status.RUNNING);
@@ -145,8 +173,7 @@ public class SocketController {
 	}
 
 	private void makeRandomNumber(GameRoom gameRoom) {
-		gameRoom.setGameNumber(new GameNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting()
-		)));
+		gameRoom.setGameNumber(new GameNumber(generationNumberStrategy.generateRandomNumber(gameRoom.getSetting())));
 	}
 
 	private boolean isAllPlayersReadyDone(GameRoom gameRoom) {

@@ -113,9 +113,9 @@ app.v_game_pad = (function () {
   _sendGuessNumbers = function (guessNumber) {
     app.m_player.getInfo().guessNumber = guessNumber;
     app.m_player.getInfo().gameRoomId = app.v_game_room.getGameRoomModel().id;
-    var header = {}, data = app.m_player.getInfo();
+    var header = {'Content-Type' : 'application/json'}, data = app.m_player.getInfo();
     app.v_shell.getStompClient().send(
-      '/app/player/guess-number/' + app.v_game_room.getGameRoomModel().id,
+      '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-guess-number',
       header, JSON.stringify(data)
     );
   };
