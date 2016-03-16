@@ -164,7 +164,7 @@ public class SocketController {
 
 		Map<String, String> messageData = new HashMap<>();
 		messageData.put("message", player.getNickname() + "님 " + (player.getInputCount() + 1) + "번째 입력중");
-		messageData.put("type", "notification");
+		messageData.put("type", "focus");
 		MessagingDto dto = new MessagingDto();
 		dto.setClientId(clientIdPayload.get("clientId"));
 		dto.setId(String.valueOf(id));

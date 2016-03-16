@@ -347,7 +347,6 @@ app.v_shell = (function () {
   _logoutNotification = function (email) {
     var header = {}, data = {email : email, operation : 'delete'};
     stateMap.stomp_client.send('/app/player/logout', header, JSON.stringify(data));
-    //stateMap.stomp_client.send('/app/player/logout', header, {});
   };
 
   playerInfoUpdate = function (callback) {
@@ -363,7 +362,6 @@ app.v_shell = (function () {
       },
       success : function (text) {
         var textJson = JSON.parse(text);
-        console.log('pppppppppp', textJson);
         if (textJson) {
           app.m_player.initModule(textJson);
         }
