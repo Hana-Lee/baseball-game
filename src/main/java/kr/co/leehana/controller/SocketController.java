@@ -118,7 +118,7 @@ public class SocketController {
 
 		final MessagingDto dto = new MessagingDto();
 		dto.setData(gameRoom);
-		dto.setOperation("update");
+		dto.setOperation("playerReadyStatusUpdated");
 		return dto;
 	}
 
@@ -166,6 +166,27 @@ public class SocketController {
 		messageData.put("message", player.getNickname() + "님 " + (player.getInputCount() + 1) + "번째 입력중");
 		messageData.put("type", "focus");
 		MessagingDto dto = new MessagingDto();
+		dto.setClientId(clientIdPayload.get("clientId"));
+		dto.setId(String.valueOf(id));
+		dto.setData(messageData);
+		dto.setOperation("insert");
+
+		return dto;
+	}
+
+	@MessageMapping(value = {"/gameroom/{id}/player-game-over-notification"})
+	@SendTo(value = {"/topic/gameroom/{id}/progress/updated", "/topic/gameroom/{id}/updated"})
+	public MessagingDto playerGameOverNotification(@DestinationVariable Long id, @Payload Map<String, String>
+			clientIdPayload, Principal principal) {
+		final Player player = playerService.getByEmail(principal.getName());
+		final GameRoom gameRoom = gameRoomService.getById(id);
+		Map<String, String> messageData = new HashMap<>();
+		messageData.put("message", player.getNickname() + "님이 숫자를 맞췄습니다 (" + player.getInputCount() + "/" + gameRoom.getSetting
+				().getLimitGuessInputCount() + ")");
+		messageData.put("type", "focus");
+		MessagingDto dto = new MessagingDto();
+		dto.setObject(gameRoom);
+		dto.setObjectOperation("playerGameOverUpdate");
 		dto.setClientId(clientIdPayload.get("clientId"));
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);

@@ -23,7 +23,7 @@ app.v_game_room = (function () {
   var
     ON_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
     ON_GAME_START = 'onGameStart',
-    ON_GAME_OVER = 'onGameOver',
+    ON_GAME_END = 'onGameEnd',
     configMap = {
       settable_map : {
         game_room_model : null
@@ -229,8 +229,15 @@ app.v_game_room = (function () {
 
     stateMap.subscribeObj.push(
       app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
-        var responseBody = JSON.parse(response.body), updatedGameRoom = responseBody.data,
+        var responseBody = JSON.parse(response.body),
+          updatedGameRoom = responseBody.object,
+          operation = responseBody.objectOperation;
+
+        if (updatedGameRoom === undefined || updatedGameRoom === null
+          || updatedGameRoom.roomNumber === undefined || updatedGameRoom.roomNumber === null) {
+          updatedGameRoom = responseBody.data;
           operation = responseBody.operation;
+        }
 
         if (configMap.game_room_model.owner.email !== updatedGameRoom.owner.email) {
           _onOwnerChangeHandler(updatedGameRoom);
@@ -269,7 +276,7 @@ app.v_game_room = (function () {
   return {
     ON_UPDATE_GAME_ROOM_INFO : ON_UPDATE_GAME_ROOM_INFO,
     ON_GAME_START : ON_GAME_START,
-    ON_GAME_OVER : ON_GAME_OVER,
+    ON_GAME_END : ON_GAME_END,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,

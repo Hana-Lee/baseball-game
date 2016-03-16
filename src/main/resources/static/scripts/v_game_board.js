@@ -55,38 +55,44 @@ app.v_game_board = (function () {
   };
 
   _playerInfoUpdatedHandler = function (operation) {
-    var gameStatus = app.v_game_room.getGameRoomModel().status,
-      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
-    if (app.m_player.getInfo().status === app.const.status.INPUT
-      && operation === 'guessNumberPlayer' && gameStatus === app.const.status.RUNNING) {
-      webixMap.game_progress_board.add({
-        message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
-        type : 'normal'
-      });
-    }
-  };
-
-  _updateGameRoomInfoHandler = function () {
-    var gameStatus = app.v_game_room.getGameRoomModel().status,
-      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
-    if (gameStatus === app.const.status.RUNNING) {
-      app.v_shell.playerInfoUpdate(function () {
-        app.m_player.getInfo().inputCount = 0;
-
-        webixMap.game_progress_board.add({
-          message : '게임이 시작 되었습니다', type : 'alert'
-        });
+    var inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    if (operation === 'guessNumberPlayer') {
+      if (app.m_player.getInfo().status === app.const.status.INPUT) {
         webixMap.game_progress_board.add({
           message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
           type : 'normal'
         });
-        webix.callEvent(app.v_game_room.ON_GAME_START, []);
-      });
-    } else if (gameStatus === app.const.status.GAME_OVER) {
-      webixMap.game_progress_board.add({
-        message : '모든 게임이 종료 되었습니다', type : 'alert'
-      });
-      webix.callEvent(app.v_game_room.ON_GAME_OVER, []);
+      } else if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
+        app.v_shell.playerGameOverNotification({clientId : getProgressBoardProxyClientId()});
+      }
+    }
+  };
+
+  _updateGameRoomInfoHandler = function (operation) {
+    var gameStatus = app.v_game_room.getGameRoomModel().status,
+      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    if (operation === 'playerReadyStatusUpdated') {
+      if (gameStatus === app.const.status.RUNNING) {
+        app.v_shell.playerInfoUpdate(function () {
+          app.m_player.getInfo().inputCount = 0;
+
+          webixMap.game_progress_board.add({
+            message : '게임이 시작 되었습니다', type : 'alert'
+          });
+          webixMap.game_progress_board.add({
+            message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+            type : 'normal'
+          });
+          webix.callEvent(app.v_game_room.ON_GAME_START, []);
+        });
+      }
+    } else if (operation === 'gameRoomGameEnd') {
+      if (gameStatus === app.const.status.GAME_END) {
+        webixMap.game_progress_board.add({
+          message : '모든 게임이 종료 되었습니다', type : 'alert'
+        });
+        webix.callEvent(app.v_game_room.ON_GAME_END, []);
+      }
     }
     _resetJoinedPlayersProfile();
     _makePlayersProfile();
@@ -211,7 +217,7 @@ app.v_game_board = (function () {
   };
 
   _makePlayersProfile = function () {
-    var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, i;
+    var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, i, customText;
     playerList = app.v_game_room.getGameRoomModel().players;
     playerList.forEach(function (player) {
       if (player.id !== app.m_player.getInfo().id) {
@@ -222,6 +228,12 @@ app.v_game_board = (function () {
     playerListLength = playerListWithoutCurrentPlayer.length;
     for (i = 0; i < playerListLength; i++) {
       isOwner = playerListWithoutCurrentPlayer[i].id === owner.id;
+      customText = isOwner ? '_방장_' : '';
+
+      if (playerListWithoutCurrentPlayer[i].status === app.const.status.GAME_OVER) {
+        customText += ' 종료';
+      }
+
       app.v_player_profile.configModule({
         height : 207,
         avatar_width : 80,

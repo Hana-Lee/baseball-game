@@ -32,7 +32,7 @@ app.v_shell = (function () {
       stomp_client : null
     }, webixMap = {},
     showSignUp, showLogin, createGameRoom, showMainBoard, logout, getStompClient, joinGameRoom, joinRandomGameRoom,
-    leaveGameRoom, leaveAndGameRoomDelete, playerInfoUpdate,
+    leaveGameRoom, leaveAndGameRoomDelete, playerInfoUpdate, playerGameOverNotification,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
     _updatePlayerHandler, _socketErrorHandler,
     initModule;
@@ -308,7 +308,8 @@ app.v_shell = (function () {
     var responseJson = JSON.parse(response.body),
       player = responseJson.object, operation = responseJson.objectOperation;
 
-    if (player === undefined || player === null || player.email === undefined || player.email === null) {
+    if (player === undefined || player === null
+      || player.email === undefined || player.email === null) {
       player = responseJson.data;
       operation = responseJson.operation;
     }
@@ -372,6 +373,12 @@ app.v_shell = (function () {
     });
   };
 
+  playerGameOverNotification = function (data) {
+    var sendUrl, header = {};
+    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-game-over-notification';
+    stateMap.stomp_client.send(sendUrl, header, JSON.stringify(data));
+  };
+
   getStompClient = function () {
     return stateMap.stomp_client;
   };
@@ -394,6 +401,7 @@ app.v_shell = (function () {
     leaveGameRoom : leaveGameRoom,
     leaveAndGameRoomDelete : leaveAndGameRoomDelete,
     playerInfoUpdate : playerInfoUpdate,
+    playerGameOverNotification : playerGameOverNotification,
     ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED,
     ON_WEB_SOCKET_ERROR : ON_WEB_SOCKET_ERROR
   };

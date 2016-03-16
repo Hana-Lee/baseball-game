@@ -87,7 +87,7 @@ app.v_player_profile = (function () {
         result += ' ( ' + email + ' )';
       }
 
-      if (configMap.custom_text) {
+      if (configMap.custom_text && configMap.custom_text !== '') {
         result += ' ' + configMap.custom_text;
       }
 

@@ -24,6 +24,7 @@ app.const = (function () {
     status = {
       NORMAL : 'NORMAL',
       RUNNING : 'RUNNING',
+      GAME_END : 'GAME_END',
       GAME_OVER : 'GAME_OVER',
       READY_BEFORE : 'READY_BEFORE',
       READY_DONE : 'READY_DONE',

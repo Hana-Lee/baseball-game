@@ -37,7 +37,7 @@ app.v_game_pad = (function () {
     }, webixMap = {},
     _createView, _showMakeNumberWindow,
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
-    _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler, _sendGuessNumbers,
+    _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameTerminatedHandler, _sendGuessNumbers,
     _guessNumberValidate, _playerInfoUpdatedHandler, _playerInputCountNotification,
     initModule;
 
@@ -412,7 +412,7 @@ app.v_game_pad = (function () {
     }
   };
 
-  _gameOverHandler = function () {
+  _gameTerminatedHandler = function () {
     var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
     if (gameRoomStatus === app.const.status.NORMAL || gameRoomStatus === app.const.status.GAME_OVER) {
       if (stateMap.game_status) {
@@ -441,7 +441,7 @@ app.v_game_pad = (function () {
     _createView();
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_START, _gameStartHandler));
-    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_OVER, _gameOverHandler));
+    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_GAME_END, _gameTerminatedHandler));
     stateMap.events.push(webix.attachEvent(app.v_shell.ON_PLAYER_INFO_UPDATED, _playerInfoUpdatedHandler));
   };
 
