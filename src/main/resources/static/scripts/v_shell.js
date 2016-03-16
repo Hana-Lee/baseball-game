@@ -32,7 +32,7 @@ app.v_shell = (function () {
       stomp_client : null
     }, webixMap = {},
     showSignUp, showLogin, createGameRoom, showMainBoard, logout, getStompClient, joinGameRoom, joinRandomGameRoom,
-    leaveGameRoom, leaveAndGameRoomDelete,
+    leaveGameRoom, leaveAndGameRoomDelete, playerInfoUpdate,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
     _updatePlayerHandler, _socketErrorHandler,
     initModule;
@@ -306,11 +306,11 @@ app.v_shell = (function () {
 
   _updatePlayerHandler = function (response) {
     var responseJson = JSON.parse(response.body),
-      player = responseJson.data, operation = responseJson.operation;
+      player = responseJson.object, operation = responseJson.objectOperation;
 
-    if (!player || !player.id) {
-      player = responseJson.object;
-      operation = responseJson.objectOperation;
+    if (player === undefined || player === null || player.email === undefined || player.email === null) {
+      player = responseJson.data;
+      operation = responseJson.operation;
     }
 
     if (player.id === app.m_player.getInfo().id) {
@@ -350,6 +350,30 @@ app.v_shell = (function () {
     //stateMap.stomp_client.send('/app/player/logout', header, {});
   };
 
+  playerInfoUpdate = function (callback) {
+    webix.ajax().get('player', {}, {
+      error : function (text) {
+        console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson
+        });
+      },
+      success : function (text) {
+        var textJson = JSON.parse(text);
+        console.log('pppppppppp', textJson);
+        if (textJson) {
+          app.m_player.initModule(textJson);
+        }
+        if (callback && typeof callback === 'function') {
+          callback();
+        }
+      }
+    });
+  };
+
   getStompClient = function () {
     return stateMap.stomp_client;
   };
@@ -371,6 +395,7 @@ app.v_shell = (function () {
     createGameRoom : createGameRoom,
     leaveGameRoom : leaveGameRoom,
     leaveAndGameRoomDelete : leaveAndGameRoomDelete,
+    playerInfoUpdate : playerInfoUpdate,
     ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED,
     ON_WEB_SOCKET_ERROR : ON_WEB_SOCKET_ERROR
   };

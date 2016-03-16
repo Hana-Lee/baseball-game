@@ -121,7 +121,7 @@ public class PlayerController {
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {GET})
-	public ResponseEntity getLoggedInPlayer() {
+	public ResponseEntity<PlayerDto.Response> getLoggedInPlayer() {
 		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		if (principal == null) {
 			throw new PlayerNotLoggedInException("Player do not logged in");
@@ -133,7 +133,7 @@ public class PlayerController {
 
 	@NotifyClients(url = {"/topic/player/updated"}, operation = {"ready"})
 	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
-	public ResponseEntity readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto) {
+	public ResponseEntity<PlayerDto.Response> readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto) {
 		final Player player = getCurrentPlayer();
 		player.setStatus(readyDto.getStatus());
 		playerService.update(player);
@@ -148,7 +148,7 @@ public class PlayerController {
 	}
 
 	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
-	public ResponseEntity handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+	public ResponseEntity<ErrorResponse> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		final ErrorResponse errorResponse = new ErrorResponse();
 		String message;
 		if (e.getBindingResult().getFieldError() != null) {

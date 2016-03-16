@@ -38,7 +38,7 @@ app.v_game_pad = (function () {
     _createView, _showMakeNumberWindow,
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
     _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameOverHandler, _sendGuessNumbers,
-    _guessNumberValidate, _playerInfoUpdatedHandler,
+    _guessNumberValidate, _playerInfoUpdatedHandler, _playerInputCountNotification,
     initModule;
 
   _sendCreatedNumber = function (send_data) {
@@ -111,25 +111,31 @@ app.v_game_pad = (function () {
   };
 
   _sendGuessNumbers = function (guessNumber) {
+    var sendUrl, header = {}, data;
     app.m_player.getInfo().guessNumber = guessNumber;
     app.m_player.getInfo().gameRoomId = app.v_game_room.getGameRoomModel().id;
-    var header = {'Content-Type' : 'application/json'}, data = app.m_player.getInfo();
-    app.v_shell.getStompClient().send(
-      '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-guess-number',
-      header, JSON.stringify(data)
-    );
+    data = app.m_player.getInfo();
+    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-guess-number';
+
+    app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
+  };
+
+  _playerInputCountNotification = function () {
+    var sendUrl, progressBoardProxyClientId, header = {}, data;
+    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-input-count-notification';
+    progressBoardProxyClientId = app.v_game_board.getProgressBoardProxyClientId();
+    data = {clientId : progressBoardProxyClientId};
+
+    app.v_shell.getStompClient().send(sendUrl, {}, JSON.stringify(data));
   };
 
   _playerReadyNotification = function () {
-    var header = {}, data = {};
-    app.v_shell.getStompClient().send(
-      '/app/player/ready/' + app.v_game_room.getGameRoomModel().id,
-      header, JSON.stringify(data)
-    );
-    app.v_shell.getStompClient().send(
-      '/app/player/ready/' + app.v_game_room.getGameRoomModel().id + '/gameroom/notification',
-      header, JSON.stringify(data)
-    );
+    var sendUrl, header = {}, data = {};
+    sendUrl = '/app/player/ready/' + app.v_game_room.getGameRoomModel().id;
+    app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
+
+    sendUrl = '/app/player/ready/' + app.v_game_room.getGameRoomModel().id + '/gameroom/notification';
+    app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
 
   _resetStateMap = function () {
@@ -422,6 +428,7 @@ app.v_game_pad = (function () {
     if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
       _hideProgressBar();
     } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'guessNumberPlayer') {
+      _playerInputCountNotification();
       _showProgressBar();
     }
   };

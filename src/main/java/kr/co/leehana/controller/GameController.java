@@ -69,7 +69,7 @@ public class GameController {
 	}
 
 	public String makeGuessResultMessage(final GuessNumberComparedResult result, final PlayerDto.Update player) {
-		final String message = "[" + player.getGuessNumber() + "]:";
+		final String message = "[" + player.getGuessNumber() + "] - ";
 		if (isGameEnd(result)) {
 			return message + "숫자를 맞췄습니다";
 		} else {

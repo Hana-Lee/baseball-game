@@ -110,7 +110,7 @@ public class SocketController {
 
 	@MessageMapping(value = {"/player/ready/{id}/gameroom/notification"})
 	@SendTo(value = {"/topic/gameroom/{id}/player-ready-status-updated"})
-	public MessagingDto readyNotificationToGameRoom(@DestinationVariable Long id) {
+	public MessagingDto readyNotificationToGameRoom(@DestinationVariable Long id, Principal principal) {
 		final GameRoom gameRoom = gameRoomService.getById(id);
 
 		updateGameRoomStatus(gameRoom);
@@ -132,8 +132,8 @@ public class SocketController {
 
 		final GameRoom gameRoom = gameRoomService.getById(id);
 
-		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(),
-				updateDto.getGuessNumber());
+		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(), updateDto
+				.getGuessNumber());
 
 		String guessResultMessage = gameController.makeGuessResultMessage(result, updateDto);
 
@@ -149,6 +149,24 @@ public class SocketController {
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(modelMapper.map(updatedPlayer, PlayerDto.Response.class));
 		dto.setObjectOperation("guessNumberPlayer");
+		dto.setId(String.valueOf(id));
+		dto.setData(messageData);
+		dto.setOperation("insert");
+
+		return dto;
+	}
+
+	@MessageMapping(value = {"/gameroom/{id}/player-input-count-notification"})
+	@SendTo(value = {"/topic/gameroom/{id}/progress/updated"})
+	public MessagingDto playerInputCountNotification(@DestinationVariable Long id, @Payload Map<String, String>
+			clientIdPayload, Principal principal) {
+		final Player player = playerService.getByEmail(principal.getName());
+
+		Map<String, String> messageData = new HashMap<>();
+		messageData.put("message", player.getNickname() + "님 " + (player.getInputCount() + 1) + "번째 입력중");
+		messageData.put("type", "notification");
+		MessagingDto dto = new MessagingDto();
+		dto.setClientId(clientIdPayload.get("clientId"));
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
 		dto.setOperation("insert");

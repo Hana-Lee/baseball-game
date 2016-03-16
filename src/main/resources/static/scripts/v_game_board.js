@@ -36,7 +36,7 @@ app.v_game_board = (function () {
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap, _playerInfoUpdatedHandler,
     _updateGameRoomInfoHandler,
-    initModule;
+    getProgressBoardProxyClientId, initModule;
 
   _resetWebixMap = function () {
     webixMap = {};
@@ -70,16 +70,18 @@ app.v_game_board = (function () {
     var gameStatus = app.v_game_room.getGameRoomModel().status,
       inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
     if (gameStatus === app.const.status.RUNNING) {
-      app.m_player.getInfo().inputCount = 0;
+      app.v_shell.playerInfoUpdate(function () {
+        app.m_player.getInfo().inputCount = 0;
 
-      webixMap.game_progress_board.add({
-        message : '게임이 시작 되었습니다', type : 'alert'
+        webixMap.game_progress_board.add({
+          message : '게임이 시작 되었습니다', type : 'alert'
+        });
+        webixMap.game_progress_board.add({
+          message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+          type : 'normal'
+        });
+        webix.callEvent(app.v_game_room.ON_GAME_START, []);
       });
-      webixMap.game_progress_board.add({
-        message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
-        type : 'normal'
-      });
-      webix.callEvent(app.v_game_room.ON_GAME_START, []);
     } else if (gameStatus === app.const.status.GAME_OVER) {
       webixMap.game_progress_board.add({
         message : '모든 게임이 종료 되었습니다', type : 'alert'
@@ -231,6 +233,10 @@ app.v_game_board = (function () {
     }
   };
 
+  getProgressBoardProxyClientId = function () {
+    return stateMap.proxy ? stateMap.proxy.clientId : null;
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.v_game_room.getGameRoomModel().id + '/progress/updated');
@@ -243,6 +249,7 @@ app.v_game_board = (function () {
   };
 
   return {
-    initModule : initModule
+    initModule : initModule,
+    getProgressBoardProxyClientId : getProgressBoardProxyClientId
   };
 }());
