@@ -29,19 +29,21 @@ public class GuessNumberValidator extends AbstractNumberValidator implements Con
 
 	@Override
 	public boolean isValid(PlayerDto.Update updateDto, ConstraintValidatorContext context) {
-		boolean result = true;
-		final Long gameRoomId = updateDto.getGameRoomId();
 		final String guessNumber = updateDto.getGuessNumber();
-		final GameRoom gameRoom = gameRoomService.getById(gameRoomId);
 
 		if (guessNumber == null) {
-			result = true;
-		} else if (!validate(gameRoom, guessNumber) && StringUtils.isNotBlank(getMessage())) {
-			context.disableDefaultConstraintViolation();
-			context.buildConstraintViolationWithTemplate(getMessage()).addConstraintViolation();
-			result = false;
+			return true;
 		}
 
-		return result;
+		final Long gameRoomId = updateDto.getGameRoomId();
+		final GameRoom gameRoom = gameRoomService.getById(gameRoomId);
+
+		if (!validate(gameRoom, guessNumber) && StringUtils.isNotBlank(getMessage())) {
+			context.disableDefaultConstraintViolation();
+			context.buildConstraintViolationWithTemplate(getMessage()).addConstraintViolation();
+			return false;
+		}
+
+		return true;
 	}
 }

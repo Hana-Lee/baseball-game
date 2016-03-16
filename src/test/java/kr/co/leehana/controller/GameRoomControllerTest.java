@@ -55,7 +55,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GameRoomControllerTest {
 
 	private static final String BASE_URL = "/gameroom";
-	private static final String CHANGE_OWNER_URL = BASE_URL + "/change/owner/%d";
+	private static final String CHANGE_OWNER_URL = BASE_URL + "/change-owner/%d";
 	private static final String JOIN_URL = BASE_URL + "/join/%d";
 	private static final String LEAVE_URL = BASE_URL + "/leave/%d";
 	private static final String ALL_GAMEROOM_URL = BASE_URL + "/all";
