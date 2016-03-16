@@ -12,6 +12,7 @@ import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayerNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayersNotEmpty;
 import kr.co.leehana.exception.GameRoomRunningException;
+import kr.co.leehana.exception.GameRoomUpdateFieldAllEmptyException;
 import kr.co.leehana.exception.OwnerChangeException;
 import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.AttackerRoleCount;
@@ -30,7 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -98,12 +99,8 @@ public class GameRoomController {
 			url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"},
 			operation = {"insert", "delete"})
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
-	public ResponseEntity create(@RequestBody @Valid GameRoomDto.Create createDto, BindingResult bindingResult) throws
+	public ResponseEntity<GameRoom> create(@RequestBody @Valid GameRoomDto.Create createDto) throws
 			JsonProcessingException {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
-
 		ownerSetting(createDto);
 
 		createDto.setRoomNumber(generationNumberStrategy.generateRoomNumber());
@@ -133,18 +130,17 @@ public class GameRoomController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {GET})
-	@ResponseStatus(OK)
-	public GameRoom getGameRoom(@PathVariable Long id) {
-		return gameRoomService.getById(id);
+	public ResponseEntity<GameRoom> getGameRoom(@PathVariable Long id) {
+		return new ResponseEntity<>(gameRoomService.getById(id), OK);
 	}
 
 	@NotifyClients(
 			url = {"/topic/gameroom/{id}/updated", "/topic/gameroom/list/updated"},
 			operation = {"update", "update"})
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PUT})
-	public ResponseEntity update(@PathVariable Long id, @RequestBody GameRoomDto.Update updateDto) {
+	public ResponseEntity<GameRoom> update(@PathVariable Long id, @RequestBody GameRoomDto.Update updateDto) {
 		if (updateDtoHasAllFieldNullValue(updateDto)) {
-			return createErrorResponseEntity("Update fields are must not be null", null);
+			throw new GameRoomUpdateFieldAllEmptyException("Update fields are must not be null");
 		}
 
 		GameRoom updatedGameRoom = gameRoomService.update(id, updateDto);
@@ -157,7 +153,7 @@ public class GameRoomController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {DELETE})
-	public ResponseEntity delete(@PathVariable Long id) throws JsonProcessingException {
+	public ResponseEntity<Object> delete(@PathVariable Long id) throws JsonProcessingException {
 		gameRoomService.delete(id);
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -167,12 +163,7 @@ public class GameRoomController {
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
 			operation = {"update", "join", "delete"})
 	@RequestMapping(value = {URL_JOIN_VALUE}, method = {PATCH})
-	public ResponseEntity join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto, BindingResult
-			bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
-
+	public ResponseEntity<GameRoom> join(@PathVariable Long id, @RequestBody @Valid GameRoomDto.Join joinDto) {
 		GameRoom gameRoom = gameRoomService.getById(id);
 
 		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
@@ -210,12 +201,8 @@ public class GameRoomController {
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated"},
 			operation = {"update", "changeOwner"})
 	@RequestMapping(value = {URL_CHANGE_OWNER_VALUE}, method = {PATCH})
-	public ResponseEntity changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
-			changeOwnerDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
-
+	public ResponseEntity<GameRoom> changeOwner(@PathVariable Long id, @RequestBody @Valid GameRoomDto.ChangeOwner
+			changeOwnerDto) {
 		if (Objects.equals(changeOwnerDto.getNewOwnerId(), changeOwnerDto.getOldOwnerId())) {
 			throw new OwnerChangeException("New owner ID and old owner ID is not allow same ID [ " + changeOwnerDto
 					.getNewOwnerId() + ":" + changeOwnerDto.getOldOwnerId() + " ]");
@@ -237,7 +224,7 @@ public class GameRoomController {
 			url = {"/topic/gameroom/list/updated", "/topic/player/list/updated"},
 			operation = {"delete", "insert"})
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {DELETE})
-	public ResponseEntity leaveAndDelete(@PathVariable Long id) throws JsonProcessingException {
+	public ResponseEntity<GameRoom> leaveAndDelete(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
 
 		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
@@ -271,7 +258,7 @@ public class GameRoomController {
 			url = {"/topic/gameroom/list/updated", "/topic/gameroom/{id}/updated", "/topic/player/list/updated"},
 			operation = {"update", "leave", "insert"})
 	@RequestMapping(value = {URL_LEAVE_VALUE}, method = {PATCH})
-	public ResponseEntity leave(@PathVariable Long id) throws JsonProcessingException {
+	public ResponseEntity<GameRoom> leave(@PathVariable Long id) throws JsonProcessingException {
 		GameRoom gameRoom = gameRoomService.getById(id);
 
 		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
@@ -313,11 +300,8 @@ public class GameRoomController {
 
 	@NotifyClients(url = {"/topic/gameroom/{id}/updated"}, operation = {"setGameNumber"})
 	@RequestMapping(value = {URL_SET_GAME_NUMBER_VALUE}, method = {PATCH})
-	public ResponseEntity setGameNumber(@PathVariable Long id, @RequestBody @Valid GameRoomDto.GameNumber
-			gameNumberDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
+	public ResponseEntity<GameRoom> setGameNumber(@PathVariable Long id, @RequestBody @Valid GameRoomDto.GameNumber
+			gameNumberDto) {
 		GameRoom gameRoom = gameRoomService.getById(id);
 
 		if (Objects.equals(gameRoom.getStatus(), Status.RUNNING)) {
@@ -357,24 +341,28 @@ public class GameRoomController {
 		}
 	}
 
-	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
-		String message;
-		if (bindingResult.getFieldError() != null) {
-			message = bindingResult.getFieldError().getDefaultMessage();
-		} else if (bindingResult.getGlobalError() != null) {
-			message = bindingResult.getGlobalError().getDefaultMessage();
-		} else {
-			message = "Binding error";
-		}
-		return createErrorResponseEntity(message, null);
-	}
-
 	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
 		if (StringUtils.isBlank(errorCode)) {
 			errorCode = "gameroom.bad.request";
 		}
 
 		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
+	}
+
+	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
+	public ResponseEntity handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+		final ErrorResponse errorResponse = new ErrorResponse();
+		String message;
+		if (e.getBindingResult().getFieldError() != null) {
+			message = e.getBindingResult().getFieldError().getDefaultMessage();
+		} else if (e.getBindingResult().getGlobalError() != null) {
+			message = e.getBindingResult().getGlobalError().getDefaultMessage();
+		} else {
+			message = "DTO Object binding error";
+		}
+		errorResponse.setMessage(message);
+		errorResponse.setErrorCode("bad.request");
+		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
 	}
 
 	@ExceptionHandler(GameRoleDuplicatedException.class)
@@ -414,7 +402,14 @@ public class GameRoomController {
 	}
 
 	@ExceptionHandler(GameRoomRunningException.class)
+	@ResponseStatus(BAD_REQUEST)
 	public ErrorResponse handleGameRoomAlreadyRunningException(GameRoomRunningException ex) {
+		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
+	}
+
+	@ExceptionHandler(GameRoomUpdateFieldAllEmptyException.class)
+	@ResponseStatus(BAD_REQUEST)
+	public ErrorResponse handleGameRoomUpdateFieldAllEmptyException(GameRoomUpdateFieldAllEmptyException ex) {
 		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
 	}
 

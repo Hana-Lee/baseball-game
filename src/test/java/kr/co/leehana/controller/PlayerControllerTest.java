@@ -13,14 +13,13 @@ import kr.co.leehana.model.Win;
 import kr.co.leehana.service.PlayerService;
 import kr.co.leehana.utils.TestPlayerCreator;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -49,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = App.class)
-@WebAppConfiguration
+@WebIntegrationTest
 @Transactional
 public class PlayerControllerTest {
 
@@ -279,8 +278,8 @@ public class PlayerControllerTest {
 	@Test
 	public void getLoggedInPlayer() throws Exception {
 		Player firstPlayer = creator.createTestPlayer(TEST_EMAIL, TEST_NICKNAME, TEST_PASSWORD);
-		ResultActions resultActions = mockMvc.perform(get(TEST_URL).with(httpBasic(firstPlayer.getEmail(),
-				TEST_PASSWORD)));
+		ResultActions resultActions = mockMvc.perform(get(TEST_URL + "/" + firstPlayer.getId()).with(httpBasic
+				(firstPlayer.getEmail(), TEST_PASSWORD)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isOk());
 		resultActions.andExpect(jsonPath(EMAIL_PATH, is(TEST_EMAIL)));

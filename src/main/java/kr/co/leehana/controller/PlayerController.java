@@ -9,7 +9,6 @@ import kr.co.leehana.exception.PlayerNotLoggedInException;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.PlayerService;
-import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,7 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -66,24 +65,9 @@ public class PlayerController {
 	}
 
 	@RequestMapping(value = {URL_VALUE}, method = {POST})
-	public ResponseEntity create(@RequestBody @Valid PlayerDto.Create createDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			ErrorResponse errorResponse = new ErrorResponse();
-			String message;
-			if (bindingResult.getFieldError() != null) {
-				message = bindingResult.getFieldError().getDefaultMessage();
-			} else if (bindingResult.getGlobalError() != null) {
-				message = bindingResult.getGlobalError().getDefaultMessage();
-			} else {
-				message = "DTO Object binding error";
-			}
-			errorResponse.setMessage(message);
-			errorResponse.setErrorCode("bad.request");
-			return new ResponseEntity<>(errorResponse, BAD_REQUEST);
-		}
-
+	public ResponseEntity<PlayerDto.Response> create(@RequestBody @Valid PlayerDto.Create createDto) {
 		Player newPlayer = playerService.create(createDto);
-		return new ResponseEntity<>(newPlayer, CREATED);
+		return new ResponseEntity<>(modelMapper.map(newPlayer, PlayerDto.Response.class), CREATED);
 	}
 
 	@RequestMapping(value = {URL_ALL_VALUE}, method = {GET})
@@ -96,31 +80,25 @@ public class PlayerController {
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {GET})
-	@ResponseStatus(code = OK)
-	public PlayerDto.Response getPlayer(@PathVariable Long id) {
-		return modelMapper.map(playerService.getById(id), PlayerDto.Response.class);
+	public ResponseEntity<PlayerDto.Response> getPlayer(@PathVariable Long id) {
+		return new ResponseEntity<>(modelMapper.map(playerService.getById(id), PlayerDto.Response.class), OK);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {PUT})
-	public ResponseEntity update(@PathVariable Long id, @RequestBody @Valid PlayerDto.Update updateDto, BindingResult
-			bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return new ResponseEntity<>(BAD_REQUEST);
-		}
-
+	public ResponseEntity<PlayerDto.Response> update(@PathVariable Long id, @RequestBody @Valid PlayerDto.Update updateDto) {
 		Player updatedPlayer = playerService.updateById(id, updateDto);
 		return new ResponseEntity<>(modelMapper.map(updatedPlayer, PlayerDto.Response.class), OK);
 	}
 
 	@RequestMapping(value = {URL_WITH_ID_VALUE}, method = {DELETE})
-	public ResponseEntity delete(@PathVariable Long id) {
+	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		playerService.delete(id);
 
 		return new ResponseEntity<>(NO_CONTENT);
 	}
 
 	@RequestMapping(value = {URL_LOGGED_IN_USERS_VALUE}, method = {GET})
-	public ResponseEntity getLoggedInPlayers() {
+	public ResponseEntity<List<PlayerDto.Response>> getLoggedInPlayers() {
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		List<PlayerDto.Response> loggedInPlayers = new ArrayList<>();
 		String currentPlayerEmail = getCurrentPlayerEmail();
@@ -155,10 +133,7 @@ public class PlayerController {
 
 	@NotifyClients(url = {"/topic/player/updated"}, operation = {"ready"})
 	@RequestMapping(value = {URL_READY_VALUE}, method = {PATCH})
-	public ResponseEntity readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return createErrorResponseEntity(bindingResult);
-		}
+	public ResponseEntity readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto) {
 		final Player player = getCurrentPlayer();
 		player.setStatus(readyDto.getStatus());
 		playerService.update(player);
@@ -170,6 +145,22 @@ public class PlayerController {
 				.getPrincipal();
 
 		return playerService.getByEmail(userDetails.getEmail());
+	}
+
+	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
+	public ResponseEntity handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+		final ErrorResponse errorResponse = new ErrorResponse();
+		String message;
+		if (e.getBindingResult().getFieldError() != null) {
+			message = e.getBindingResult().getFieldError().getDefaultMessage();
+		} else if (e.getBindingResult().getGlobalError() != null) {
+			message = e.getBindingResult().getGlobalError().getDefaultMessage();
+		} else {
+			message = "DTO Object binding error";
+		}
+		errorResponse.setMessage(message);
+		errorResponse.setErrorCode("bad.request");
+		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
 	}
 
 	@ExceptionHandler(PlayerDuplicatedException.class)
@@ -195,25 +186,5 @@ public class PlayerController {
 		errorResponse.setMessage(message);
 		errorResponse.setErrorCode(errorCode);
 		return errorResponse;
-	}
-
-	private ResponseEntity createErrorResponseEntity(BindingResult bindingResult) {
-		String message;
-		if (bindingResult.getFieldError() != null) {
-			message = bindingResult.getFieldError().getDefaultMessage();
-		} else if (bindingResult.getGlobalError() != null) {
-			message = bindingResult.getGlobalError().getDefaultMessage();
-		} else {
-			message = "Binding error";
-		}
-		return createErrorResponseEntity(message, null);
-	}
-
-	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
-		if (StringUtils.isBlank(errorCode)) {
-			errorCode = "player.bad.request";
-		}
-
-		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
 	}
 }

@@ -62,7 +62,8 @@ public class GameRoomControllerTest {
 
 	private static final String ROOM_NAME = "루비";
 
-	private static final String GAMEROOM_BAD_REQUEST_CODE = "gameroom.bad.request";
+	private static final String GAMEROOM_BAD_REQUEST_CODE = "bad.request";
+	private static final String GAMEROOM_ALL_FIELD_EMPTY_CODE = "gameroom.all.field.empty.exception";
 	private static final String DUP_ERROR_CODE = "duplicated.owner.exception";
 	private static final String DUP_GAME_ROLE_CODE = "duplicated.gameRole.exception";
 	private static final String GAMEROOM_PLAYER_NOT_FOUND_CODE = "gameroom.player.not.found.exception";
@@ -224,7 +225,7 @@ public class GameRoomControllerTest {
 				DEFAULT_TEST_PASS)));
 		resultActions.andDo(print());
 		resultActions.andExpect(status().isBadRequest());
-		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_BAD_REQUEST_CODE)));
+		resultActions.andExpect(jsonPath(ERROR_CODE_PATH, is(GAMEROOM_ALL_FIELD_EMPTY_CODE)));
 	}
 
 	@Test
