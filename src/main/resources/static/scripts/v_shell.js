@@ -35,7 +35,7 @@ app.v_shell = (function () {
     leaveGameRoom, leaveAndGameRoomDelete, playerInfoUpdate, playerGameOverNotification,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
     _updatePlayerHandler, _socketErrorHandler,
-    initModule;
+    gameEndNotification, initModule;
 
   showSignUp = function () {
     $$('login-container').destructor();
@@ -379,6 +379,12 @@ app.v_shell = (function () {
     stateMap.stomp_client.send(sendUrl, header, JSON.stringify(data));
   };
 
+  gameEndNotification = function () {
+    var sendUrl, header = {}, data = {};
+    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/game-end-notification';
+    stateMap.stomp_client.send(sendUrl, header, JSON.stringify(data));
+  };
+
   getStompClient = function () {
     return stateMap.stomp_client;
   };
@@ -402,6 +408,7 @@ app.v_shell = (function () {
     leaveAndGameRoomDelete : leaveAndGameRoomDelete,
     playerInfoUpdate : playerInfoUpdate,
     playerGameOverNotification : playerGameOverNotification,
+    gameEndNotification : gameEndNotification,
     ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED,
     ON_WEB_SOCKET_ERROR : ON_WEB_SOCKET_ERROR
   };

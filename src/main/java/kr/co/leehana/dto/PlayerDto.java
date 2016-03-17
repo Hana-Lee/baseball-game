@@ -90,6 +90,7 @@ public class PlayerDto {
 		private Status status;
 		private Integer inputCount;
 		private String guessNumber;
+		private Date gameOverTime;
 	}
 
 	@Data

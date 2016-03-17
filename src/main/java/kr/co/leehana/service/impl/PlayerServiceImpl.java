@@ -164,6 +164,10 @@ public class PlayerServiceImpl implements PlayerService {
 			player.setGuessNumber(updateDto.getGuessNumber());
 		}
 
+		if (updateDto.getGameOverTime() != null) {
+			player.setGameOverTime(updateDto.getGameOverTime());
+		}
+
 		player.setUpdated(new Date());
 
 		return playerRepository.save(player);

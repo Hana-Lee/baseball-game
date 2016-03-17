@@ -94,10 +94,12 @@ app.v_game_pad = (function () {
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
+          webixMap.number_pad.enable();
           //_showProgressBar();
         } else {
           webixMap.ready_button.config.label = '준비!!';
           webixMap.ready_button.refresh();
+          webixMap.number_pad.disable();
           _hideProgressBar();
         }
 
@@ -126,7 +128,7 @@ app.v_game_pad = (function () {
     progressBoardProxyClientId = app.v_game_board.getProgressBoardProxyClientId();
     data = {clientId : progressBoardProxyClientId};
 
-    app.v_shell.getStompClient().send(sendUrl, {}, JSON.stringify(data));
+    app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
 
   _playerReadyNotification = function () {
@@ -245,7 +247,7 @@ app.v_game_pad = (function () {
 
   _createView = function () {
     var mainView = {
-      id : 'game-pad-container', css : 'game_pad_container',
+      id : 'number-pad-container', css : 'game_pad_container',
       cols : [{
         width : 120,
         rows : [{
@@ -269,7 +271,7 @@ app.v_game_pad = (function () {
         }]
       }, {
         rows : [{
-          id : 'game-pad',
+          id : 'number-pad',
           view : 'dataview',
           css : 'game_pad',
           type : {
@@ -280,6 +282,7 @@ app.v_game_pad = (function () {
           select : false,
           multiselect : true,
           scroll : false,
+          disabled : !stateMap.isReady,
           data : [
             {id : '0', number : 0},
             {id : '1', number : 1},
@@ -299,7 +302,7 @@ app.v_game_pad = (function () {
             'onItemClick' : function (id/*, evt, el*/) {
               var idIndex, genNumberCount = app.v_game_room.getGameRoomModel().setting.generationNumberCount;
               if (stateMap.isReady) {
-                if ($$('game-pad').isSelected(id)) {
+                if ($$('number-pad').isSelected(id)) {
                   idIndex = stateMap.selected_num.indexOf(id);
                   stateMap.selected_num.splice(idIndex, 1);
                 } else {
@@ -316,7 +319,7 @@ app.v_game_pad = (function () {
                 }
 
                 setTimeout(function () {
-                  $$('game-pad').select(stateMap.selected_num);
+                  $$('number-pad').select(stateMap.selected_num);
                 }, 0);
 
                 if (stateMap.selected_num.length === genNumberCount) {
@@ -339,7 +342,7 @@ app.v_game_pad = (function () {
                 _sendGuessNumbers(guessNumber);
 
                 stateMap.selected_num = [];
-                $$('game-pad').unselectAll();
+                $$('number-pad').unselectAll();
                 this.disable();
                 _hideProgressBar(true);
               }
@@ -357,6 +360,7 @@ app.v_game_pad = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.ready_button = $$('ready-button');
+    webixMap.number_pad = $$('number-pad');
   };
 
   _guessNumberValidate = function (guessNumber) {
@@ -386,7 +390,7 @@ app.v_game_pad = (function () {
     stateMap.input_count++;
     // TODO stateMap.input_count 번째 입력이라는 알림 보내기
 
-    $$('game-pad').showProgress({
+    $$('number-pad').showProgress({
       type : 'top',
       delay : configMap.input_delay,
       hide : true,
@@ -400,7 +404,7 @@ app.v_game_pad = (function () {
   };
 
   _hideProgressBar = function (now) {
-    $$('game-pad').hideProgress(now);
+    $$('number-pad').hideProgress(now);
   };
 
   _gameStartHandler = function () {
@@ -414,10 +418,16 @@ app.v_game_pad = (function () {
 
   _gameTerminatedHandler = function () {
     var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
-    if (gameRoomStatus === app.const.status.NORMAL || gameRoomStatus === app.const.status.GAME_OVER) {
+    if (gameRoomStatus === app.const.status.NORMAL || gameRoomStatus === app.const.status.GAME_END) {
       if (stateMap.game_status) {
         _hideProgressBar();
+        stateMap.isReady = false;
         stateMap.game_status = null;
+
+        webixMap.ready_button.config.label = '준비!!';
+        webixMap.ready_button.refresh();
+
+        webixMap.number_pad.disable();
       }
 
       webixMap.ready_button.enable();
@@ -427,7 +437,7 @@ app.v_game_pad = (function () {
   _playerInfoUpdatedHandler = function (operation) {
     if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
       _hideProgressBar();
-    } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'guessNumberPlayer') {
+    } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'playerGuessNumber') {
       _playerInputCountNotification();
       _showProgressBar();
     }

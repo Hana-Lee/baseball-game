@@ -35,7 +35,7 @@ app.v_game_board = (function () {
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap, _playerInfoUpdatedHandler,
-    _updateGameRoomInfoHandler,
+    _updateGameRoomInfoHandler, _checkGameEnd,
     getProgressBoardProxyClientId, initModule;
 
   _resetWebixMap = function () {
@@ -56,7 +56,7 @@ app.v_game_board = (function () {
 
   _playerInfoUpdatedHandler = function (operation) {
     var inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
-    if (operation === 'guessNumberPlayer') {
+    if (operation === 'playerGuessNumber') {
       if (app.m_player.getInfo().status === app.const.status.INPUT) {
         webixMap.game_progress_board.add({
           message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
@@ -65,6 +65,22 @@ app.v_game_board = (function () {
       } else if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
         app.v_shell.playerGameOverNotification({clientId : getProgressBoardProxyClientId()});
       }
+    }
+  };
+
+  _checkGameEnd = function () {
+    var gameEnd = true;
+    app.v_game_room.getGameRoomModel().players.forEach(function (player) {
+      console.log('player status', player.status);
+      if (player.status !== app.const.status.GAME_OVER) {
+        gameEnd = false;
+
+        return false;
+      }
+    });
+
+    if (gameEnd) {
+      app.v_shell.gameEndNotification();
     }
   };
 
@@ -86,14 +102,15 @@ app.v_game_board = (function () {
           webix.callEvent(app.v_game_room.ON_GAME_START, []);
         });
       }
-    } else if (operation === 'gameRoomGameEnd') {
+    } else if (operation === 'playerGameOverUpdate') {
       if (gameStatus === app.const.status.GAME_END) {
         webixMap.game_progress_board.add({
-          message : '모든 게임이 종료 되었습니다', type : 'alert'
+          message : '게임이 종료 되었습니다', type : 'alert'
         });
         webix.callEvent(app.v_game_room.ON_GAME_END, []);
       }
     }
+
     _resetJoinedPlayersProfile();
     _makePlayersProfile();
   };
@@ -239,7 +256,7 @@ app.v_game_board = (function () {
         avatar_width : 80,
         player_model : playerListWithoutCurrentPlayer[i],
         show_email : false,
-        custom_text : isOwner ? '_방장_' : null
+        custom_text : customText
       });
       app.v_player_profile.initModule(stateMap.player_container_list[i]);
     }

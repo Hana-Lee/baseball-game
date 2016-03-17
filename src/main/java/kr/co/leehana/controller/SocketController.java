@@ -27,6 +27,7 @@ import org.springframework.stereotype.Controller;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -139,6 +140,7 @@ public class SocketController {
 
 		if (gameController.isGameEnd(result)) {
 			updateDto.setStatus(Status.GAME_OVER);
+			updateDto.setGameOverTime(new Date());
 		}
 
 		final Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
@@ -148,7 +150,7 @@ public class SocketController {
 		messageData.put("type", "alert");
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(modelMapper.map(updatedPlayer, PlayerDto.Response.class));
-		dto.setObjectOperation("guessNumberPlayer");
+		dto.setObjectOperation("playerGuessNumber");
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
 		dto.setOperation("insert");
@@ -180,9 +182,21 @@ public class SocketController {
 			clientIdPayload, Principal principal) {
 		final Player player = playerService.getByEmail(principal.getName());
 		final GameRoom gameRoom = gameRoomService.getById(id);
+		if (gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getStatus(), Status.GAME_OVER)).count() ==
+				gameRoom.getPlayers().size()) {
+			gameRoom.setStatus(Status.GAME_END);
+			gameRoom.getPlayers().forEach(p -> {
+				p.setStatus(Status.READY_BEFORE);
+				p.setInputCount(0);
+				p.setGuessNumber(null);
+				// TODO 스코어, 랭킹, 전적
+			});
+			gameRoomService.update(gameRoom);
+		}
+
 		Map<String, String> messageData = new HashMap<>();
-		messageData.put("message", player.getNickname() + "님이 숫자를 맞췄습니다 (" + player.getInputCount() + "/" + gameRoom.getSetting
-				().getLimitGuessInputCount() + ")");
+		messageData.put("message", player.getNickname() + "님이 숫자를 맞췄습니다 (" + player.getInputCount() + "/" + gameRoom
+				.getSetting().getLimitGuessInputCount() + ")");
 		messageData.put("type", "focus");
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(gameRoom);
@@ -190,6 +204,41 @@ public class SocketController {
 		dto.setClientId(clientIdPayload.get("clientId"));
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
+		dto.setOperation("insert");
+
+		return dto;
+	}
+
+	@MessageMapping(value = {"/gameroom/{id}/game-end-notification"})
+	@SendTo(value = {"/topic/gameroom/{id}/progress/updated", "/topic/gameroom/{id}/updated"})
+	public MessagingDto gameEndNotification(@DestinationVariable Long id) {
+		final GameRoom gameRoom = gameRoomService.getById(id);
+		gameRoom.setStatus(Status.GAME_END);
+
+//		gameController.makePlayerRankMap(gameRoom);
+//
+//		gameRoom.getPlayers().stream().forEach(p -> {
+//			p.setStatus(Status.READY_BEFORE);
+//			p.setInputCount(0);
+//			p.setGuessNumber(null);
+//			p.setGameOverTime(null);
+//			// 모든 게임이 끝날때까지 기다려야 전적이 기록된다.
+//			p.getMatchRecord().getLose().setCount(0);
+//			p.getMatchRecord().getWin().setCount(1);
+//			p.getMatchRecord().getTotalGame().setCount(1);
+//		});
+
+		gameRoomService.update(gameRoom);
+
+		final Map<String, String> messageData = new HashMap<>();
+		messageData.put("message", "게임이 종료 되었습니다");
+		messageData.put("type", "alert");
+
+		final MessagingDto dto = new MessagingDto();
+		dto.setObject(gameRoom);
+		dto.setObjectOperation("gameRoomGameEnd");
+		dto.setData(messageData);
+		dto.setId(String.valueOf(id));
 		dto.setOperation("insert");
 
 		return dto;

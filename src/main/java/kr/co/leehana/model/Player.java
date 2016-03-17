@@ -127,4 +127,7 @@ public class Player implements Serializable {
 
 	@Transient
 	private String guessNumber;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date gameOverTime;
 }
