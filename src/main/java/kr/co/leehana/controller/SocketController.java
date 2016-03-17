@@ -271,6 +271,7 @@ public class SocketController {
 	private void updateGameRoomStatus(GameRoom gameRoom) {
 		if (isAllPlayersReadyDone(gameRoom)) {
 			gameRoom.setStatus(Status.RUNNING);
+			gameRoom.setGameCount(gameRoom.getGameCount() + 1);
 
 			if (gameRoom.getGameNumber() == null || StringUtils.isBlank(gameRoom.getGameNumber().getValue())) {
 				gameRoom.setGameNumber(new GameNumber(gameController.generateNumber(gameRoom.getSetting())));
