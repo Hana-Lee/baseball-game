@@ -85,7 +85,9 @@ app.v_chat = (function () {
     webixMap.chat_message.setValue('');
 
     setTimeout(function () {
-      webixMap.chat_message.focus();
+      if (webixMap.chat_message && webixMap.chat_message.focus) {
+        webixMap.chat_message.focus();
+      }
     }, 100);
   };
 
@@ -124,7 +126,10 @@ app.v_chat = (function () {
         template : _chatTemplate
       }, {
         cols : [{
-          view : 'text', id : 'chat-message', placeholder : '채팅 메세지를 입력해주세요', gravity : 3,
+          view : 'text',
+          id : 'chat-message',
+          placeholder : '채팅 메세지를 입력해주세요',
+          gravity : 3,
           on : {
             onAfterRender : function () {
               webix.UIManager.setFocus(this);
