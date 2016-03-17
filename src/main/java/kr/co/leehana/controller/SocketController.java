@@ -191,6 +191,7 @@ public class SocketController {
 				p.setGuessNumber(null);
 				// TODO 스코어, 랭킹, 전적
 			});
+			gameRoom.setGameNumber(null);
 			gameRoomService.update(gameRoom);
 		}
 
