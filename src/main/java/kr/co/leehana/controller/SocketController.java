@@ -280,6 +280,10 @@ public class SocketController {
 			gameRoom.setStatus(Status.NORMAL);
 		}
 
+		if (!gameRoom.getPlayerRankMap().isEmpty()) {
+			gameRoom.getPlayerRankMap().clear();
+		}
+
 		updatePlayersStatus(gameRoom);
 	}
 
