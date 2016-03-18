@@ -37,7 +37,7 @@ public class OldScoreCalculatorTest {
 	@Test
 	public void testDependerScoreCalculation() {
 		// Very Hard Guess, Easy Generation
-		int[][] expScores = new int[][]{
+		Integer[][] expScores = new Integer[][]{
 				{
 					// 4명중 0명 맞춤
 					391,
@@ -65,75 +65,75 @@ public class OldScoreCalculatorTest {
 		};
 		assertDependerScoreCalculationEachLevelCase(1, 2, expScores, "Very Hard Guess, Easy Generation, %d Users");
 		// Hard Guess, Easy Generation
-		expScores = new int[][]{{427, 373, 320, 267}, {320, 267, 213}, {213, 160}};
+		expScores = new Integer[][]{{427, 373, 320, 267}, {320, 267, 213}, {213, 160}};
 		assertDependerScoreCalculationEachLevelCase(5, 2, expScores, "Hard Guess, Easy Generation, %d Users");
 		// Normal Guess, Easy Generation
-		expScores = new int[][]{{480, 420, 360, 300}, {360, 300, 240}, {240, 180}};
+		expScores = new Integer[][]{{480, 420, 360, 300}, {360, 300, 240}, {240, 180}};
 		assertDependerScoreCalculationEachLevelCase(10, 2, expScores, "Normal Guess, Easy Generation, %d Users");
 		// Easy Guess, Easy Generation
-		expScores = new int[][]{{560, 490, 420, 350}, {420, 350, 280}, {280, 210}};
+		expScores = new Integer[][]{{560, 490, 420, 350}, {420, 350, 280}, {280, 210}};
 		assertDependerScoreCalculationEachLevelCase(15, 2, expScores, "Easy Guess, Easy Generation, %d Users");
 		// Very Easy Guess, Easy Generation
-		expScores = new int[][]{{680, 595, 510, 425}, {510, 425, 340}, {340, 255}};
+		expScores = new Integer[][]{{680, 595, 510, 425}, {510, 425, 340}, {340, 255}};
 		assertDependerScoreCalculationEachLevelCase(20, 2, expScores, "Very Easy Guess, Easy Generation, %d Users");
 
 		// Very Hard Guess, Normal Generation
-		expScores = new int[][]{{231, 202, 173, 144}, {173, 144, 116}, {116, 87}};
+		expScores = new Integer[][]{{231, 202, 173, 144}, {173, 144, 116}, {116, 87}};
 		assertDependerScoreCalculationEachLevelCase(1, 3, expScores, "Very Hard Guess, Normal Generation, %d Users");
 		// Hard Guess, Normal Generation
-		expScores = new int[][]{{267, 233, 200, 167}, {200, 167, 133}, {133, 100}};
+		expScores = new Integer[][]{{267, 233, 200, 167}, {200, 167, 133}, {133, 100}};
 		assertDependerScoreCalculationEachLevelCase(5, 3, expScores, "Hard Guess, Normal Generation, %d Users");
 		// Normal Guess, Normal Generation
-		expScores = new int[][]{{320, 280, 240, 200}, {240, 200, 160}, {160, 120}};
+		expScores = new Integer[][]{{320, 280, 240, 200}, {240, 200, 160}, {160, 120}};
 		assertDependerScoreCalculationEachLevelCase(10, 3, expScores, "Normal Guess, Normal Generation, %d Users");
 		// Easy Guess, Normal Generation
-		expScores = new int[][]{{400, 350, 300, 250}, {300, 250, 200}, {200, 150}};
+		expScores = new Integer[][]{{400, 350, 300, 250}, {300, 250, 200}, {200, 150}};
 		assertDependerScoreCalculationEachLevelCase(15, 3, expScores, "Easy Guess, Normal Generation, %d Users");
 		// Very Easy Guess, Normal Generation
-		expScores = new int[][]{{520, 455, 390, 325}, {390, 325, 260}, {260, 195}};
+		expScores = new Integer[][]{{520, 455, 390, 325}, {390, 325, 260}, {260, 195}};
 		assertDependerScoreCalculationEachLevelCase(20, 3, expScores, "Very Easy Guess, Normal Generation, %d Users");
 
 		// Very Hard Guess, Hard Generation
-		expScores = new int[][]{{151, 132, 113, 94}, {113, 94, 76}, {76, 57}};
+		expScores = new Integer[][]{{151, 132, 113, 94}, {113, 94, 76}, {76, 57}};
 		assertDependerScoreCalculationEachLevelCase(1, 4, expScores, "Very Hard Guess, Hard Generation, %d Users");
 		// Hard Guess, Hard Generation
-		expScores = new int[][]{{187, 163, 140, 117}, {140, 117, 93}, {93, 70}};
+		expScores = new Integer[][]{{187, 163, 140, 117}, {140, 117, 93}, {93, 70}};
 		assertDependerScoreCalculationEachLevelCase(5, 4, expScores, "Hard Guess, Hard Generation, %d Users");
 		// Normal Guess, Hard Generation
-		expScores = new int[][]{{240, 210, 180, 150}, {180, 150, 120}, {120, 90}};
+		expScores = new Integer[][]{{240, 210, 180, 150}, {180, 150, 120}, {120, 90}};
 		assertDependerScoreCalculationEachLevelCase(10, 4, expScores, "Normal Guess, Hard Generation, %d Users");
 		// Easy Guess, Hard Generation
-		expScores = new int[][]{{320, 280, 240, 200}, {240, 200, 160}, {160, 120}};
+		expScores = new Integer[][]{{320, 280, 240, 200}, {240, 200, 160}, {160, 120}};
 		assertDependerScoreCalculationEachLevelCase(15, 4, expScores, "Easy Guess, Hard Generation, %d Users");
 		// Very Easy Guess, Hard Generation
-		expScores = new int[][]{{440, 385, 330, 275}, {330, 275, 220}, {220, 165}};
+		expScores = new Integer[][]{{440, 385, 330, 275}, {330, 275, 220}, {220, 165}};
 		assertDependerScoreCalculationEachLevelCase(20, 4, expScores, "Very Easy Guess, Hard Generation, %d Users");
 
 		// Very Hard Guess, Very Hard Generation
-		expScores = new int[][]{{111, 97, 83, 69}, {83, 69, 56}, {56, 42}};
+		expScores = new Integer[][]{{111, 97, 83, 69}, {83, 69, 56}, {56, 42}};
 		assertDependerScoreCalculationEachLevelCase(1, 5, expScores, "Very Hard Guess, Very Hard Generation, %d Users");
 		// Hard Guess, Very Hard Generation
-		expScores = new int[][]{{147, 128, 110, 92}, {110, 92, 73}, {73, 55}};
+		expScores = new Integer[][]{{147, 128, 110, 92}, {110, 92, 73}, {73, 55}};
 		assertDependerScoreCalculationEachLevelCase(5, 5, expScores, "Hard Guess, Very Hard Generation, %d Users");
 		// Normal Guess, Very Hard Generation
-		expScores = new int[][]{{200, 175, 150, 125}, {150, 125, 100}, {100, 75}};
+		expScores = new Integer[][]{{200, 175, 150, 125}, {150, 125, 100}, {100, 75}};
 		assertDependerScoreCalculationEachLevelCase(10, 5, expScores, "Normal Guess, Very Hard Generation, %d Users");
 		// Easy Guess, Very Hard Generation
-		expScores = new int[][]{{280, 245, 210, 175}, {210, 175, 140}, {140, 105}};
+		expScores = new Integer[][]{{280, 245, 210, 175}, {210, 175, 140}, {140, 105}};
 		assertDependerScoreCalculationEachLevelCase(15, 5, expScores, "Easy Guess, Very Hard Generation, %d Users");
 		// Very Easy Guess, Very Hard Generation
-		expScores = new int[][]{{400, 350, 300, 250}, {300, 250, 200}, {200, 150}};
+		expScores = new Integer[][]{{400, 350, 300, 250}, {300, 250, 200}, {200, 150}};
 		assertDependerScoreCalculationEachLevelCase(20, 5, expScores, "Very Easy Guess, Very Hard Generation, %d Users");
 	}
 
-	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, int[][] expScoreArray,
+	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, Integer[][] expScoreArray,
 	                                                         String assertFailMessage) {
-		for (int[] expScores : expScoreArray) {
+		for (Integer[] expScores : expScoreArray) {
 			assertDependerScoreCalculationEachLevelCase(guessLevel, generationLevel, expScores, assertFailMessage);
 		}
 	}
 
-	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, int[] expScores,
+	private void assertDependerScoreCalculationEachLevelCase(int guessLevel, int generationLevel, Integer[] expScores,
 	                                                         String assertFailMessage) {
 		for (int solvedUserCount = 0; solvedUserCount < expScores.length; solvedUserCount++) {
 			makeGameRoomForTest(guessLevel, generationLevel, expScores.length, solvedUserCount);
@@ -180,7 +180,7 @@ public class OldScoreCalculatorTest {
 
 		final Score dependerScore = OldScoreCalculator.calculation(depender, this.gameRoom);
 
-		assertEquals("기본 설정에서 모든 유저가 맞춘경우 수비자의 점수는 20점 이여야 합니다", 20, dependerScore.getValue());
+		assertEquals("기본 설정에서 모든 유저가 맞춘경우 수비자의 점수는 20점 이여야 합니다", 20, dependerScore.getValue().intValue());
 	}
 
 	@Test
@@ -289,7 +289,7 @@ public class OldScoreCalculatorTest {
 		int count = 0;
 		for (OldUser user : this.gameRoom.getUsers()) {
 			final Score score = OldScoreCalculator.attackerScore(user, gameRoom);
-			final int expectedScore = expectedScores.get(count++);
+			final Integer expectedScore = expectedScores.get(count++);
 			assertEquals(expectedScore, score.getValue());
 		}
 	}
@@ -342,7 +342,7 @@ public class OldScoreCalculatorTest {
 		assertNotFocusedScoreCalculation(20, 5, 22);
 	}
 
-	private void assertNotFocusedScoreCalculation(int guessLevel, int generationLevel, int expectedScore) {
+	private void assertNotFocusedScoreCalculation(int guessLevel, int generationLevel, Integer expectedScore) {
 		final GuessNumberComparedResult result = new GuessNumberComparedResult(new Settlement(false), new Strike(2), new Ball(1));
 		final Setting setting = new Setting(5, guessLevel, generationLevel);
 		gameRoom.setSetting(setting);
@@ -374,7 +374,7 @@ public class OldScoreCalculatorTest {
 
 		final Score score = OldScoreCalculator.attackerScore(user, gameRoom);
 
-		assertEquals(0, score.getValue());
+		assertEquals(0, score.getValue().intValue());
 	}
 
 	@Test
@@ -391,7 +391,7 @@ public class OldScoreCalculatorTest {
 
 		final Score firstScore = OldScoreCalculator.calculation(user, gameRoom);
 		user.getTotalScore().setValue(user.getTotalScore().getValue() + firstScore.getValue());
-		assertEquals("기본 설정, 1명중 1등은 40점이여야 합니다.", 40, firstScore.getValue());
+		assertEquals("기본 설정, 1명중 1등은 40점이여야 합니다.", 40, firstScore.getValue().intValue());
 
 		final OldUser secUser = new OldUser("이두나", new Role(GameRole.ATTACKER), new Score());
 		secUser.setRank(new Rank(1));
@@ -403,7 +403,7 @@ public class OldScoreCalculatorTest {
 
 		final Score secScore = OldScoreCalculator.calculation(user, gameRoom);
 		user.getTotalScore().setValue(user.getTotalScore().getValue() + secScore.getValue());
-		assertEquals("기본 설정, 2명중 1등은 60점이여야 합니다.", 60, secScore.getValue());
-		assertEquals("총점은 100점 이여야 합니다.", 100, user.getTotalScore().getValue());
+		assertEquals("기본 설정, 2명중 1등은 60점이여야 합니다.", 60, secScore.getValue().intValue());
+		assertEquals("총점은 100점 이여야 합니다.", 100, user.getTotalScore().getValue().intValue());
 	}
 }

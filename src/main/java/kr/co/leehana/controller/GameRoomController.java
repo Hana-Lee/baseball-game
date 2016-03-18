@@ -236,6 +236,10 @@ public class GameRoomController {
 		player.setGuessNumber(null);
 		player.setWrongCount(0);
 		player.getRank().setValue(0);
+		player.getScore().setValue(0);
+		player.getResult().getBall().setValue(0);
+		player.getResult().getStrike().setValue(0);
+		player.getResult().getSettlement().setSolved(false);
 
 		gameRoom.getPlayers().remove(player);
 
@@ -272,6 +276,10 @@ public class GameRoomController {
 		player.setGuessNumber(null);
 		player.setWrongCount(0);
 		player.getRank().setValue(0);
+		player.getScore().setValue(0);
+		player.getResult().getBall().setValue(0);
+		player.getResult().getStrike().setValue(0);
+		player.getResult().getSettlement().setSolved(false);
 
 		gameRoom.getPlayers().remove(player);
 

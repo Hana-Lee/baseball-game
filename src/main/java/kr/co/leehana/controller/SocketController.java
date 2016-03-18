@@ -9,9 +9,11 @@ import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.Score;
 import kr.co.leehana.service.ChatService;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
+import kr.co.leehana.util.ScoreCalculator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
@@ -86,8 +88,7 @@ public class SocketController {
 	@SendTo(value = {"/topic/gameroom/{id}/progress/updated"})
 	public MessagingDto gameRoomProgressUpdate(@DestinationVariable Long id, Principal principal) {
 		final Player player = playerService.getByEmail(principal.getName());
-		player.setInputCount(0);
-		player.setGuessNumber(null);
+
 		String message = "";
 		String type = "";
 		if (Objects.equals(player.getStatus(), Status.READY_DONE)) {
@@ -131,14 +132,19 @@ public class SocketController {
 		updateDto.setInputCount(updateDto.getInputCount() + 1);
 
 		final GameRoom gameRoom = gameRoomService.getById(id);
+		final Player player = playerService.getByEmail(principal.getName());
 
 		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(), updateDto
 				.getGuessNumber());
+
+		// TODO 중복 입력 제거 할 것.
 		updateDto.setResult(result);
+		player.setResult(result);
 
 		String guessResultMessage = gameController.makeGuessResultMessage(result, updateDto);
 
-		if (gameController.isGameOver(result)) {
+		if (gameController.isGameOver(result) || Objects.equals(player.getInputCount(), gameRoom.getSetting()
+				.getLimitGuessInputCount())) {
 			updateDto.setStatus(Status.GAME_OVER);
 			updateDto.setGameOverTime(new Date());
 
@@ -146,7 +152,13 @@ public class SocketController {
 			Long rankValue = gameRoom.getPlayers().stream().filter(p -> p.getRank() != null && p.getRank().getValue()
 					> 0).count() + 1;
 			playerRank.setValue(rankValue.intValue());
+
+			// TODO 중복 입력 제거 할 것.
 			updateDto.setRank(playerRank);
+			player.setRank(playerRank);
+
+			Score score = ScoreCalculator.calculation(player, gameRoom);
+			updateDto.setScore(score);
 		}
 
 		final Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
@@ -196,6 +208,8 @@ public class SocketController {
 				p.setInputCount(0);
 				p.setGuessNumber(null);
 				// TODO 스코어, 랭킹, 전적
+				final Integer totalScore = p.getTotalScore().getValue() + p.getScore().getValue();
+				p.getTotalScore().setValue(totalScore);
 			});
 			gameRoom.setGameNumber(null);
 			gameRoomService.update(gameRoom);

@@ -134,6 +134,17 @@ public class PlayerController {
 	public ResponseEntity<PlayerDto.Response> readyOrReadyCancel(@RequestBody @Valid PlayerDto.Ready readyDto) {
 		final Player player = getCurrentPlayer();
 		player.setStatus(readyDto.getStatus());
+
+		// reset
+		player.setInputCount(0);
+		player.setWrongCount(0);
+		player.setGuessNumber(null);
+		player.getRank().setValue(0);
+		player.getScore().setValue(0);
+		player.getResult().getBall().setValue(0);
+		player.getResult().getStrike().setValue(0);
+		player.getResult().getSettlement().setSolved(false);
+
 		playerService.update(player);
 		return new ResponseEntity<>(modelMapper.map(player, PlayerDto.Response.class), OK);
 	}

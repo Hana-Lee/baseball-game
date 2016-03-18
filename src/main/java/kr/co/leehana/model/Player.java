@@ -140,6 +140,11 @@ public class Player implements Serializable {
 	@NotNull
 	private Rank rank;
 
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "score_id")
+	@NotNull
+	private Score score;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date gameOverTime;
 }

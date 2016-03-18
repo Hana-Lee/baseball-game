@@ -13,6 +13,7 @@ import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.Score;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.TotalScore;
 import lombok.Data;
@@ -73,6 +74,7 @@ public class PlayerDto {
 		private String guessNumber;
 		private Rank rank;
 		private GuessNumberComparedResult result;
+		private Score score;
 	}
 
 	@Data
@@ -99,6 +101,7 @@ public class PlayerDto {
 		private Date gameOverTime;
 		private Rank rank;
 		private GuessNumberComparedResult result;
+		private Score score;
 	}
 
 	@Data

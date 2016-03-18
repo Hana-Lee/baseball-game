@@ -103,7 +103,7 @@ app.v_game_board = (function () {
           });
           playerRankList.forEach(function (p, idx) {
             webixMap.game_progress_board.add({
-              message : (idx + 1) + '등 : ' + p.nickname + '님', type : 'focus'
+              message : (idx + 1) + '등 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
             });
           });
         }

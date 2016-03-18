@@ -14,6 +14,7 @@ import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
 import kr.co.leehana.model.TotalGame;
@@ -105,6 +106,7 @@ public class PlayerServiceImpl implements PlayerService {
 		final GuessNumberComparedResult result = new GuessNumberComparedResult(new Settlement(false), new Strike(0),
 				new Ball(0));
 		player.setResult(result);
+		player.setScore(new Score(0));
 	}
 
 	@Override
@@ -189,6 +191,14 @@ public class PlayerServiceImpl implements PlayerService {
 
 		if (updateDto.getResult() != null) {
 			player.setResult(updateDto.getResult());
+		}
+
+		if (updateDto.getScore() != null) {
+			player.setScore(updateDto.getScore());
+		}
+
+		if (updateDto.getTotalScore() != null) {
+			player.setTotalScore(updateDto.getTotalScore());
 		}
 
 		player.setUpdated(new Date());
