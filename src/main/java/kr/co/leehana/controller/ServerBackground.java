@@ -1,18 +1,18 @@
 package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.leehana.factory.GameRoomMaker;
-import kr.co.leehana.model.ErrorMessage;
-import kr.co.leehana.model.OldGameRoom;
-import kr.co.leehana.model.OldUser;
-import kr.co.leehana.model.Rank;
-import kr.co.leehana.model.GuessNumberComparedResult;
-import kr.co.leehana.model.ResultDto;
-import kr.co.leehana.model.Role;
-import kr.co.leehana.model.Score;
 import kr.co.leehana.enums.ErrorType;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.enums.MessageType;
+import kr.co.leehana.factory.GameRoomMaker;
+import kr.co.leehana.model.ErrorMessage;
+import kr.co.leehana.model.GuessNumberComparedResult;
+import kr.co.leehana.model.OldGameRoom;
+import kr.co.leehana.model.OldUser;
+import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.ResultDto;
+import kr.co.leehana.model.Role;
+import kr.co.leehana.model.Score;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -133,9 +133,10 @@ public class ServerBackground {
 								final String gameRoomName = clientSendValues[0];
 								final String userId = clientSendValues[2];
 								final OldUser ownerUser = clients.entrySet().stream().filter(entry -> entry.getKey()
-										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
-										.get(0);
-								final OldGameRoom newGameRoom = GameRoomMaker.make(gameRoomList, gameRoomName, ownerUser);
+										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()
+								).get(0);
+								final OldGameRoom newGameRoom = GameRoomMaker.make(gameRoomList, gameRoomName,
+										ownerUser);
 								gameRoomList.add(newGameRoom);
 								jsonResult = objectMapper.writeValueAsString(newGameRoom);
 								dataOutputStream.writeUTF(jsonResult);
@@ -148,15 +149,15 @@ public class ServerBackground {
 								final String userId = clientSendValues[2];
 								final String role = clientSendValues[4];
 								final OldUser joinedUser = clients.entrySet().stream().filter(entry -> entry.getKey()
-										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList())
-										.get(0);
+										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()
+								).get(0);
 								joinedUser.setRole(new Role(GameRole.valueOf(role)));
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 
 								ErrorMessage errorMessage = new ErrorMessage();
-								if (gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(joinedUser.getEmail()))
-										.count() > 0) {
+								if (gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(joinedUser.getEmail()
+								)).count() > 0) {
 									errorMessage.setMessage(ErrorType.ALREADY_JOIN.getMessage());
 								} else {
 									gameRoom.getUsers().add(joinedUser);
@@ -173,12 +174,12 @@ public class ServerBackground {
 							if (value != null) {
 								final String[] clientSendValues = value.split(":");
 								final long gameRoomId = Long.parseLong(clientSendValues[0]);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[2];
-								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
-										.findFirst().get();
+								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals
+										(userId)).findFirst().get();
 
 								resetUser(user);
 
@@ -200,8 +201,8 @@ public class ServerBackground {
 						case START:
 							if (value != null) {
 								final long gameRoomId = Long.parseLong(value);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 
 								if (gameRoom.getGenerationNumbers() == null || gameRoom.getGenerationNumbers().isEmpty
 										()) {
@@ -213,12 +214,12 @@ public class ServerBackground {
 							if (value != null) {
 								final String[] clientSendValues = value.split(":");
 								final long gameRoomId = Long.parseLong(clientSendValues[2]);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 
 								final String userId = clientSendValues[4];
-								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId))
-										.findFirst().get();
+								final OldUser user = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals
+										(userId)).findFirst().get();
 								user.setGuessNum(clientSendValues[0]);
 
 								final ErrorMessage errorMessage = new ErrorMessage();
@@ -236,14 +237,14 @@ public class ServerBackground {
 									user.setGuessCount(user.getGuessCount() + 1);
 									result = gameEngine.compareNumber(gameRoom.getGenerationNumbers(), user
 											.getGuessNum());
-									if (result.getSettlement().isSolved()) {
+									if (result.getSettlement().getSolved()) {
 										user.setGameOver(true);
 
 										int ranking = (int) (gameRoom.getUsers().stream().filter(u -> u.getRank() !=
 												null && u.getRank().getValue() > 0).count() + 1);
 
 										user.setRank(new Rank(ranking));
-									} else if (!result.getSettlement().isSolved() && user.getGuessCount() == gameRoom
+									} else if (!result.getSettlement().getSolved() && user.getGuessCount() == gameRoom
 											.getSetting().getLimitGuessInputCount()) {
 										user.setGameOver(true);
 										result = null;
@@ -259,7 +260,7 @@ public class ServerBackground {
 
 								Score score = null;
 								if (user.getGameOver()) {
-									score = ScoreCalculator.calculation(user, gameRoom);
+									score = OldScoreCalculator.calculation(user, gameRoom);
 
 									if (user.getTotalScore() == null) {
 										user.setTotalScore(score);
@@ -282,8 +283,8 @@ public class ServerBackground {
 								jsonResult = objectMapper.writeValueAsString(resultDto);
 								dataOutputStream.writeUTF(jsonResult);
 
-								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType
-										().equals(GameRole.DEFENDER)).findFirst().orElse(null);
+								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getRole()
+										.getRoleType().equals(GameRole.DEFENDER)).findFirst().orElse(null);
 								if (depender != null) {
 									clients.get(depender).writeUTF(jsonResult);
 								}
@@ -292,8 +293,8 @@ public class ServerBackground {
 						case GET_SETTING:
 							if (value != null) {
 								final long gameRoomId = Long.parseLong(value);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 								jsonResult = objectMapper.writeValueAsString(gameRoom.getSetting());
 								dataOutputStream.writeUTF(jsonResult);
 							}
@@ -303,8 +304,8 @@ public class ServerBackground {
 								// TODO json object 로 처리할것
 								final String[] clientSendValues = value.split(":");
 								final long gameRoomId = Long.parseLong(clientSendValues[0]);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 
 								//잘못된 숫자 입력 횟수 제한
 								final int limitWrongInputCount = Integer.parseInt(clientSendValues[2]);
@@ -328,8 +329,8 @@ public class ServerBackground {
 								OldUser newUser = new OldUser(value, null, new Score());
 								ErrorMessage errorMessage = new ErrorMessage();
 
-								if (clients.entrySet().stream().filter(entry -> entry.getKey().getEmail().equals(newUser
-										.getEmail())).count() > 0) {
+								if (clients.entrySet().stream().filter(entry -> entry.getKey().getEmail().equals
+										(newUser.getEmail())).count() > 0) {
 									errorMessage.setMessage(ErrorType.DUPLICATE_USER_ID.getMessage());
 								} else {
 									clients.put(newUser, dataOutputStream);
@@ -343,8 +344,9 @@ public class ServerBackground {
 						case LOGOUT:
 							if (value != null) {
 								final String userId = value;
-								OldUser leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey().getEmail()
-										.equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()).get(0);
+								OldUser leaveUser = clients.entrySet().stream().filter(entry -> entry.getKey()
+										.getEmail().equals(userId)).map(Map.Entry::getKey).collect(Collectors.toList()
+								).get(0);
 								clients.remove(leaveUser);
 								bgMessageClients.remove(leaveUser);
 							}
@@ -379,8 +381,8 @@ public class ServerBackground {
 						case ALL_USER_GUESS_COMPLETE_STATE_RESET:
 							if (value != null) {
 								final long gameRoomId = Long.parseLong(value);
-								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
+								OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId)
+										.collect(Collectors.toList()).get(0);
 								gameRoom.getUsers().forEach(u -> u.setGuessCompleted(false));
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(true));
 							}
@@ -388,10 +390,10 @@ public class ServerBackground {
 						case DEPENDER_ALREADY_EXIST:
 							if (value != null) {
 								final long gameRoomId = Long.parseLong(value);
-								final OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
-								boolean dependerAlreadyExist = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole
-										.DEFENDER)).count() > 0;
+								final OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() ==
+										gameRoomId).collect(Collectors.toList()).get(0);
+								boolean dependerAlreadyExist = gameRoom.getUsers().stream().filter(u -> u.getRole()
+										.getRoleType().equals(GameRole.DEFENDER)).count() > 0;
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(dependerAlreadyExist));
 							}
 							break;
@@ -400,10 +402,11 @@ public class ServerBackground {
 								final String[] clientSendValues = value.split(":");
 								final long gameRoomId = Long.parseLong(clientSendValues[0]);
 								final String userId = clientSendValues[2];
-								final OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
-										(Collectors.toList()).get(0);
-								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals(userId)).findFirst().get();
-								final Score score = ScoreCalculator.calculation(depender, gameRoom);
+								final OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() ==
+										gameRoomId).collect(Collectors.toList()).get(0);
+								final OldUser depender = gameRoom.getUsers().stream().filter(u -> u.getEmail().equals
+										(userId)).findFirst().get();
+								final Score score = OldScoreCalculator.calculation(depender, gameRoom);
 								dataOutputStream.writeUTF(objectMapper.writeValueAsString(score));
 							}
 							break;
@@ -418,13 +421,13 @@ public class ServerBackground {
 
 		private void broadCastCurrentState(String value, MessageType messageType) throws IOException {
 			final long gameRoomId = Long.parseLong(value);
-			OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect(Collectors.toList()
-			).get(0);
+			OldGameRoom gameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect(Collectors
+					.toList()).get(0);
 			boolean currentState = false;
 			switch (messageType) {
 				case GET_READY_STATE:
-					currentState = gameRoom.getUsers().stream().filter(OldUser::getReady).count() == gameRoom.getUsers()
-							.size();
+					currentState = gameRoom.getUsers().stream().filter(OldUser::getReady).count() == gameRoom.getUsers
+							().size();
 					break;
 				case ALL_USER_COMPLETED_GUESS:
 					currentState = gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole

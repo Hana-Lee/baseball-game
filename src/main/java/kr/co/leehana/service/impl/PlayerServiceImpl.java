@@ -6,11 +6,16 @@ import kr.co.leehana.exception.PlayerDuplicatedException;
 import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.Avatar;
+import kr.co.leehana.model.Ball;
 import kr.co.leehana.model.DefenderRoleCount;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
 import kr.co.leehana.model.MatchRecord;
 import kr.co.leehana.model.Player;
+import kr.co.leehana.model.Rank;
+import kr.co.leehana.model.Settlement;
+import kr.co.leehana.model.Strike;
 import kr.co.leehana.model.TotalGame;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.TotalScore;
@@ -94,6 +99,12 @@ public class PlayerServiceImpl implements PlayerService {
 		player.setUpdated(now);
 
 		player.setEnabled(Enabled.TRUE);
+
+		player.setRank(new Rank(0));
+
+		final GuessNumberComparedResult result = new GuessNumberComparedResult(new Settlement(false), new Strike(0),
+				new Ball(0));
+		player.setResult(result);
 	}
 
 	@Override
@@ -160,12 +171,24 @@ public class PlayerServiceImpl implements PlayerService {
 			player.setInputCount(updateDto.getInputCount());
 		}
 
+		if (updateDto.getWrongCount() != null) {
+			player.setWrongCount(updateDto.getWrongCount());
+		}
+
 		if (updateDto.getGuessNumber() != null) {
 			player.setGuessNumber(updateDto.getGuessNumber());
 		}
 
 		if (updateDto.getGameOverTime() != null) {
 			player.setGameOverTime(updateDto.getGameOverTime());
+		}
+
+		if (updateDto.getRank() != null) {
+			player.setRank(updateDto.getRank());
+		}
+
+		if (updateDto.getResult() != null) {
+			player.setResult(updateDto.getResult());
 		}
 
 		player.setUpdated(new Date());

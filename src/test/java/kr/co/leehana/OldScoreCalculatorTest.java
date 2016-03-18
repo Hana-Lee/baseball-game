@@ -1,6 +1,6 @@
 package kr.co.leehana;
 
-import kr.co.leehana.controller.ScoreCalculator;
+import kr.co.leehana.controller.OldScoreCalculator;
 import kr.co.leehana.model.Ball;
 import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.OldGameRoom;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  * @author Hana Lee
  * @since 2016-01-03 20:36
  */
-public class ScoreCalculatorTest {
+public class OldScoreCalculatorTest {
 
 	private OldGameRoom gameRoom;
 
@@ -137,7 +137,7 @@ public class ScoreCalculatorTest {
 	                                                         String assertFailMessage) {
 		for (int solvedUserCount = 0; solvedUserCount < expScores.length; solvedUserCount++) {
 			makeGameRoomForTest(guessLevel, generationLevel, expScores.length, solvedUserCount);
-			Score score = ScoreCalculator.dependerScore(findDepender(), gameRoom);
+			Score score = OldScoreCalculator.dependerScore(findDepender(), gameRoom);
 			assertEquals(String.format(assertFailMessage, expScores.length), expScores[solvedUserCount], score.getValue());
 		}
 	}
@@ -178,7 +178,7 @@ public class ScoreCalculatorTest {
 		this.gameRoom.getUsers().add(depender);
 		this.gameRoom.getUsers().add(attacker);
 
-		final Score dependerScore = ScoreCalculator.calculation(depender, this.gameRoom);
+		final Score dependerScore = OldScoreCalculator.calculation(depender, this.gameRoom);
 
 		assertEquals("기본 설정에서 모든 유저가 맞춘경우 수비자의 점수는 20점 이여야 합니다", 20, dependerScore.getValue());
 	}
@@ -288,7 +288,7 @@ public class ScoreCalculatorTest {
 
 		int count = 0;
 		for (OldUser user : this.gameRoom.getUsers()) {
-			final Score score = ScoreCalculator.attackerScore(user, gameRoom);
+			final Score score = OldScoreCalculator.attackerScore(user, gameRoom);
 			final int expectedScore = expectedScores.get(count++);
 			assertEquals(expectedScore, score.getValue());
 		}
@@ -356,7 +356,7 @@ public class ScoreCalculatorTest {
 
 		assertEquals(1, gameRoom.getUsers().size());
 
-		final Score score = ScoreCalculator.attackerScore(user, gameRoom);
+		final Score score = OldScoreCalculator.attackerScore(user, gameRoom);
 		assertEquals(expectedScore, score.getValue());
 	}
 
@@ -372,7 +372,7 @@ public class ScoreCalculatorTest {
 
 		assertEquals(1, gameRoom.getUsers().size());
 
-		final Score score = ScoreCalculator.attackerScore(user, gameRoom);
+		final Score score = OldScoreCalculator.attackerScore(user, gameRoom);
 
 		assertEquals(0, score.getValue());
 	}
@@ -389,7 +389,7 @@ public class ScoreCalculatorTest {
 
 		assertEquals(1, gameRoom.getUsers().size());
 
-		final Score firstScore = ScoreCalculator.calculation(user, gameRoom);
+		final Score firstScore = OldScoreCalculator.calculation(user, gameRoom);
 		user.getTotalScore().setValue(user.getTotalScore().getValue() + firstScore.getValue());
 		assertEquals("기본 설정, 1명중 1등은 40점이여야 합니다.", 40, firstScore.getValue());
 
@@ -401,7 +401,7 @@ public class ScoreCalculatorTest {
 
 		user.setRank(new Rank(2));
 
-		final Score secScore = ScoreCalculator.calculation(user, gameRoom);
+		final Score secScore = OldScoreCalculator.calculation(user, gameRoom);
 		user.getTotalScore().setValue(user.getTotalScore().getValue() + secScore.getValue());
 		assertEquals("기본 설정, 2명중 1등은 60점이여야 합니다.", 60, secScore.getValue());
 		assertEquals("총점은 100점 이여야 합니다.", 100, user.getTotalScore().getValue());

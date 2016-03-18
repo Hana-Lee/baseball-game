@@ -8,6 +8,7 @@ import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Player;
+import kr.co.leehana.model.Rank;
 import kr.co.leehana.service.ChatService;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
@@ -133,12 +134,19 @@ public class SocketController {
 
 		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(), updateDto
 				.getGuessNumber());
+		updateDto.setResult(result);
 
 		String guessResultMessage = gameController.makeGuessResultMessage(result, updateDto);
 
-		if (gameController.isGameEnd(result)) {
+		if (gameController.isGameOver(result)) {
 			updateDto.setStatus(Status.GAME_OVER);
 			updateDto.setGameOverTime(new Date());
+
+			final Rank playerRank = new Rank();
+			Long rankValue = gameRoom.getPlayers().stream().filter(p -> p.getRank() != null && p.getRank().getValue()
+					> 0).count() + 1;
+			playerRank.setValue(rankValue.intValue());
+			updateDto.setRank(playerRank);
 		}
 
 		final Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);

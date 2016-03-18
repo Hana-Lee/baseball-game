@@ -125,8 +125,20 @@ public class Player implements Serializable {
 
 	private Integer inputCount = 0;
 
+	private Integer wrongCount = 0;
+
 	@Transient
 	private String guessNumber;
+
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "game_result_id")
+	@NotNull
+	private GuessNumberComparedResult result;
+
+	@OneToOne(cascade = {CascadeType.ALL}, optional = false, fetch = FetchType.EAGER, orphanRemoval = true)
+	@JoinColumn(name = "rank_id")
+	@NotNull
+	private Rank rank;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date gameOverTime;

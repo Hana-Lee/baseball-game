@@ -15,7 +15,7 @@
  white    : true,
  todo     : true
  */
-/*global $, app, webix, $$ */
+/*global $, app, webix, $$, _ */
 
 app.v_game_board = (function () {
   'use strict';
@@ -35,7 +35,7 @@ app.v_game_board = (function () {
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap, _playerInfoUpdatedHandler,
-    _updateGameRoomInfoHandler, _checkGameEnd,
+    _updateGameRoomInfoHandler,
     getProgressBoardProxyClientId, initModule;
 
   _resetWebixMap = function () {
@@ -68,25 +68,10 @@ app.v_game_board = (function () {
     }
   };
 
-  _checkGameEnd = function () {
-    var gameEnd = true;
-    app.v_game_room.getGameRoomModel().players.forEach(function (player) {
-      console.log('player status', player.status);
-      if (player.status !== app.const.status.GAME_OVER) {
-        gameEnd = false;
-
-        return false;
-      }
-    });
-
-    if (gameEnd) {
-      app.v_shell.gameEndNotification();
-    }
-  };
-
   _updateGameRoomInfoHandler = function (operation) {
     var gameStatus = app.v_game_room.getGameRoomModel().status,
-      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount,
+      playerRankList;
     if (operation === 'playerReadyStatusUpdated') {
       if (gameStatus === app.const.status.RUNNING) {
         app.v_shell.playerInfoUpdate(function () {
@@ -106,6 +91,24 @@ app.v_game_board = (function () {
       if (gameStatus === app.const.status.GAME_END) {
         webixMap.game_progress_board.add({
           message : '게임이 종료 되었습니다', type : 'alert'
+        });
+        playerRankList = _.sortBy(app.v_game_room.getGameRoomModel().players, function (player) {
+          console.log(Math.max(player.rank.value));
+          return player.rank.value;
+        });
+
+        if (playerRankList && playerRankList.length > 0) {
+          webixMap.game_progress_board.add({
+            message : '게임 순위 입니다.', type : 'focus'
+          });
+          playerRankList.forEach(function (p, idx) {
+            webixMap.game_progress_board.add({
+              message : (idx + 1) + '등 : ' + p.nickname + '님', type : 'focus'
+            });
+          });
+        }
+        webixMap.game_progress_board.add({
+          message : '시작하려면 준비를 눌러주세요', type : 'alert'
         });
         webix.callEvent(app.v_game_room.ON_GAME_END, []);
       }

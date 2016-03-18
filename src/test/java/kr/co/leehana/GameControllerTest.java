@@ -106,7 +106,7 @@ public class GameControllerTest {
 	@Test
 	public void testGameEndWithMatchingNumber() {
 		GuessNumberComparedResult result = gameController.compareNumber("123", "123");
-		boolean isGameEnd = gameController.isGameEnd(result);
+		boolean isGameEnd = gameController.isGameOver(result);
 		assertTrue("게임 종료값은 true 여야 합니다", isGameEnd);
 	}
 
@@ -121,7 +121,7 @@ public class GameControllerTest {
 	private void assertGuessResult(String generatedNumber, String guessNumbers, boolean solved, int expectedStrikes,
 	                               int expectedBalls) {
 		GuessNumberComparedResult guessResult = gameController.compareNumber(generatedNumber, guessNumbers);
-		assertThat(guessResult.getSettlement().isSolved(), equalTo(solved));
+		assertThat(guessResult.getSettlement().getSolved(), equalTo(solved));
 		assertThat(guessResult.getStrike().getValue(), equalTo(expectedStrikes));
 		assertThat(guessResult.getBall().getValue(), equalTo(expectedBalls));
 	}

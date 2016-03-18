@@ -61,7 +61,8 @@ public class GameController {
 			}
 		}
 
-		return new GuessNumberComparedResult(new Settlement(isSolved(genNumCount, strikes)), new Strike(strikes), new Ball(balls));
+		return new GuessNumberComparedResult(new Settlement(isSolved(genNumCount, strikes)), new Strike(strikes), new
+				Ball(balls));
 	}
 
 	private boolean isSolved(int generatedNumberCount, int strikes) {
@@ -70,7 +71,7 @@ public class GameController {
 
 	public String makeGuessResultMessage(final GuessNumberComparedResult result, final PlayerDto.Update player) {
 		final String message = "[" + player.getGuessNumber() + "] - ";
-		if (isGameEnd(result)) {
+		if (isGameOver(result)) {
 			return message + "숫자를 맞췄습니다";
 		} else {
 			return message + result.getStrike().getValue() + "스트라이크, " + result.getBall().getValue() + "볼";
@@ -96,7 +97,7 @@ public class GameController {
 		return generationNumberStrategy.generateRandomNumber(setting);
 	}
 
-	public boolean isGameEnd(GuessNumberComparedResult result) {
-		return result.getSettlement() != null && result.getSettlement().isSolved();
+	public boolean isGameOver(GuessNumberComparedResult result) {
+		return result.getSettlement() != null && result.getSettlement().getSolved();
 	}
 }

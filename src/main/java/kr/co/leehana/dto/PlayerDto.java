@@ -9,8 +9,10 @@ import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.Avatar;
 import kr.co.leehana.model.DefenderRoleCount;
+import kr.co.leehana.model.GuessNumberComparedResult;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.MatchRecord;
+import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.TotalRank;
 import kr.co.leehana.model.TotalScore;
 import lombok.Data;
@@ -67,7 +69,10 @@ public class PlayerDto {
 		private Date deleted;
 		private Enabled enabled;
 		private Integer inputCount;
+		private Integer wrongCount;
 		private String guessNumber;
+		private Rank rank;
+		private GuessNumberComparedResult result;
 	}
 
 	@Data
@@ -89,8 +94,11 @@ public class PlayerDto {
 		private Boolean admin;
 		private Status status;
 		private Integer inputCount;
+		private Integer wrongCount;
 		private String guessNumber;
 		private Date gameOverTime;
+		private Rank rank;
+		private GuessNumberComparedResult result;
 	}
 
 	@Data

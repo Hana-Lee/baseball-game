@@ -1,19 +1,19 @@
 package kr.co.leehana.controller;
 
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.enums.GameRole;
 
-public class ScoreCalculator {
+public class OldScoreCalculator {
 
 	private static final int DEPENDER_BASE = 40;
 	private static final int DEPENDER_EACH_USER = 20;
 	private static final int ATTACKER_BASE = 20;
 	private static final int ATTACKER_EACH_USER = 10;
 
-	public ScoreCalculator() {
+	public OldScoreCalculator() {
 	}
 
 	public static Score calculation(final OldUser user, final OldGameRoom gameRoom) {
@@ -41,7 +41,7 @@ public class ScoreCalculator {
 
 	private static long getSolvedUserCount(final OldGameRoom gameRoom) {
 		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER) && u
-				.getResult().getSettlement().isSolved()).count();
+				.getResult().getSettlement().getSolved()).count();
 	}
 
 	private static long getAttackerCount(final OldGameRoom gameRoom) {
@@ -90,8 +90,8 @@ public class ScoreCalculator {
 
 	private static boolean allUserFocusedNumber(final OldGameRoom gameRoom) {
 		return gameRoom.getUsers().stream().filter(u -> u.getRole().getRoleType().equals(GameRole.ATTACKER) && u
-				.getResult().getSettlement().isSolved()).count() == gameRoom.getUsers().stream().filter(u -> u.getRole
-				().getRoleType().equals(GameRole.ATTACKER)).count();
+				.getResult().getSettlement().getSolved()).count() == gameRoom.getUsers().stream().filter(u -> u
+				.getRole().getRoleType().equals(GameRole.ATTACKER)).count();
 	}
 
 	private static float makeAttackerBaseScore(final OldUser user, final OldGameRoom gameRoom, final Setting setting) {
@@ -124,8 +124,7 @@ public class ScoreCalculator {
 	}
 
 	private static boolean successGuess(final OldUser user) {
-		return user.getResult().getSettlement().isSolved() && user.getRank() != null && user.getRank().getValue()
-				> 0;
+		return user.getResult().getSettlement().getSolved() && user.getRank() != null && user.getRank().getValue() > 0;
 	}
 
 	private static boolean exceededLimitGuessCount(final OldUser user, final Setting setting) {
@@ -142,8 +141,8 @@ public class ScoreCalculator {
 		return Math.round(guessScoreValue + numberCountScoreValue);
 	}
 
-	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final OldUser
-			user) {
+	private static float getNumberCountScoreValue(final int generationNumberCount, final float baseScore, final
+	OldUser user) {
 		float numberCountScoreValue;
 		final boolean isAttacker = user.getRole().getRoleType().equals(GameRole.ATTACKER);
 		switch (generationNumberCount) {

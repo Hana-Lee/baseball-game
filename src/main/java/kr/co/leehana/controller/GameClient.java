@@ -1,6 +1,7 @@
 package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.OldGameRoom;
 import kr.co.leehana.model.OldUser;
@@ -8,7 +9,6 @@ import kr.co.leehana.model.ResultDto;
 import kr.co.leehana.model.Role;
 import kr.co.leehana.model.Score;
 import kr.co.leehana.model.Setting;
-import kr.co.leehana.enums.GameRole;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,7 +40,8 @@ public class GameClient {
 			boolean onlyOneAttacker = false;
 			if (s2.hasNextLine()) {
 				final String inputNum = s2.nextLine();
-				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getEmail());
+				client.sendSocketData("GUESS_NUM," + inputNum + ":ROOM_ID:" + gameRoomId + ":USER_ID:" + user.getEmail
+						());
 
 				final String resultDtoJson = client.getServerMessage();
 				System.out.println("result dto json : " + resultDtoJson);
@@ -66,11 +67,11 @@ public class GameClient {
 					System.out.println(strikeCount + "스트라이크, " + ballCount + "볼 입니다.");
 				}
 
-				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().isSolved()) {
+				if (resultDto.getResult() != null && resultDto.getResult().getSettlement().getSolved()) {
 					System.out.println("축하합니다. 숫자를 맞추셨네요 ^^");
 					System.out.println(resultDto.getGameRoom().getUsers().stream().filter(u -> u.getRole().getRoleType
-							().equals(GameRole.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank()
-							.getValue() + "등 입니다.");
+							().equals(GameRole.ATTACKER)).count() + "명의 유저중 " + resultDto.getUser().getRank().getValue
+							() + "등 입니다.");
 					System.out.println("점수 : " + resultDto.getScore().getValue() + "점 입니다.");
 					System.out.println("누적 점수 : " + resultDto.getUser().getTotalScore().getValue() + "점 입니다.");
 					isGameOver = true;
@@ -338,8 +339,8 @@ public class GameClient {
 			final OldGameRoom joinedGameRoom = gameRoomList.stream().filter(r -> r.getId() == gameRoomId).collect
 					(Collectors.toList()).get(0);
 			System.out.println("----- 게임룸 (" + joinedGameRoom.getName() + ") -----");
-			final String userList = joinedGameRoom.getUsers().stream().map(OldUser::getEmail).collect(Collectors.joining
-					("," +
+			final String userList = joinedGameRoom.getUsers().stream().map(OldUser::getEmail).collect(Collectors
+					.joining("," +
 					" " +
 					"" + ""));
 			System.out.println("방장 : " + joinedGameRoom.getOwner().getEmail());
@@ -434,10 +435,11 @@ public class GameClient {
 				System.out.println("수비 " + user.getEmail() + "님의 점수는 : " + dependerScore.getValue() + "입니다.");
 				System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 			} else {
-				if (resultDto.getResult().getSettlement().isSolved()) {
+				if (resultDto.getResult().getSettlement().getSolved()) {
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
-					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum
+							());
 					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
 							resultDto.getResult().getBall().getValue() + "볼");
 
@@ -449,7 +451,8 @@ public class GameClient {
 				} else {
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
 					System.out.println("생성숫자 : " + resultDto.getGameRoom().getGenerationNumbers());
-					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum());
+					System.out.println(resultDto.getUser().getEmail() + " 유저의 입력 : " + resultDto.getUser().getGuessNum
+							());
 					System.out.println("추측 결과 : " + resultDto.getResult().getStrike().getValue() + "스트라이크, " +
 							resultDto.getResult().getBall().getValue() + "볼");
 					System.out.println("=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=");
