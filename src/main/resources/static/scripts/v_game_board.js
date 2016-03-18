@@ -99,7 +99,7 @@ app.v_game_board = (function () {
 
         if (playerRankList && playerRankList.length > 0) {
           webixMap.game_progress_board.add({
-            message : '게임 순위 입니다.', type : 'focus'
+            message : '*** 게임 순위 입니다 ***', type : 'focus'
           });
           playerRankList.forEach(function (p, idx) {
             webixMap.game_progress_board.add({
