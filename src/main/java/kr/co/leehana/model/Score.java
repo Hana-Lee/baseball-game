@@ -35,7 +35,7 @@ public class Score implements Serializable {
 	@Setter(AccessLevel.NONE)
 	private Long id;
 
-	private Integer value;
+	private Integer value = 0;
 
 	public Score(Integer value) {
 		this.value = value;
