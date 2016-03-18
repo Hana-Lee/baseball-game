@@ -56,7 +56,10 @@ public class TestWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		httpSecurity.httpBasic();
 
-		httpSecurity.logout().logoutSuccessHandler(logoutSuccessHandler);
+		httpSecurity.logout()
+				.invalidateHttpSession(true)
+				.clearAuthentication(true)
+				.logoutSuccessHandler(logoutSuccessHandler);
 
 		httpSecurity.csrf().disable();
 		httpSecurity.headers().frameOptions().disable();

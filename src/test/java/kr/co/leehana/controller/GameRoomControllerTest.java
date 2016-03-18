@@ -10,13 +10,14 @@ import kr.co.leehana.model.Setting;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import kr.co.leehana.utils.TestPlayerCreator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -49,8 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 2016-02-09 18:27
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(App.class)
-@WebAppConfiguration
+@SpringApplicationConfiguration(classes = {App.class})
+@WebIntegrationTest(randomPort = false)
 @Transactional
 public class GameRoomControllerTest {
 
@@ -79,7 +80,7 @@ public class GameRoomControllerTest {
 
 	private static final String OWNER_EMAIL_PATH = "$.owner.email";
 	private static final String PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == 'i@leehana.co.kr')]";
-	private static final String SEC_PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == 'i2@leehana.co.kr')]";
+	private static final String SEC_PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == '" + SEC_EMAIL + "')]";
 	private static final String THIRD_PLAYER_EMAIL_CONTAIN_PATH = "$.players[?(@.email == 'i3@leehana.co.kr')]";
 
 	@Autowired

@@ -45,7 +45,7 @@ public class GameRoomServiceImpl implements GameRoomService {
 		if (gameRoomRepository.findOneByOwnerAndEnabled(createDto.getOwner(), Enabled.TRUE) != null) {
 			log.error("owner duplicated exception. {} : {}", createDto.getOwner().getId(), createDto.getOwner()
 					.getNickname());
-			throw new OwnerDuplicatedException(createDto.getOwner());
+			throw new OwnerDuplicatedException("[" + createDto.getOwner().getEmail() + "] 중복된 방장 입니다.");
 		}
 
 		fillInitData(gameRoom);

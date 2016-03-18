@@ -6,15 +6,11 @@ import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.enums.Status;
-import kr.co.leehana.exception.ErrorResponse;
 import kr.co.leehana.exception.GameRoleDuplicatedException;
-import kr.co.leehana.exception.GameRoomNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayerNotFoundException;
 import kr.co.leehana.exception.GameRoomPlayersNotEmpty;
-import kr.co.leehana.exception.GameRoomRunningException;
 import kr.co.leehana.exception.GameRoomUpdateFieldAllEmptyException;
 import kr.co.leehana.exception.OwnerChangeException;
-import kr.co.leehana.exception.OwnerDuplicatedException;
 import kr.co.leehana.model.AttackerRoleCount;
 import kr.co.leehana.model.DefenderRoleCount;
 import kr.co.leehana.model.GameRoom;
@@ -31,8 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +38,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -339,84 +332,5 @@ public class GameRoomController {
 		if (!Objects.equals(gameRoom.getOwner().getEmail(), currentPlayer.getEmail())) {
 			throw new OwnerChangeException(currentPlayer.getNickname() + " is not game room owner.");
 		}
-	}
-
-	private ResponseEntity createErrorResponseEntity(String message, String errorCode) {
-		if (StringUtils.isBlank(errorCode)) {
-			errorCode = "gameroom.bad.request";
-		}
-
-		return new ResponseEntity<>(createErrorResponse(message, errorCode), BAD_REQUEST);
-	}
-
-	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
-	public ResponseEntity handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		final ErrorResponse errorResponse = new ErrorResponse();
-		String message;
-		if (e.getBindingResult().getFieldError() != null) {
-			message = e.getBindingResult().getFieldError().getDefaultMessage();
-		} else if (e.getBindingResult().getGlobalError() != null) {
-			message = e.getBindingResult().getGlobalError().getDefaultMessage();
-		} else {
-			message = "DTO Object binding error";
-		}
-		errorResponse.setMessage(message);
-		errorResponse.setErrorCode("bad.request");
-		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
-	}
-
-	@ExceptionHandler(GameRoleDuplicatedException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoleDuplicatedException(GameRoleDuplicatedException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(OwnerDuplicatedException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleOwnerDuplicatedException(OwnerDuplicatedException ex) {
-		return createErrorResponse("[" + ex.getOwner().getEmail() + "] 중복된 방장 입니다.", "duplicated.owner.exception");
-	}
-
-	@ExceptionHandler(GameRoomNotFoundException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomNotFoundException(GameRoomNotFoundException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(OwnerChangeException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleOwnerChangeException(OwnerChangeException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(GameRoomPlayerNotFoundException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomPlayerNotFoundException(GameRoomPlayerNotFoundException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(GameRoomPlayersNotEmpty.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomPlayersNotEmptyException(GameRoomPlayersNotEmpty ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(GameRoomRunningException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomAlreadyRunningException(GameRoomRunningException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	@ExceptionHandler(GameRoomUpdateFieldAllEmptyException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handleGameRoomUpdateFieldAllEmptyException(GameRoomUpdateFieldAllEmptyException ex) {
-		return createErrorResponse(ex.getMessage(), ex.getErrorCode());
-	}
-
-	private ErrorResponse createErrorResponse(String message, String errorCode) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(message);
-		errorResponse.setErrorCode(errorCode);
-		return errorResponse;
 	}
 }

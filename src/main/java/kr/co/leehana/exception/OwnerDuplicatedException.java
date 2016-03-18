@@ -12,6 +12,13 @@ public class OwnerDuplicatedException extends RuntimeException {
 	@Getter
 	private Player owner;
 
+	@Getter
+	private String errorCode = "duplicated.owner.exception";
+
+	public OwnerDuplicatedException(String message) {
+		super(message);
+	}
+
 	public OwnerDuplicatedException(Player owner) {
 		this.owner = owner;
 	}

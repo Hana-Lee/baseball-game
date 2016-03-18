@@ -2,13 +2,11 @@ package kr.co.leehana.controller;
 
 import kr.co.leehana.annotation.NotifyClients;
 import kr.co.leehana.dto.PlayerDto;
-import kr.co.leehana.exception.ErrorResponse;
-import kr.co.leehana.exception.PlayerDuplicatedException;
-import kr.co.leehana.exception.PlayerNotFoundException;
 import kr.co.leehana.exception.PlayerNotLoggedInException;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.security.UserDetailsImpl;
 import kr.co.leehana.service.PlayerService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,8 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -45,6 +40,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
  * @since 2016-01-14 22-39
  */
 @RestController
+@Slf4j
 public class PlayerController {
 
 	public static final String URL_VALUE = "/player";
@@ -104,6 +100,8 @@ public class PlayerController {
 		String currentPlayerEmail = getCurrentPlayerEmail();
 		principals.stream().filter(principal -> principal instanceof UserDetailsImpl).forEach(principal -> {
 			String email = ((UserDetailsImpl) principal).getEmail();
+			log.info("current player email : " + currentPlayerEmail);
+			log.info("other player email : " + email);
 			if (!currentPlayerEmail.equals(email)) {
 				Player player = playerService.getByEmailAndEnabledAndNoJoinedRoom(email);
 				if (player != null) {
@@ -145,46 +143,5 @@ public class PlayerController {
 				.getPrincipal();
 
 		return playerService.getByEmail(userDetails.getEmail());
-	}
-
-	@ExceptionHandler(value = {MethodArgumentNotValidException.class})
-	public ResponseEntity<ErrorResponse> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		final ErrorResponse errorResponse = new ErrorResponse();
-		String message;
-		if (e.getBindingResult().getFieldError() != null) {
-			message = e.getBindingResult().getFieldError().getDefaultMessage();
-		} else if (e.getBindingResult().getGlobalError() != null) {
-			message = e.getBindingResult().getGlobalError().getDefaultMessage();
-		} else {
-			message = "DTO Object binding error";
-		}
-		errorResponse.setMessage(message);
-		errorResponse.setErrorCode("bad.request");
-		return new ResponseEntity<>(errorResponse, BAD_REQUEST);
-	}
-
-	@ExceptionHandler(PlayerDuplicatedException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handlePlayerDuplicatedException(PlayerDuplicatedException e) {
-		return createErrorResponse(e.getMessage(), e.getErrorCode());
-	}
-
-	@ExceptionHandler(PlayerNotFoundException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handlePlayerNotFoundException(PlayerNotFoundException e) {
-		return createErrorResponse(e.getMessage(), e.getErrorCode());
-	}
-
-	@ExceptionHandler(PlayerNotLoggedInException.class)
-	@ResponseStatus(BAD_REQUEST)
-	public ErrorResponse handlePlayerNotLoggedInException(PlayerNotLoggedInException e) {
-		return createErrorResponse(e.getMessage(), e.getErrorCode());
-	}
-
-	private ErrorResponse createErrorResponse(String message, String errorCode) {
-		ErrorResponse errorResponse = new ErrorResponse();
-		errorResponse.setMessage(message);
-		errorResponse.setErrorCode(errorCode);
-		return errorResponse;
 	}
 }
