@@ -25,6 +25,7 @@
     "jquery": "~2.x.x",
     "webix": "~3.x.x",
     "sockjs-client": "~1.x.x",
-    "stomp-websocket": "~2.x.x"
+    "stomp-websocket": "~2.x.x",
+    "underscore": "^1.8.3"
   }
 }
