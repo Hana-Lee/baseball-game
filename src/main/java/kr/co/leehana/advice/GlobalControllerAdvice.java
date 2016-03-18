@@ -130,7 +130,6 @@ public class GlobalControllerAdvice {
 	@SendToUser(value = {"/topic/errors"}, broadcast = false)
 	public MessagingDto handleMethodArgumentNotValidException(org.springframework.messaging.handler.annotation.support
 			                                                              .MethodArgumentNotValidException exception) {
-		// TODO Exception Handler 들을 ControllerAdvice 로 모두 옮겨서 관리 할 것
 		String message = null;
 		if (exception.getBindingResult().getGlobalError() != null) {
 			message = exception.getBindingResult().getGlobalError().getDefaultMessage();
