@@ -35,7 +35,7 @@ app.v_game_board = (function () {
     }, webixMap = {},
     _createView, _makePlayersProfile, _resetJoinedPlayersProfile,
     _resetWebixMap, _resetStateMap, _playerInfoUpdatedHandler,
-    _updateGameRoomInfoHandler,
+    _updateGameRoomInfoHandler, _anotherPlayerInputResultInfoHandler,
     getProgressBoardProxyClientId, initModule;
 
   _resetWebixMap = function () {
@@ -273,6 +273,24 @@ app.v_game_board = (function () {
     return stateMap.proxy ? stateMap.proxy.clientId : null;
   };
 
+  _anotherPlayerInputResultInfoHandler = function (anotherPlayerInfo, message, operation) {
+    var inputCountLimit = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    if (operation === 'anotherPlayerInputResultInfo') {
+      webixMap.game_progress_board.add({
+        message : anotherPlayerInfo.nickname + '님의 입력 결과 입니다',
+        type : 'normal'
+      });
+      webixMap.game_progress_board.add({
+        message : anotherPlayerInfo.inputCount + '/' + inputCountLimit + '번째 입력.',
+        type : 'normal'
+      });
+      webixMap.game_progress_board.add({
+        message : message,
+        type : 'normal'
+      });
+    }
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.v_game_room.getGameRoomModel().id + '/progress/updated');
@@ -280,6 +298,7 @@ app.v_game_board = (function () {
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfoHandler));
     stateMap.events.push(webix.attachEvent(app.v_shell.ON_PLAYER_INFO_UPDATED, _playerInfoUpdatedHandler));
+    stateMap.events.push(webix.attachEvent(app.v_game_room.ON_ANOTHER_PLAYER_INPUT_RESULT_INFO, _anotherPlayerInputResultInfoHandler));
 
     _createView();
   };

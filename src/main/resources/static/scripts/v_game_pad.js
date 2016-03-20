@@ -39,6 +39,7 @@ app.v_game_pad = (function () {
     _resetWebixMap, _resetStateMap, _sendReadyDataToServer, _gameStartHandler, _sendCreatedNumber,
     _showProgressBar, _hideProgressBar, _playerReadyNotification, _gameTerminatedHandler, _sendGuessNumbers,
     _guessNumberValidate, _playerInfoUpdatedHandler, _playerInputCountNotification,
+    _playerInputResultNotificationToDefender,
     initModule;
 
   _sendCreatedNumber = function (send_data) {
@@ -436,10 +437,20 @@ app.v_game_pad = (function () {
     }
   };
 
+  _playerInputResultNotificationToDefender = function () {
+    var sendUrl, progressBoardProxyClientId, header = {}, data;
+    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-input-result-notification-to-defender';
+    progressBoardProxyClientId = app.v_game_board.getProgressBoardProxyClientId();
+    data = {};
+
+    app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
+  };
+
   _playerInfoUpdatedHandler = function (operation) {
     if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
       _hideProgressBar();
     } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'playerGuessNumber') {
+      _playerInputResultNotificationToDefender();
       _playerInputCountNotification();
       _showProgressBar();
     }
