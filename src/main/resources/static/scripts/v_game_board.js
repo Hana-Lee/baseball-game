@@ -93,7 +93,6 @@ app.v_game_board = (function () {
           message : '게임이 종료 되었습니다', type : 'alert'
         });
         playerRankList = _.sortBy(app.v_game_room.getGameRoomModel().players, function (player) {
-          console.log(Math.max(player.rank.value));
           return player.rank.value;
         });
 
@@ -102,9 +101,18 @@ app.v_game_board = (function () {
             message : '*** 게임 순위 입니다 ***', type : 'focus'
           });
           playerRankList.forEach(function (p, idx) {
-            webixMap.game_progress_board.add({
-              message : (idx + 1) + '등 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
-            });
+            if (p.gameRole === app.const.gameRole.DEFENDER) {
+              webixMap.game_progress_board.add({
+                message : '****************', type : 'focus'
+              });
+              webixMap.game_progress_board.add({
+                message :'수비 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
+              });
+            } else {
+              webixMap.game_progress_board.add({
+                message : (idx + 1) + '등 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
+              });
+            }
           });
         }
         webixMap.game_progress_board.add({

@@ -3,6 +3,7 @@ package kr.co.leehana.controller;
 import kr.co.leehana.dto.ChatDto;
 import kr.co.leehana.dto.MessagingDto;
 import kr.co.leehana.dto.PlayerDto;
+import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.model.GameRoom;
@@ -209,13 +210,26 @@ public class SocketController {
 		final Player player = playerService.getByEmail(principal.getName());
 		final GameRoom gameRoom = gameRoomService.getById(id);
 		if (gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getStatus(), Status.GAME_OVER)).count() ==
-				gameRoom.getPlayers().size()) {
+				gameRoom.getPlayers().stream().filter(p -> Objects.equals(p.getGameRole(), GameRole.ATTACKER)).count
+						()) {
 			gameRoom.setStatus(Status.GAME_END);
 			gameRoom.getPlayers().forEach(p -> {
 				p.setStatus(Status.READY_BEFORE);
 				p.setInputCount(0);
 				p.setGuessNumber(null);
-				// TODO 스코어, 랭킹, 전적
+				// TODO 수비 플레이어 점수 계산 및 랭킹 계산 개선하기, 여기서 할께 아닌듯?
+				if (Objects.equals(p.getGameRole(), GameRole.DEFENDER)) {
+					final Score score = ScoreCalculator.calculation(p, gameRoom);
+					p.getScore().setValue(score.getValue());
+					final Integer totalScore = p.getTotalScore().getValue() + p.getScore().getValue();
+					p.getTotalScore().setValue(totalScore);
+
+					p.getRank().setValue(999);
+					p.setGameOverTime(new Date());
+
+					playerService.update(p);
+				}
+
 				updatePlayerTotalRank(p);
 				updatePlayerMatchRecord(p);
 				updatePlayerLevel(p);
@@ -242,7 +256,7 @@ public class SocketController {
 	/**
 	 * 현재 플레이어의 입력 결과를 수비 플레이어에게 알림을 보낸다.
 	 *
-	 * @param id 게임룸 ID
+	 * @param id        게임룸 ID
 	 * @param principal 메세지를 보낸 플레이어 주체
 	 * @return 플레이어의 정보와 게임입력 결과 메세지를 담은 객체
 	 */
@@ -302,16 +316,18 @@ public class SocketController {
 	/**
 	 * <p>플레이어의 전적을 업데이트 한다</p>
 	 * <p>폐배의 조건은 숫자를 끝까지 못맞췄을 경우이다</p>
+	 * <p>수비 플레이어는 무조껀 승리로 간주</p>
 	 *
 	 * @param player {@code Player} 전적을 업데이트할 플레이어
 	 */
 	private void updatePlayerMatchRecord(Player player) {
 		final Integer totalGameCount = player.getMatchRecord().getTotalGame().getCount();
 		player.getMatchRecord().getTotalGame().setCount(totalGameCount + 1);
-		if (player.getResult() == null || !player.getResult().getSettlement().getSolved()) {
+		if (Objects.equals(player.getGameRole(), GameRole.ATTACKER) && !player.getResult().getSettlement().getSolved
+				()) {
 			final Integer loseCount = player.getMatchRecord().getLose().getCount();
 			player.getMatchRecord().getLose().setCount(loseCount + 1);
-		} else if (player.getResult().getSettlement().getSolved()) {
+		} else {
 			final Integer winCount = player.getMatchRecord().getWin().getCount();
 			player.getMatchRecord().getWin().setCount(winCount + 1);
 		}

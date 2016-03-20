@@ -414,7 +414,10 @@ app.v_game_pad = (function () {
     var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
     if (gameRoomStatus === app.const.status.RUNNING) {
       stateMap.game_status = app.v_game_room.getGameRoomModel().status;
-      _showProgressBar();
+
+      if (app.m_player.getInfo().gameRole === app.const.gameRole.ATTACKER) {
+        _showProgressBar();
+      }
       webixMap.ready_button.disable();
     }
   };
@@ -438,10 +441,8 @@ app.v_game_pad = (function () {
   };
 
   _playerInputResultNotificationToDefender = function () {
-    var sendUrl, progressBoardProxyClientId, header = {}, data;
+    var sendUrl, header = {}, data = {};
     sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-input-result-notification-to-defender';
-    progressBoardProxyClientId = app.v_game_board.getProgressBoardProxyClientId();
-    data = {};
 
     app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
