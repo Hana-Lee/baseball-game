@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSessionListener;
  * @author Hana Lee
  * @since 2016-01-14 22-21
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"kr.co.leehana"})
 @EnableAspectJAutoProxy
 public class App extends SpringBootServletInitializer {
 

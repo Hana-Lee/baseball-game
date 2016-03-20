@@ -30,6 +30,7 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -159,6 +160,9 @@ public class SocketController {
 
 			Score score = ScoreCalculator.calculation(player, gameRoom);
 			updateDto.setScore(score);
+
+			final Integer totalScore = player.getTotalScore().getValue() + updateDto.getScore().getValue();
+			updateDto.getTotalScore().setValue(totalScore);
 		}
 
 		final Player updatedPlayer = playerService.updateByEmail(principal.getName(), updateDto);
@@ -208,8 +212,7 @@ public class SocketController {
 				p.setInputCount(0);
 				p.setGuessNumber(null);
 				// TODO 스코어, 랭킹, 전적
-				final Integer totalScore = p.getTotalScore().getValue() + p.getScore().getValue();
-				p.getTotalScore().setValue(totalScore);
+				updatePlayerTotalRank(p);
 			});
 			gameRoom.setGameNumber(null);
 			gameRoomService.update(gameRoom);
@@ -228,6 +231,60 @@ public class SocketController {
 		dto.setOperation("insert");
 
 		return dto;
+	}
+
+	/**
+	 * <p>플레이어의 랭킹을 수정하는 메소드</p>
+	 * <p>랭킹은 변경되지 않을 수 도 있다</p>
+	 *
+	 * @param player {@code Player} 랭킹을 변경할 플레이어
+	 * @return 랭킹 값이 변경 되면 {@code true} 가 반환 된다
+	 */
+	private boolean updatePlayerTotalRank(final Player player) {
+		final List<Player> allPlayers = playerService.getAll();
+
+		final Long greaterThanScoreCount = allPlayers.stream().filter(p -> p.getTotalScore().getValue() > player
+				.getTotalScore().getValue()).count();
+
+		final Long sameScorePlayerCount = allPlayers.stream().filter(p -> Objects.equals(p.getTotalScore().getValue(),
+				player.getTotalScore().getValue())).count();
+
+		Integer totalRankValue = greaterThanScoreCount.intValue() + 1;
+		if (greaterThanScoreCount == 0 && sameScorePlayerCount == 0) { // 높은 플레이어가 없고 같은 플레이어도 없으면..
+//			totalRankValue = 1;
+		} else if (greaterThanScoreCount > 0 && sameScorePlayerCount == 0) { // 높은 플레이어는 있고 같은 플레이어가 없으면..
+//			totalRankValue = greaterThanScoreCount.intValue() + 1;
+		} else if (greaterThanScoreCount > 0 && sameScorePlayerCount > 0) { // 높은 플레이어는 있고 같은 플레이어도 있으면..
+			final Long lessThanGameOverTimeCount = allPlayers.stream().filter(p -> Objects.equals(p.getTotalScore()
+					.getValue(), player.getTotalScore().getValue()) && p.getGameOverTime().getTime() < player
+					.getGameOverTime().getTime()).count();
+			if (lessThanGameOverTimeCount > 0) {
+				totalRankValue += lessThanGameOverTimeCount.intValue();
+			}
+		} else if (greaterThanScoreCount == 0 && sameScorePlayerCount > 0) { // 높은 플레이어는 없고 같은 플레이어도 있으면..
+			final Long lessThanGameOverTimeCount = allPlayers.stream().filter(p -> Objects.equals(p.getTotalScore()
+					.getValue(), player.getTotalScore().getValue()) && p.getGameOverTime().getTime() < player
+					.getGameOverTime().getTime()).count();
+			if (lessThanGameOverTimeCount > 0) {
+				totalRankValue += lessThanGameOverTimeCount.intValue();
+			}
+		}
+
+		final Integer originalTotalRankValue = player.getTotalScore().getValue();
+		if (!Objects.equals(originalTotalRankValue, totalRankValue)) { // 현재 랭킹과 다르면..
+			player.getTotalRank().setValue(totalRankValue);
+
+			final Integer finalTotalRankValue = totalRankValue;
+			// 현재 등수와 동일한 플레이어 또는 이전 등수보다 작고 현재 등수보다 높은 플레이어를 찾아 +1 씩 등수를 조절한다
+			allPlayers.stream().filter(p -> Objects.equals(p.getTotalRank().getValue(), player.getTotalRank().getValue
+					()) || (originalTotalRankValue > p.getTotalRank().getValue() && finalTotalRankValue < p
+					.getTotalRank().getValue())).forEach(p -> p.getTotalRank().setValue(p.getTotalRank().getValue() +
+					1));
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@MessageMapping(value = {"/gameroom/{id}/game-end-notification"})

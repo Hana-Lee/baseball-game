@@ -37,7 +37,7 @@ public class TotalScore implements Serializable {
 	private Long id;
 
 	@NotNull
-	private Integer value;
+	private Integer value = 0;
 
 	public TotalScore(Integer value) {
 		this.value = value;
