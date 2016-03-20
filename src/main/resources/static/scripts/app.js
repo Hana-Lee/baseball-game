@@ -42,6 +42,11 @@ var app = (function () {
             return;
           }
 
+          if (update.objectOperation && update.objectOperation === 'anotherPlayerInputCount'
+            && app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
+            return;
+          }
+
           webix.dp(view).ignore(function () {
             if (update.operation === 'delete') {
               view.remove(update.data.id);

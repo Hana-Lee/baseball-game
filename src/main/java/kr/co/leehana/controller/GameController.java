@@ -1,9 +1,9 @@
 package kr.co.leehana.controller;
 
-import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.model.Ball;
 import kr.co.leehana.model.ErrorMessage;
 import kr.co.leehana.model.GuessNumberComparedResult;
+import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Setting;
 import kr.co.leehana.model.Settlement;
 import kr.co.leehana.model.Strike;
@@ -69,8 +69,9 @@ public class GameController {
 		return strikes == generatedNumberCount;
 	}
 
-	public String makeGuessResultMessage(final GuessNumberComparedResult result, final PlayerDto.Update player) {
+	public String makeGuessResultMessage(final Player player) {
 		final String message = "[" + player.getGuessNumber() + "] - ";
+		final GuessNumberComparedResult result =  player.getResult();
 		if (isGameOver(result)) {
 			return message + "숫자를 맞췄습니다";
 		} else {

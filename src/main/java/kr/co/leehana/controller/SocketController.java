@@ -136,6 +136,7 @@ public class SocketController {
 		final GameRoom gameRoom = gameRoomService.getById(id);
 		final Player player = playerService.getByEmail(principal.getName());
 		player.setInputCount(updateDto.getInputCount());
+		player.setGuessNumber(updateDto.getGuessNumber());
 
 		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(), updateDto
 				.getGuessNumber());
@@ -144,7 +145,7 @@ public class SocketController {
 		updateDto.setResult(result);
 		player.setResult(result);
 
-		String guessResultMessage = gameController.makeGuessResultMessage(result, updateDto);
+		String guessResultMessage = gameController.makeGuessResultMessage(player);
 
 		if (gameController.isGameOver(result) || Objects.equals(player.getInputCount(), gameRoom.getSetting()
 				.getLimitGuessInputCount())) {
@@ -192,6 +193,7 @@ public class SocketController {
 		messageData.put("message", player.getNickname() + "님 " + (player.getInputCount() + 1) + "번째 입력중");
 		messageData.put("type", "focus");
 		MessagingDto dto = new MessagingDto();
+		dto.setObjectOperation("anotherPlayerInputCount");
 		dto.setClientId(clientIdPayload.get("clientId"));
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
@@ -233,6 +235,29 @@ public class SocketController {
 		dto.setId(String.valueOf(id));
 		dto.setData(messageData);
 		dto.setOperation("insert");
+
+		return dto;
+	}
+
+	/**
+	 * 현재 플레이어의 입력 결과를 수비 플레이어에게 알림을 보낸다.
+	 *
+	 * @param id 게임룸 ID
+	 * @param principal 메세지를 보낸 플레이어 주체
+	 * @return 플레이어의 정보와 게임입력 결과 메세지를 담은 객체
+	 */
+	@MessageMapping(value = {"/gameroom/{id}/player-input-result-notification-to-defender"})
+	@SendTo(value = {"/topic/gameroom/{id}/another-player-input-result-info"})
+	public MessagingDto playerInputResultNotificationToDefender(@DestinationVariable Long id, Principal principal) {
+		final Player player = playerService.getByEmail(principal.getName());
+		final String message = gameController.makeGuessResultMessage(player);
+
+		MessagingDto dto = new MessagingDto();
+		dto.setObject(modelMapper.map(player, PlayerDto.Response.class));
+		dto.setObjectOperation("anotherPlayerInputResultInfo");
+		dto.setData(message);
+		dto.setId(String.valueOf(id));
+		dto.setOperation("anotherPlayerInputResultInfo");
 
 		return dto;
 	}

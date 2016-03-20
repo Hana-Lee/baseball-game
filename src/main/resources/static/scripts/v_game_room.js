@@ -24,6 +24,7 @@ app.v_game_room = (function () {
     ON_UPDATE_GAME_ROOM_INFO = 'onUpdateGameRoomInfo',
     ON_GAME_START = 'onGameStart',
     ON_GAME_END = 'onGameEnd',
+    ON_ANOTHER_PLAYER_INPUT_RESULT_INFO = 'onAnotherPlayerInputResultInfo',
     configMap = {
       settable_map : {
         game_room_model : null
@@ -249,7 +250,7 @@ app.v_game_room = (function () {
         
         if (updatedGameRoom.status === app.const.status.GAME_END) {
           webixMap.profile_container.getChildViews()[0].destructor();
-          
+
           app.v_shell.playerInfoUpdate(function () {
             app.v_player_profile.configModule({
               height : 200,
@@ -275,6 +276,22 @@ app.v_game_room = (function () {
         webix.callEvent(ON_UPDATE_GAME_ROOM_INFO, [operation]);
       }, {})
     );
+
+    subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/another-player-input-result-info';
+    stateMap.subscribeObj.push(
+      app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
+        var responseBody = JSON.parse(response.body), operation, anotherPlayerInfo, message;
+
+        if (app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
+          anotherPlayerInfo = responseBody.object;
+          operation = responseBody.objectOperation;
+          message = responseBody.data;
+
+          webix.callEvent(ON_ANOTHER_PLAYER_INPUT_RESULT_INFO, [anotherPlayerInfo, message, operation]);
+        }
+      }, {})
+    );
+
     _createView();
   };
 
@@ -290,6 +307,7 @@ app.v_game_room = (function () {
     ON_UPDATE_GAME_ROOM_INFO : ON_UPDATE_GAME_ROOM_INFO,
     ON_GAME_START : ON_GAME_START,
     ON_GAME_END : ON_GAME_END,
+    ON_ANOTHER_PLAYER_INPUT_RESULT_INFO : ON_ANOTHER_PLAYER_INPUT_RESULT_INFO,
     initModule : initModule,
     destructor : destructor,
     configModule : configModule,
