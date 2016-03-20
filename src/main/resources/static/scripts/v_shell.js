@@ -76,7 +76,7 @@ app.v_shell = (function () {
     app.v_main_board.destructor();
 
     data = {
-      gameRole : 'ATTACKER'
+      gameRole : app.const.gameRole.ATTACKER
     };
     dataString = JSON.stringify(data);
 

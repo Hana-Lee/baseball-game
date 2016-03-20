@@ -29,9 +29,14 @@ app.const = (function () {
       READY_BEFORE : 'READY_BEFORE',
       READY_DONE : 'READY_DONE',
       INPUT : 'INPUT'
+    },
+    gameRole = {
+      ATTACKER : 'ATTACKER',
+      DEFENDER : 'DEFENDER'
     };
 
   return {
-    status : status
+    status : status,
+    gameRole : gameRole
   };
 }());

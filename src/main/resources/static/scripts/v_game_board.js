@@ -110,7 +110,7 @@ app.v_game_board = (function () {
         webixMap.game_progress_board.add({
           message : '시작하려면 준비를 눌러주세요', type : 'alert'
         });
-        
+
         webix.callEvent(app.v_game_room.ON_GAME_END, []);
       }
     }
@@ -238,7 +238,7 @@ app.v_game_board = (function () {
   };
 
   _makePlayersProfile = function () {
-    var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, i, customText;
+    var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, isDefender, i, customText;
     playerList = app.v_game_room.getGameRoomModel().players;
     playerList.forEach(function (player) {
       if (player.id !== app.m_player.getInfo().id) {
@@ -249,10 +249,13 @@ app.v_game_board = (function () {
     playerListLength = playerListWithoutCurrentPlayer.length;
     for (i = 0; i < playerListLength; i++) {
       isOwner = playerListWithoutCurrentPlayer[i].id === owner.id;
-      customText = isOwner ? '_방장_' : '';
+      customText = isOwner ? '_방장_ ' : '';
+
+      isDefender = playerListWithoutCurrentPlayer[i].gameRole === app.const.gameRole.DEFENDER;
+      customText += isDefender ? '수비 ' : '';
 
       if (playerListWithoutCurrentPlayer[i].status === app.const.status.GAME_OVER) {
-        customText += ' 종료';
+        customText += '종료';
       }
 
       app.v_player_profile.configModule({

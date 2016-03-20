@@ -94,8 +94,10 @@ app.v_game_pad = (function () {
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
-          webixMap.number_pad.enable();
-          //_showProgressBar();
+          
+          if (app.m_player.getInfo().gameRole === app.const.gameRole.ATTACKER) {
+            webixMap.number_pad.enable();
+          }
         } else {
           webixMap.ready_button.config.label = '준비!!';
           webixMap.ready_button.refresh();
@@ -261,7 +263,7 @@ app.v_game_pad = (function () {
             onItemClick : function () {
               stateMap.isReady = !stateMap.isReady;
 
-              if (stateMap.isReady && app.m_player.getInfo().gameRole === 'DEFENDER') {
+              if (stateMap.isReady && app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
                 _showMakeNumberWindow();
               } else {
                 _sendReadyDataToServer();

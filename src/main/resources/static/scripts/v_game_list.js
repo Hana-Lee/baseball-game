@@ -127,12 +127,12 @@ app.v_game_list = (function () {
         view : 'form',
         elements : [{
           id : 'role-selector',
-          view : 'richselect', label : '역할', value : 'ATTACKER',
+          view : 'richselect', label : '역할', value : app.const.gameRole.ATTACKER,
           labelAlign : 'center',
           options : [{
-            id : 'ATTACKER', value : '공격'
+            id : app.const.gameRole.ATTACKER, value : '공격'
           }, {
-            id : 'DEFENDER', value : '수비'
+            id : app.const.gameRole.DEFENDER, value : '수비'
           }]
         }, {
           cols : [{
