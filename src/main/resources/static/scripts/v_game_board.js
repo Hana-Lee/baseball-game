@@ -110,6 +110,7 @@ app.v_game_board = (function () {
         webixMap.game_progress_board.add({
           message : '시작하려면 준비를 눌러주세요', type : 'alert'
         });
+        
         webix.callEvent(app.v_game_room.ON_GAME_END, []);
       }
     }

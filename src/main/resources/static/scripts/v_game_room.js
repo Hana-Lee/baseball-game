@@ -246,6 +246,19 @@ app.v_game_room = (function () {
         configMap.game_room_model = updatedGameRoom;
 
         _updateGameRoomTitle();
+        
+        if (updatedGameRoom.status === app.const.status.GAME_END) {
+          webixMap.profile_container.getChildViews()[0].destructor();
+          
+          app.v_shell.playerInfoUpdate(function () {
+            app.v_player_profile.configModule({
+              height : 200,
+              avatar_width : 130,
+              player_model : app.m_player.getInfo()
+            });
+            app.v_player_profile.initModule(webixMap.profile_container);
+          });
+        }
 
         webix.callEvent(ON_UPDATE_GAME_ROOM_INFO, [operation]);
       }, {})

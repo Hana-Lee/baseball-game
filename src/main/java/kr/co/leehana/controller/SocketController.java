@@ -134,6 +134,7 @@ public class SocketController {
 
 		final GameRoom gameRoom = gameRoomService.getById(id);
 		final Player player = playerService.getByEmail(principal.getName());
+		player.setInputCount(updateDto.getInputCount());
 
 		GuessNumberComparedResult result = gameController.compareNumber(gameRoom.getGameNumber().getValue(), updateDto
 				.getGuessNumber());
@@ -213,6 +214,7 @@ public class SocketController {
 				p.setGuessNumber(null);
 				// TODO 스코어, 랭킹, 전적
 				updatePlayerTotalRank(p);
+				updatePlayerMatchRecord(p);
 			});
 			gameRoom.setGameNumber(null);
 			gameRoomService.update(gameRoom);
@@ -231,6 +233,24 @@ public class SocketController {
 		dto.setOperation("insert");
 
 		return dto;
+	}
+
+	/**
+	 * <p>플레이어의 전적을 업데이트 한다</p>
+	 * <p>폐배의 조건은 숫자를 끝까지 못맞췄을 경우이다</p>
+	 *
+	 * @param player {@code Player} 전적을 업데이트할 플레이어
+	 */
+	private void updatePlayerMatchRecord(Player player) {
+		final Integer totalGameCount = player.getMatchRecord().getTotalGame().getCount();
+		player.getMatchRecord().getTotalGame().setCount(totalGameCount + 1);
+		if (player.getResult() == null || !player.getResult().getSettlement().getSolved()) {
+			final Integer loseCount = player.getMatchRecord().getLose().getCount();
+			player.getMatchRecord().getLose().setCount(loseCount + 1);
+		} else if (player.getResult().getSettlement().getSolved()) {
+			final Integer winCount = player.getMatchRecord().getWin().getCount();
+			player.getMatchRecord().getWin().setCount(winCount + 1);
+		}
 	}
 
 	/**
