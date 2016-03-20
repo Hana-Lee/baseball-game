@@ -132,10 +132,11 @@ app.v_main_menu = (function () {
             }
           }
         }, {
-          view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요', value : 'ATTACKER',
+          view : 'richselect', label : '역할', name : 'gameRole', invalidMessage : '역할을 선택해주세요',
+          value : app.const.gameRole.ATTACKER,
           options : [
-            {id : 'ATTACKER', value : '공격'},
-            {id : 'DEFENDER', value : '수비'}
+            {id : app.const.gameRole.ATTACKER, value : '공격'},
+            {id : app.const.gameRole.DEFENDER, value : '수비'}
           ]
         }, {
           view : 'fieldset', label : '게임 설정', name : 'setting',
