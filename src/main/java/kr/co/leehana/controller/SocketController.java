@@ -7,6 +7,7 @@ import kr.co.leehana.enums.Status;
 import kr.co.leehana.model.GameNumber;
 import kr.co.leehana.model.GameRoom;
 import kr.co.leehana.model.GuessNumberComparedResult;
+import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Player;
 import kr.co.leehana.model.Rank;
 import kr.co.leehana.model.Score;
@@ -215,6 +216,7 @@ public class SocketController {
 				// TODO 스코어, 랭킹, 전적
 				updatePlayerTotalRank(p);
 				updatePlayerMatchRecord(p);
+				updatePlayerLevel(p);
 			});
 			gameRoom.setGameNumber(null);
 			gameRoomService.update(gameRoom);
@@ -233,6 +235,43 @@ public class SocketController {
 		dto.setOperation("insert");
 
 		return dto;
+	}
+
+	/**
+	 * <p>플레이어의 레벨을 업데이트 한다</p>
+	 * <p>2레벨 -> 3레벨 : 200점 필요</p>
+	 * <p>3레벨 -> 4레벨 : 300점 필요</p>
+	 * <p>99레벨 -> 100레벨 : 9900점 필요</p>
+	 * <p>100레벨 -> 101레벨 : 10000점 필요</p>
+	 *
+	 * @param player {@code Player} 레벨을 업데이트 할 플레이어
+	 */
+	private void updatePlayerLevel(Player player) {
+		final Level currentLevel = player.getLevel();
+		if (player.getTotalScore().getValue() > 0) {
+			boolean levelUpDone = false;
+			int baseLevelScoreValue = 100;
+			Integer levelValue = currentLevel.getValue();
+			if (levelValue > 1) {
+				for (int i = 2; i <= levelValue; i++) {
+					baseLevelScoreValue += 100 * i;
+				}
+			}
+
+			while (!levelUpDone) {
+				int scoreValue = player.getTotalScore().getValue() - baseLevelScoreValue;
+				if (scoreValue < 0) {
+					levelUpDone = true;
+				} else {
+					levelValue += 1;
+					baseLevelScoreValue += levelValue * 100;
+				}
+			}
+
+			if (currentLevel.getValue() < levelValue) {
+				player.getLevel().setValue(levelValue);
+			}
+		}
 	}
 
 	/**
