@@ -112,6 +112,18 @@ app.v_game_list = (function () {
 
     webixMap.top = webix.ui(mainView, stateMap.container);
     webixMap.main_view = $$('game-room-list');
+    webix.extend(webixMap.main_view, webix.ProgressBar);
+
+    webixMap.main_view.disable();
+    webixMap.main_view.showProgress({
+      type : 'icon',
+      icon : 'spinner'
+    });
+    _getCreatedGameRoomList(function (data) {
+      webixMap.main_view.parse(data);
+      webixMap.main_view.enable();
+      webixMap.main_view.enable();
+    });
   };
 
   _showGameRoleSelectWindow = function (selectedGameRoom) {
@@ -156,13 +168,25 @@ app.v_game_list = (function () {
     webix.ajax().get('gameroom/all', {
       error : function (text) {
         console.log(text);
+        var textJson = JSON.parse(text);
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : textJson.message
+        });
         stateMap.game_room_list = [];
-        callback();
       },
       success : function (text) {
         var serverResponse = JSON.parse(text);
         stateMap.game_room_list = serverResponse.content;
-        callback();
+        callback(serverResponse.content);
+
+        stateMap.game_room_list.forEach(function (gameRoom) {
+          if (gameRoom.status !== app.const.status.RUNNING) {
+            $$('quick-join').enable();
+            return false;
+          }
+        });
       }
     });
   };
@@ -211,7 +235,7 @@ app.v_game_list = (function () {
     stateMap.proxy = webix.proxy('stomp', '/gameroom/list/updated');
     stateMap.proxy.clientId = app.utils.guid();
 
-    _getCreatedGameRoomList(_createView);
+    _createView();
   };
 
   return {

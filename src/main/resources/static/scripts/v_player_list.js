@@ -44,19 +44,30 @@ app.v_player_list = (function () {
   };
 
   _getLoggedInPlayers = function (callback) {
-    var serverResponse = '';
-    webix.ajax().sync().get('player/login/true', {
+    var serverResponse;
+    webix.ajax().get('player/login/true', {
       error : function (text) {
+        var message;
         serverResponse = JSON.parse(text);
+        if (serverResponse && serverResponse.message) {
+          message = serverResponse.message;
+        } else {
+          message = '로그인한 플레이어들을 가지고 오는데 실패 하였습니다';
+        }
+
         _loggedInPlayers = [];
+        webix.alert({
+          title : '오류',
+          ok : '확인',
+          text : message
+        });
       },
       success : function (text) {
         serverResponse = JSON.parse(text);
         _loggedInPlayers = serverResponse;
+        callback();
       }
     });
-
-    callback();
   };
 
   _createView = function () {
