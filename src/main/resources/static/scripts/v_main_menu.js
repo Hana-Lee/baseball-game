@@ -53,11 +53,9 @@ app.v_main_menu = (function () {
 
   _createView = function () {
     var isNotAdmin = function () {
-      return configMap.player_model.admin !== true;
+      return app.model.getPlayer().admin !== true;
     }, getDynamicWidth = function () {
       return isNotAdmin() ? 609 : 409;
-    }, isGameRoomsNotExist = function () {
-      return configMap.game_room_list.length === 0;
     }, mainView;
 
     mainView = {
@@ -78,7 +76,7 @@ app.v_main_menu = (function () {
         id : 'quick-join',
         view : 'button',
         label : '빠른입장',
-        disabled : isGameRoomsNotExist(),
+        disabled : true,
         width : configMap.button_width,
         click : function () {
           app.v_shell.joinRandomGameRoom(configMap.game_room_list);
@@ -227,21 +225,6 @@ app.v_main_menu = (function () {
     webixMap.game_room_name_field = $$('game-room-name-field');
   };
 
-  _getCreatedGameRoomList = function (callback) {
-    webix.ajax().get('gameroom/all', {
-      error : function (text) {
-        console.log(text);
-        configMap.game_room_list = [];
-        callback();
-      },
-      success : function (text) {
-        var serverResponse = JSON.parse(text);
-        configMap.game_room_list = serverResponse.content;
-        callback();
-      }
-    });
-  };
-
   disableQuickBtn = function () {
     webixMap.quick_join_btn.disable();
   };
@@ -253,7 +236,7 @@ app.v_main_menu = (function () {
   initModule = function (container) {
     stateMap.container = container;
     configMap.player_model = app.m_player.getInfo();
-    _getCreatedGameRoomList(_createView);
+    _createView();
   };
 
   return {

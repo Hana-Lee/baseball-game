@@ -30,6 +30,7 @@ var app = (function () {
     webix.proxy.stomp = {
       $proxy : true,
       game_room : null,
+      user_prefix : null,
       init : function () {
         this.clientId = this.clientId || webix.uid();
       },
@@ -68,9 +69,13 @@ var app = (function () {
         subscribeList.push(
           app.v_shell.getStompClient().subscribe(subscribeUrl, _responseHandler, {id : 'sub-' + this.clientId})
         );
-        subscribeList.push(
-          app.v_shell.getStompClient().subscribe('/user' + subscribeUrl, _responseHandler, {id : 'sub-' + this.clientId})
-        );
+
+        if (this.user_prefix) {
+          subscribeList.push(
+            app.v_shell.getStompClient().subscribe(this.user_prefix + subscribeUrl,
+              _responseHandler, {id : 'sub-' + this.clientId})
+          );
+        }
 
         view.attachEvent('onDestruct', function () {
           subscribeList.forEach(function (sub) {

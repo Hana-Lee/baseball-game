@@ -40,7 +40,7 @@ app.v_shell = (function () {
     leaveGameRoom, leaveAndGameRoomDelete, playerInfoUpdate, playerGameOverNotification,
     _getLoggedInPlayerInfo, _initStompClient, _createView, _loginNotification, _logoutNotification, _showGameRoom,
     _updatePlayerHandler, _socketErrorHandler,
-    gameEndNotification, initModule;
+    gameEndNotification, showWaitDialog, hideWaitDialog, initModule;
 
   showSignUp = function () {
     $$('login-container').destructor();
@@ -249,9 +249,9 @@ app.v_shell = (function () {
 
   _getLoggedInPlayerInfo = function (callback) {
     var serverResponse;
-    webix.ajax().sync().get('player', {
+    webix.ajax().get('player', {
       error : function (text) {
-        serverResponse = JSON.parse(text);
+        console.log('ajax error', text);
         app.m_player.initModule(null);
         app.model.setPlayer(null);
         stateMap.loggedIn = false;
@@ -286,7 +286,6 @@ app.v_shell = (function () {
         if (callback) {
           callback();
         }
-
         stateMap.stomp_client.subscribe('/topic/player/updated', _updatePlayerHandler, {});
         stateMap.stomp_client.subscribe('/user/topic/player/updated', _updatePlayerHandler, {});
         stateMap.stomp_client.subscribe('/user/topic/errors', _socketErrorHandler, {});
@@ -298,7 +297,6 @@ app.v_shell = (function () {
   };
 
   _socketErrorHandler = function (response) {
-    console.log('error response', response);
     var responseJson = JSON.parse(response.body);
     if (responseJson.errorMessage) {
       webix.alert({
@@ -341,6 +339,8 @@ app.v_shell = (function () {
       };
 
       webixMap.top = webix.ui(mainView, stateMap.container);
+      webixMap.main_view = $$('main-layout');
+      webix.extend(webixMap.top, webix.ProgressBar);
 
       app.v_main_board.initModule(webixMap.top);
       //app.v_game_room.initModule(webixMap.top);
@@ -396,6 +396,16 @@ app.v_shell = (function () {
     return stateMap.stomp_client;
   };
 
+  showWaitDialog = function () {
+    webixMap.top.disable();
+    webixMap.top.showProgress();
+  };
+
+  hideWaitDialog = function () {
+    webixMap.top.enable();
+    webixMap.top.hideProgress();
+  };
+
   initModule = function (container) {
     stateMap.container = container;
     _getLoggedInPlayerInfo(_createView);
@@ -416,6 +426,8 @@ app.v_shell = (function () {
     playerInfoUpdate : playerInfoUpdate,
     playerGameOverNotification : playerGameOverNotification,
     gameEndNotification : gameEndNotification,
+    showWaitDialog : showWaitDialog,
+    hideWaitDialog : hideWaitDialog,
     ON_PLAYER_INFO_UPDATED : ON_PLAYER_INFO_UPDATED,
     ON_WEB_SOCKET_ERROR : ON_WEB_SOCKET_ERROR
   };

@@ -19,7 +19,7 @@
 app.utils = (function () {
   'use strict';
   var _s4,
-    guid, makeError, setConfigMap;
+    guid, makeError, setConfigMap, isHTML;
 
   _s4 = function () {
     return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
@@ -76,9 +76,23 @@ app.utils = (function () {
     }
   };
 
+  // http://stackoverflow.com/a/15458968
+  isHTML = function(str) {
+    var a = document.createElement('div'), c, i;
+    a.innerHTML = str;
+    c = a.childNodes;
+    for (i = c.length; i < 0; i--) {
+      if (c[i].nodeType === 1) {
+        return true;
+      }
+    }
+    return false;
+  };
+
   return {
     guid : guid,
     makeError : makeError,
-    setConfigMap : setConfigMap
+    setConfigMap : setConfigMap,
+    isHTML : isHTML
   };
 }());

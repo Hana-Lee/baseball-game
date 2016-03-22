@@ -303,6 +303,7 @@ app.v_game_board = (function () {
     stateMap.container = container;
     stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.v_game_room.getGameRoomModel().id + '/progress/updated');
     stateMap.proxy.clientId = app.utils.guid();
+    stateMap.proxy.user_prefix = '/user';
 
     stateMap.events.push(webix.attachEvent(app.v_game_room.ON_UPDATE_GAME_ROOM_INFO, _updateGameRoomInfoHandler));
     stateMap.events.push(webix.attachEvent(app.v_shell.ON_PLAYER_INFO_UPDATED, _playerInfoUpdatedHandler));
