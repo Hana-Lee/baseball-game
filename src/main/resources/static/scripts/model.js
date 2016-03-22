@@ -18,8 +18,7 @@
 /*global $, app, webix, $$ */
 
 /**
- * @namespace app
- * @module model
+ * @namespace app.model
  *
  * @description 플레이어, 게임룸, 게임룸 리스트를 저장하여 어플리케이션에서 활용 한다
  */

@@ -17,6 +17,9 @@
  */
 /*global $, app:true, webix */
 
+/**
+ * @namespace app
+ */
 var app = (function () {
   'use strict';
   var stateMap = {

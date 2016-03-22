@@ -17,6 +17,11 @@
  */
 /*global $, app, webix, $$, SockJS, Stomp */
 
+/**
+ * @namespace app.v_shell
+ *
+ * @description 게임 전반을 다루는 컨트롤러
+ */
 app.v_shell = (function () {
   'use strict';
 
@@ -243,11 +248,12 @@ app.v_shell = (function () {
   };
 
   _getLoggedInPlayerInfo = function (callback) {
-    var serverResponse = '';
+    var serverResponse;
     webix.ajax().sync().get('player', {
       error : function (text) {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(null);
+        app.model.setPlayer(null);
         stateMap.loggedIn = false;
         if (stateMap.stomp_client) {
           stateMap.stomp_client.disconnect();
@@ -257,6 +263,7 @@ app.v_shell = (function () {
       success : function (text) {
         serverResponse = JSON.parse(text);
         app.m_player.initModule(serverResponse);
+        app.model.setPlayer(serverResponse);
         stateMap.loggedIn = true;
 
         if (!stateMap.stomp_client) {
