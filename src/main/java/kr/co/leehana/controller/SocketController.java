@@ -350,18 +350,7 @@ public class SocketController {
 				player.getTotalScore().getValue())).count();
 
 		Integer totalRankValue = greaterThanScoreCount.intValue() + 1;
-		if (greaterThanScoreCount == 0 && sameScorePlayerCount == 0) { // 높은 플레이어가 없고 같은 플레이어도 없으면..
-//			totalRankValue = 1;
-		} else if (greaterThanScoreCount > 0 && sameScorePlayerCount == 0) { // 높은 플레이어는 있고 같은 플레이어가 없으면..
-//			totalRankValue = greaterThanScoreCount.intValue() + 1;
-		} else if (greaterThanScoreCount > 0 && sameScorePlayerCount > 0) { // 높은 플레이어는 있고 같은 플레이어도 있으면..
-			final Long lessThanGameOverTimeCount = allPlayers.stream().filter(p -> Objects.equals(p.getTotalScore()
-					.getValue(), player.getTotalScore().getValue()) && p.getGameOverTime().getTime() < player
-					.getGameOverTime().getTime()).count();
-			if (lessThanGameOverTimeCount > 0) {
-				totalRankValue += lessThanGameOverTimeCount.intValue();
-			}
-		} else if (greaterThanScoreCount == 0 && sameScorePlayerCount > 0) { // 높은 플레이어는 없고 같은 플레이어도 있으면..
+		if (sameScorePlayerCount > 0) {
 			final Long lessThanGameOverTimeCount = allPlayers.stream().filter(p -> Objects.equals(p.getTotalScore()
 					.getValue(), player.getTotalScore().getValue()) && p.getGameOverTime().getTime() < player
 					.getGameOverTime().getTime()).count();
