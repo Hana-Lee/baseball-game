@@ -294,6 +294,20 @@ app.v_shell = (function () {
       },
       function (error) {
         console.log(error);
+        if (error && error.toLowerCase().indexOf('lost connection') !== -1) {
+          $$('main-layout').destructor();
+
+          //_logoutNotification(app.m_player.getInfo().email);
+
+          stateMap.loggedIn = false;
+          stateMap.stomp_client.disconnect();
+          stateMap.stomp_client = null;
+          $('#main-container').html('');
+
+          app.m_player.reset();
+
+          app.initModule(stateMap.container);
+        }
       }
     );
   };
