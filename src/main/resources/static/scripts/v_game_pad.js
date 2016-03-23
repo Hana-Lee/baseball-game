@@ -95,7 +95,7 @@ app.v_game_pad = (function () {
         if (stateMap.isReady) {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
-          
+
           if (app.m_player.getInfo().gameRole === app.const.gameRole.ATTACKER) {
             webixMap.number_pad.enable();
           }
@@ -378,10 +378,15 @@ app.v_game_pad = (function () {
       result = true;
     }
     if (result === false && message !== '') {
+      app.model.getPlayer().wrongCount += 1;
+      app.m_player.getInfo().wrongCount += 1; // 추후 제거
+
       webix.alert({
         title : '오류',
         ok : '확인',
         text : message
+          + '(입력 오류 : ' + app.m_player.getInfo().wrongCount + '/'
+          + app.v_game_room.getGameRoomModel().setting.limitWrongInputCount + ')'
       });
       webix.message(message, 'error');
     }
