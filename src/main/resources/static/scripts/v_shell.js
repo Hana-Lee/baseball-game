@@ -189,6 +189,7 @@ app.v_shell = (function () {
         app.m_player.getInfo().gameRole = null;
         app.m_player.getInfo().status = null;
         app.m_player.getInfo().gameRoomId = null;
+        app.m_player.getInfo().wrongCount = 0;
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -213,6 +214,7 @@ app.v_shell = (function () {
         app.m_player.getInfo().gameRole = null;
         app.m_player.getInfo().status = null;
         app.m_player.getInfo().gameRoomId = null;
+        app.m_player.getInfo().wrongCount = 0;
         app.v_main_board.initModule(webixMap.top);
       }
     });
