@@ -150,7 +150,7 @@ app.v_main_board = (function () {
     app.v_main_menu.initModule(webixMap.main_menu_container);
 
     app.v_player_profile.configModule({
-      player_model : app.m_player.getInfo()
+      player_model : app.model.getPlayer()
     });
     app.v_player_profile.initModule(webixMap.player_profile_container);
     app.v_player_list.initModule(webixMap.player_list_container);

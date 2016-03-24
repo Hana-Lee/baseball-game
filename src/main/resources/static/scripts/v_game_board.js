@@ -55,33 +55,33 @@ app.v_game_board = (function () {
   };
 
   _playerInfoUpdatedHandler = function (operation) {
-    var inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    var inputLimitCount = app.model.getGameRoom().setting.limitGuessInputCount;
     if (operation === 'playerGuessNumber') {
-      if (app.m_player.getInfo().status === app.const.status.INPUT) {
+      if (app.model.getPlayer().status === app.const.status.INPUT) {
         webixMap.game_progress_board.add({
-          message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+          message : (app.model.getPlayer().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
           type : 'normal'
         });
-      } else if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
+      } else if (app.model.getPlayer().status === app.const.status.GAME_OVER) {
         app.v_shell.playerGameOverNotification({clientId : getProgressBoardProxyClientId()});
       }
     }
   };
 
   _updateGameRoomInfoHandler = function (operation) {
-    var gameStatus = app.v_game_room.getGameRoomModel().status,
-      inputLimitCount = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount,
+    var gameStatus = app.model.getGameRoom().status,
+      inputLimitCount = app.model.getGameRoom().setting.limitGuessInputCount,
       playerRankList;
     if (operation === 'playerReadyStatusUpdated') {
       if (gameStatus === app.const.status.RUNNING) {
         app.v_shell.playerInfoUpdate(function () {
-          app.m_player.getInfo().inputCount = 0;
+          app.model.getPlayer().inputCount = 0;
 
           webixMap.game_progress_board.add({
             message : '게임이 시작 되었습니다', type : 'alert'
           });
           webixMap.game_progress_board.add({
-            message : (app.m_player.getInfo().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
+            message : (app.model.getPlayer().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
             type : 'normal'
           });
           webix.callEvent(app.v_game_room.ON_GAME_START, []);
@@ -92,7 +92,7 @@ app.v_game_board = (function () {
         webixMap.game_progress_board.add({
           message : '게임이 종료 되었습니다', type : 'alert'
         });
-        playerRankList = _.sortBy(app.v_game_room.getGameRoomModel().players, function (player) {
+        playerRankList = _.sortBy(app.model.getGameRoom().players, function (player) {
           return player.rank.value;
         });
 
@@ -247,13 +247,13 @@ app.v_game_board = (function () {
 
   _makePlayersProfile = function () {
     var playerList, playerListWithoutCurrentPlayer = [], owner, playerListLength, isOwner, isDefender, i, customText;
-    playerList = app.v_game_room.getGameRoomModel().players;
+    playerList = app.model.getGameRoom().players;
     playerList.forEach(function (player) {
-      if (player.id !== app.m_player.getInfo().id) {
+      if (player.id !== app.model.getPlayer().id) {
         playerListWithoutCurrentPlayer.push(player);
       }
     });
-    owner = app.v_game_room.getGameRoomModel().owner;
+    owner = app.model.getGameRoom().owner;
     playerListLength = playerListWithoutCurrentPlayer.length;
     for (i = 0; i < playerListLength; i++) {
       isOwner = playerListWithoutCurrentPlayer[i].id === owner.id;
@@ -282,7 +282,7 @@ app.v_game_board = (function () {
   };
 
   _anotherPlayerInputResultInfoHandler = function (anotherPlayerInfo, message, operation) {
-    var inputCountLimit = app.v_game_room.getGameRoomModel().setting.limitGuessInputCount;
+    var inputCountLimit = app.model.getGameRoom().setting.limitGuessInputCount;
     if (operation === 'anotherPlayerInputResultInfo') {
       webixMap.game_progress_board.add({
         message : anotherPlayerInfo.nickname + '님의 입력 결과 입니다',
@@ -301,7 +301,7 @@ app.v_game_board = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.v_game_room.getGameRoomModel().id + '/progress/updated');
+    stateMap.proxy = webix.proxy('stomp', '/gameroom/' + app.model.getGameRoom().id + '/progress/updated');
     stateMap.proxy.clientId = app.utils.guid();
     stateMap.proxy.user_prefix = '/user';
 

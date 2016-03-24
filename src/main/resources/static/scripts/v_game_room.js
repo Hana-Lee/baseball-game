@@ -25,21 +25,15 @@ app.v_game_room = (function () {
     ON_GAME_START = 'onGameStart',
     ON_GAME_END = 'onGameEnd',
     ON_ANOTHER_PLAYER_INPUT_RESULT_INFO = 'onAnotherPlayerInputResultInfo',
-    configMap = {
-      settable_map : {
-        game_room_model : null
-      },
-      game_room_model : null
-    },
     stateMap = {
       container : null,
       webix_events : [],
       subscribeObj : [],
       input_count : 0
     }, webixMap = {},
-    _createView, _onOwnerChangeHandler, _resetWebixMap, _resetConfigMap, _resetStateMap,
+    _createView, _onOwnerChangeHandler, _resetWebixMap, _resetStateMap,
     _getSettingTemplate, _getTitleTemplate, _updateGameRoomTitle,
-    configModule, initModule, destructor, getGameRoomModel;
+    initModule, destructor;
 
   _resetWebixMap = function () {
     webixMap = {};
@@ -60,22 +54,18 @@ app.v_game_room = (function () {
     stateMap.container = null;
   };
 
-  _resetConfigMap = function () {
-    configMap.game_room_model = null;
-  };
-
   _getSettingTemplate = function () {
     return [
       '입력지연 : ', '25초', ', ',
-      '입력 : ', configMap.game_room_model.setting.limitGuessInputCount, ', ',
-      '갯수 : ', configMap.game_room_model.setting.generationNumberCount, ', ',
-      '오류 : ', configMap.game_room_model.setting.limitWrongInputCount
+      '입력 : ', app.model.getGameRoom().setting.limitGuessInputCount, ', ',
+      '갯수 : ', app.model.getGameRoom().setting.generationNumberCount, ', ',
+      '오류 : ', app.model.getGameRoom().setting.limitWrongInputCount
     ];
   };
 
   _getTitleTemplate = function () {
     return [
-      '[', configMap.game_room_model.roomNumber, '번방] ', configMap.game_room_model.name
+      '[', app.model.getGameRoom().roomNumber, '번방] ', app.model.getGameRoom().name
     ];
   };
 
@@ -156,7 +146,6 @@ app.v_game_room = (function () {
       ],
       on : {
         onDestruct : function () {
-          _resetConfigMap();
           _resetStateMap();
           _resetWebixMap();
         }
@@ -179,35 +168,27 @@ app.v_game_room = (function () {
     app.v_player_profile.configModule({
       height : 200,
       avatar_width : 130,
-      player_model : app.m_player.getInfo()
+      player_model : app.model.getPlayer()
     });
     app.v_player_profile.initModule(webixMap.profile_container);
 
     app.v_chat.configModule({
       chat_height : 450,
-      data_url : '/chat/gameroom/' + configMap.game_room_model.id,
+      data_url : '/chat/gameroom/' + app.model.getGameRoom().id,
       system_message_list : [
-        '[' + configMap.game_room_model.roomNumber + '번 ' + configMap.game_room_model.name + '] 방에 입장 하셨습니다',
+        '[' + app.model.getGameRoom().roomNumber + '번 ' + app.model.getGameRoom().name + '] 방에 입장 하셨습니다',
         '즐거운 게임 즐기시기 바랍니다 :-)'
       ]
     });
     app.v_chat.initModule(webixMap.chat_container);
   };
 
-  configModule = function (input_map) {
-    app.utils.setConfigMap({
-      input_map : input_map,
-      settable_map : configMap.settable_map,
-      config_map : configMap
-    });
-  };
-
   _onOwnerChangeHandler = function (updatedGameRoom) {
-    if (updatedGameRoom.owner.id === app.m_player.getInfo().id) {
+    if (updatedGameRoom.owner.id === app.model.getPlayer().id) {
       webix.alert({
         title : '정보',
         ok : '확인',
-        text : '지금부터 [<b>' + app.m_player.getInfo().nickname + '</b>] 님이<br/>방장입니다'
+        text : '지금부터 [<b>' + app.model.getPlayer().nickname + '</b>] 님이<br/>방장입니다'
       });
 
       $$('owner-change').show();
@@ -224,7 +205,7 @@ app.v_game_room = (function () {
   };
 
   initModule = function (container) {
-    var subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/updated';
+    var subscribeUrl = '/topic/gameroom/' + app.model.getGameRoom().id + '/updated';
 
     stateMap.container = container;
 
@@ -240,11 +221,11 @@ app.v_game_room = (function () {
           operation = responseBody.operation;
         }
 
-        if (configMap.game_room_model.owner.email !== updatedGameRoom.owner.email) {
+        if (app.model.getGameRoom().owner.email !== updatedGameRoom.owner.email) {
           _onOwnerChangeHandler(updatedGameRoom);
         }
 
-        configMap.game_room_model = updatedGameRoom;
+        app.model.setGameRoom(updatedGameRoom);
 
         _updateGameRoomTitle();
         
@@ -255,7 +236,7 @@ app.v_game_room = (function () {
             app.v_player_profile.configModule({
               height : 200,
               avatar_width : 130,
-              player_model : app.m_player.getInfo()
+              player_model : app.model.getPlayer()
             });
             app.v_player_profile.initModule(webixMap.profile_container);
           });
@@ -265,24 +246,24 @@ app.v_game_room = (function () {
       }, {})
     );
 
-    subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/player-ready-status-updated';
+    subscribeUrl = '/topic/gameroom/' + app.model.getGameRoom().id + '/player-ready-status-updated';
     stateMap.subscribeObj.push(
       app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
         var responseBody = JSON.parse(response.body),
           operation = responseBody.operation;
 
-        configMap.game_room_model = responseBody.data;
+        app.model.setGameRoom(responseBody.data);
 
         webix.callEvent(ON_UPDATE_GAME_ROOM_INFO, [operation]);
       }, {})
     );
 
-    subscribeUrl = '/topic/gameroom/' + configMap.game_room_model.id + '/another-player-input-result-info';
+    subscribeUrl = '/topic/gameroom/' + app.model.getGameRoom().id + '/another-player-input-result-info';
     stateMap.subscribeObj.push(
       app.v_shell.getStompClient().subscribe(subscribeUrl, function (response) {
         var responseBody = JSON.parse(response.body), operation, anotherPlayerInfo, message;
 
-        if (app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
+        if (app.model.getPlayer().gameRole === app.const.gameRole.DEFENDER) {
           anotherPlayerInfo = responseBody.object;
           operation = responseBody.objectOperation;
           message = responseBody.data;
@@ -299,18 +280,12 @@ app.v_game_room = (function () {
     webixMap.main_view.destructor();
   };
 
-  getGameRoomModel = function () {
-    return configMap.game_room_model;
-  };
-
   return {
     ON_UPDATE_GAME_ROOM_INFO : ON_UPDATE_GAME_ROOM_INFO,
     ON_GAME_START : ON_GAME_START,
     ON_GAME_END : ON_GAME_END,
     ON_ANOTHER_PLAYER_INPUT_RESULT_INFO : ON_ANOTHER_PLAYER_INPUT_RESULT_INFO,
     initModule : initModule,
-    destructor : destructor,
-    configModule : configModule,
-    getGameRoomModel : getGameRoomModel
+    destructor : destructor
   };
 }());

@@ -64,9 +64,9 @@ app.v_game_room_menu = (function () {
         id : 'exit-room', view : 'button', label : '방나가기', type : 'danger', width : configMap.button_width,
         on : {
           onItemClick : function () {
-            var gameRoomModel = app.v_game_room.getGameRoomModel();
+            var gameRoomModel = app.model.getGameRoom();
             if (gameRoomModel.players.length === 1) {
-              if (gameRoomModel.players[0].email === app.m_player.getInfo().email) {
+              if (gameRoomModel.players[0].email === app.model.getPlayer().email) {
                 app.v_shell.leaveAndGameRoomDelete(gameRoomModel);
               }
             } else {
@@ -98,7 +98,7 @@ app.v_game_room_menu = (function () {
   };
 
   _showSettingChangeWindow = function () {
-    var gameRoom = app.v_game_room.getGameRoomModel();
+    var gameRoom = app.model.getGameRoom();
     webix.ui({
       id : 'setting-change-window',
       view : 'window',
@@ -199,7 +199,7 @@ app.v_game_room_menu = (function () {
 
     sendData = JSON.stringify(sendData);
 
-    url = 'gameroom/' + app.v_game_room.getGameRoomModel().id;
+    url = 'gameroom/' + app.model.getGameRoom().id;
 
     webix.ajax().headers({
       'Content-Type' : 'application/json'
@@ -240,19 +240,19 @@ app.v_game_room_menu = (function () {
           select : true,
           template : function (obj) {
             var className = '';
-            if (obj.email === app.v_game_room.getGameRoomModel().owner.email) {
+            if (obj.email === app.model.getGameRoom().owner.email) {
               className = 'owner';
             }
             return '<div class="' + className + '" data-id="' + obj.id + '" data-email="' + obj.email + '">닉네임&nbsp;:&nbsp;' + obj.nickname + '</div>';
           },
-          data : app.v_game_room.getGameRoomModel().players
+          data : app.model.getGameRoom().players
         }, {
           cols : [{
             view : 'button', value : '확인', hotkey : 'enter', type : 'form',
             on : {
               onItemClick : function () {
                 var selectedPlayer = $$('player-list').getSelectedItem(), data, url,
-                  gameRoomModel = app.v_game_room.getGameRoomModel();
+                  gameRoomModel = app.model.getGameRoom();
 
                 if (selectedPlayer.email === gameRoomModel.owner.email) {
                   webix.alert({
@@ -265,7 +265,7 @@ app.v_game_room_menu = (function () {
                     oldOwnerId : gameRoomModel.owner.id,
                     newOwnerId : selectedPlayer.id
                   };
-                  url = 'gameroom/change-owner/' + app.v_game_room.getGameRoomModel().id;
+                  url = 'gameroom/change-owner/' + app.model.getGameRoom().id;
                   webix.ajax().headers({
                     'Content-Type' : 'application/json'
                   }).patch(url, JSON.stringify(data), {
@@ -311,7 +311,7 @@ app.v_game_room_menu = (function () {
     stateMap.container = container;
     _createView();
 
-    if (app.v_game_room.getGameRoomModel().owner.id === app.m_player.getInfo().id) {
+    if (app.model.getGameRoom().owner.id === app.model.getPlayer().id) {
       webixMap.owner_change.show();
       webixMap.setting_change.show();
     }

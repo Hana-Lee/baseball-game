@@ -38,7 +38,6 @@ app.v_game_list = (function () {
   };
 
   _resetStateMap = function () {
-    stateMap.game_room_list = null;
     stateMap.proxy = null;
     stateMap.container = null;
     stateMap = {};
@@ -74,7 +73,7 @@ app.v_game_list = (function () {
         template : _createTemplate,
         templateEnd : '</div>'
       },
-      data : stateMap.game_room_list,
+      data : app.model.getGameRoomList(),
       url : stateMap.proxy,
       on : {
         onAfterAdd : function (id) {
@@ -83,6 +82,7 @@ app.v_game_list = (function () {
           }
 
           app.v_main_menu.enableQuickBtn();
+          app.model.addGameRoom(webixMap.main_view.getItem(id));
         },
         onAfterDelete : function (id) {
           if (!id) {
@@ -92,6 +92,7 @@ app.v_game_list = (function () {
           if (this.data.count() === 0) {
             app.v_main_menu.disableQuickBtn();
           }
+          app.model.removeGameRoom(id);
         },
         onAfterRender : function () {
           $('.join_room').click(function (evt) {
@@ -174,14 +175,15 @@ app.v_game_list = (function () {
           ok : '확인',
           text : textJson.message
         });
-        stateMap.game_room_list = [];
+        app.model.clearGameRoomList();
       },
       success : function (text) {
         var serverResponse = JSON.parse(text);
-        stateMap.game_room_list = serverResponse.content;
+        app.model.setGameRoomList(serverResponse.content);
+
         callback(serverResponse.content);
 
-        stateMap.game_room_list.forEach(function (gameRoom) {
+        app.model.getGameRoomList().forEach(function (gameRoom) {
           if (gameRoom.status !== app.const.status.RUNNING) {
             $$('quick-join').enable();
             return false;

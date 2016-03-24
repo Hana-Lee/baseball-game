@@ -43,7 +43,7 @@ app.v_game_pad = (function () {
     initModule;
 
   _sendCreatedNumber = function (send_data) {
-    var gameRoomId = app.v_game_room.getGameRoomModel().id,
+    var gameRoomId = app.model.getGameRoom().id,
       sendData = {
         gameRoomId : gameRoomId
       };
@@ -96,7 +96,7 @@ app.v_game_pad = (function () {
           webixMap.ready_button.config.label = '취소!!';
           webixMap.ready_button.refresh();
 
-          if (app.m_player.getInfo().gameRole === app.const.gameRole.ATTACKER) {
+          if (app.model.getPlayer().gameRole === app.const.gameRole.ATTACKER) {
             webixMap.number_pad.enable();
           }
         } else {
@@ -117,17 +117,17 @@ app.v_game_pad = (function () {
 
   _sendGuessNumbers = function (guessNumber) {
     var sendUrl, header = {}, data;
-    app.m_player.getInfo().guessNumber = guessNumber;
-    app.m_player.getInfo().gameRoomId = app.v_game_room.getGameRoomModel().id;
-    data = app.m_player.getInfo();
-    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-guess-number';
+    app.model.getPlayer().guessNumber = guessNumber;
+    app.model.getPlayer().gameRoomId = app.model.getGameRoom().id;
+    data = app.model.getPlayer();
+    sendUrl = '/app/gameroom/' + app.model.getGameRoom().id + '/player-guess-number';
 
     app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
 
   _playerInputCountNotification = function () {
     var sendUrl, progressBoardProxyClientId, header = {}, data;
-    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-input-count-notification';
+    sendUrl = '/app/gameroom/' + app.model.getGameRoom().id + '/player-input-count-notification';
     progressBoardProxyClientId = app.v_game_board.getProgressBoardProxyClientId();
     data = {clientId : progressBoardProxyClientId};
 
@@ -136,10 +136,10 @@ app.v_game_pad = (function () {
 
   _playerReadyNotification = function () {
     var sendUrl, header = {}, data = {};
-    sendUrl = '/app/player/ready/' + app.v_game_room.getGameRoomModel().id;
+    sendUrl = '/app/player/ready/' + app.model.getGameRoom().id;
     app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
 
-    sendUrl = '/app/player/ready/' + app.v_game_room.getGameRoomModel().id + '/gameroom/notification';
+    sendUrl = '/app/player/ready/' + app.model.getGameRoom().id + '/gameroom/notification';
     app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
 
@@ -162,7 +162,7 @@ app.v_game_pad = (function () {
   };
 
   _showMakeNumberWindow = function () {
-    var numberCount = app.v_game_room.getGameRoomModel().setting.generationNumberCount;
+    var numberCount = app.model.getGameRoom().setting.generationNumberCount;
     webix.ui({
       id : 'make-number-window',
       view : 'window',
@@ -264,7 +264,7 @@ app.v_game_pad = (function () {
             onItemClick : function () {
               stateMap.isReady = !stateMap.isReady;
 
-              if (stateMap.isReady && app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
+              if (stateMap.isReady && app.model.getPlayer().gameRole === app.const.gameRole.DEFENDER) {
                 _showMakeNumberWindow();
               } else {
                 _sendReadyDataToServer();
@@ -303,7 +303,7 @@ app.v_game_pad = (function () {
           },
           on : {
             'onItemClick' : function (id/*, evt, el*/) {
-              var idIndex, genNumberCount = app.v_game_room.getGameRoomModel().setting.generationNumberCount;
+              var idIndex, genNumberCount = app.model.getGameRoom().setting.generationNumberCount;
               if (stateMap.isReady) {
                 if ($$('number-pad').isSelected(id)) {
                   idIndex = stateMap.selected_num.indexOf(id);
@@ -370,7 +370,7 @@ app.v_game_pad = (function () {
     var result = false, message = '';
     if (webix.rules.isEmpty(guessNumber)) {
       message = '빈값은 입력할 수 없습니다';
-    } else if (webix.rules.isInputCountCorrect(guessNumber, app.v_game_room.getGameRoomModel().setting.limitGuessInputCount)) {
+    } else if (webix.rules.isInputCountCorrect(guessNumber, app.model.getGameRoom().setting.limitGuessInputCount)) {
       message = '입력 갯수를 확인 해주세요';
     } else if (webix.rules.containsSameNumber(guessNumber)) {
       message = '중복된 숫자는 입력할 수 없습니다';
@@ -379,14 +379,14 @@ app.v_game_pad = (function () {
     }
     if (result === false && message !== '') {
       app.model.getPlayer().wrongCount += 1;
-      app.m_player.getInfo().wrongCount += 1; // 추후 제거
+      app.model.getPlayer().wrongCount += 1; // 추후 제거
 
       webix.alert({
         title : '오류',
         ok : '확인',
         text : message
-        + '(입력 오류 : ' + app.m_player.getInfo().wrongCount + '/'
-        + app.v_game_room.getGameRoomModel().setting.limitWrongInputCount + ')'
+        + '(입력 오류 : ' + app.model.getPlayer().wrongCount + '/'
+        + app.model.getGameRoom().setting.limitWrongInputCount + ')'
       });
       webix.message(message, 'error');
     }
@@ -405,7 +405,7 @@ app.v_game_pad = (function () {
       position : 0
     });
 
-    if (stateMap.input_count === app.v_game_room.getGameRoomModel().setting.limitGuessInputCount) {
+    if (stateMap.input_count === app.model.getGameRoom().setting.limitGuessInputCount) {
       // TODO 게임 입력 횟수 초과로 게임 종료 알림 보내기
       console.log('입력 횟수 초과!!');
     }
@@ -419,11 +419,11 @@ app.v_game_pad = (function () {
   };
 
   _gameStartHandler = function () {
-    var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
+    var gameRoomStatus = app.model.getGameRoom().status;
     if (gameRoomStatus === app.const.status.RUNNING) {
-      stateMap.game_status = app.v_game_room.getGameRoomModel().status;
+      stateMap.game_status = app.model.getGameRoom().status;
 
-      if (app.m_player.getInfo().gameRole === app.const.gameRole.ATTACKER) {
+      if (app.model.getPlayer().gameRole === app.const.gameRole.ATTACKER) {
         _showProgressBar();
       }
       webixMap.ready_button.disable();
@@ -431,7 +431,7 @@ app.v_game_pad = (function () {
   };
 
   _gameTerminatedHandler = function () {
-    var gameRoomStatus = app.v_game_room.getGameRoomModel().status;
+    var gameRoomStatus = app.model.getGameRoom().status;
     if (gameRoomStatus === app.const.status.NORMAL || gameRoomStatus === app.const.status.GAME_END) {
       if (stateMap.game_status) {
         _hideProgressBar();
@@ -450,15 +450,15 @@ app.v_game_pad = (function () {
 
   _playerInputResultNotificationToDefender = function () {
     var sendUrl, header = {}, data = {};
-    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-input-result-notification-to-defender';
+    sendUrl = '/app/gameroom/' + app.model.getGameRoom().id + '/player-input-result-notification-to-defender';
 
     app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(data));
   };
 
   _playerInfoUpdatedHandler = function (operation) {
-    if (app.m_player.getInfo().status === app.const.status.GAME_OVER) {
+    if (app.model.getPlayer().status === app.const.status.GAME_OVER) {
       _hideProgressBar();
-    } else if (app.m_player.getInfo().status === app.const.status.INPUT && operation === 'playerGuessNumber') {
+    } else if (app.model.getPlayer().status === app.const.status.INPUT && operation === 'playerGuessNumber') {
       _playerInputResultNotificationToDefender();
       _playerInputCountNotification();
       _showProgressBar();
@@ -467,7 +467,7 @@ app.v_game_pad = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    if (app.m_player.getInfo().status === app.const.status.READY_DONE) {
+    if (app.model.getPlayer().status === app.const.status.READY_DONE) {
       stateMap.isReady = true;
     }
     _createView();

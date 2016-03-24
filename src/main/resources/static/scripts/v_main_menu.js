@@ -26,12 +26,11 @@ app.v_main_menu = (function () {
       button_width : 200,
       player_model : {
         admin : false
-      },
-      game_room_list : []
+      }
     }, stateMap = {
       container : null
     }, webixMap = {},
-    _createView, _getCreatedGameRoomList,
+    _createView,
     _resetConfigMap, _resetStateMap, _resetWebixMap,
     showCreateGameRoomDialog, disableQuickBtn, enableQuickBtn, initModule;
 
@@ -39,7 +38,6 @@ app.v_main_menu = (function () {
     configMap.height = 45;
     configMap.button_width = 200;
     configMap.player_model = {};
-    configMap.game_room_list = [];
   };
 
   _resetStateMap = function () {
@@ -79,7 +77,7 @@ app.v_main_menu = (function () {
         disabled : true,
         width : configMap.button_width,
         click : function () {
-          app.v_shell.joinRandomGameRoom(configMap.game_room_list);
+          app.v_shell.joinRandomGameRoom(app.model.getGameRoomList());
         }
       }, {
         id : 'game-room-admin',
@@ -235,7 +233,7 @@ app.v_main_menu = (function () {
 
   initModule = function (container) {
     stateMap.container = container;
-    configMap.player_model = app.m_player.getInfo();
+    configMap.player_model = app.model.getPlayer();
     _createView();
   };
 

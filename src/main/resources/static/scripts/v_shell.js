@@ -68,9 +68,10 @@ app.v_shell = (function () {
       },
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
-        app.m_player.getInfo().gameRole = selectedGameRole;
-        app.m_player.getInfo().gameRoomId = joinedGameRoom.id;
-        _showGameRoom(joinedGameRoom);
+        app.model.getPlayer().gameRole = selectedGameRole;
+        app.model.getPlayer().gameRoomId = joinedGameRoom.id;
+        app.model.setGameRoom(joinedGameRoom);
+        _showGameRoom();
       }
     });
   };
@@ -104,10 +105,10 @@ app.v_shell = (function () {
       },
       success : function (text) {
         var joinedGameRoom = JSON.parse(text);
-        app.m_player.getInfo().gameRole = data.gameRole;
-        app.m_player.getInfo().gameRoomId = joinedGameRoom.id;
-
-        _showGameRoom(joinedGameRoom);
+        app.model.getPlayer().gameRole = data.gameRole;
+        app.model.getPlayer().gameRoomId = joinedGameRoom.id;
+        app.model.setGameRoom(joinedGameRoom);
+        _showGameRoom();
       }
     });
   };
@@ -141,21 +142,21 @@ app.v_shell = (function () {
       },
       success : function (text) {
         var gameRoomJson = JSON.parse(text);
-        app.m_player.getInfo().gameRole = gameRoomJson.owner.gameRole;
-        app.m_player.getInfo().gameRoomId = gameRoomJson.id;
-        _showGameRoom(gameRoomJson);
+        app.model.getPlayer().gameRole = gameRoomJson.owner.gameRole;
+        app.model.getPlayer().gameRoomId = gameRoomJson.id;
+        app.model.setGameRoom(gameRoomJson);
+        _showGameRoom();
       }
     });
   };
 
-  _showGameRoom = function (gameRoomModel) {
-    app.v_game_room.configModule({
-      game_room_model : gameRoomModel
-    });
+  _showGameRoom = function () {
     app.v_game_room.initModule(webixMap.top);
   };
 
   showMainBoard = function (removeContainer, email) {
+    app.model.setGameRoom(null);
+
     if (removeContainer === 'login-container') {
       $$('login-container').destructor();
       $('#main-container').html('');
@@ -186,10 +187,13 @@ app.v_shell = (function () {
         });
       },
       success : function (/*text*/) {
-        app.m_player.getInfo().gameRole = null;
-        app.m_player.getInfo().status = null;
-        app.m_player.getInfo().gameRoomId = null;
-        app.m_player.getInfo().wrongCount = 0;
+        app.model.getPlayer().gameRole = null;
+        app.model.getPlayer().status = null;
+        app.model.getPlayer().gameRoomId = null;
+        app.model.getPlayer().wrongCount = 0;
+
+        app.model.setGameRoom(null);
+
         app.v_main_board.initModule(webixMap.top);
       }
     });
@@ -211,17 +215,20 @@ app.v_shell = (function () {
         });
       },
       success : function (/*text*/) {
-        app.m_player.getInfo().gameRole = null;
-        app.m_player.getInfo().status = null;
-        app.m_player.getInfo().gameRoomId = null;
-        app.m_player.getInfo().wrongCount = 0;
+        app.model.getPlayer().gameRole = null;
+        app.model.getPlayer().status = null;
+        app.model.getPlayer().gameRoomId = null;
+        app.model.getPlayer().wrongCount = 0;
+
+        app.model.setGameRoom(null);
+
         app.v_main_board.initModule(webixMap.top);
       }
     });
   };
 
   logout = function () {
-    _logoutNotification(app.m_player.getInfo().email);
+    _logoutNotification(app.model.getPlayer().email);
 
     webix.ajax().post('logout', {
       error : function (text) {
@@ -235,14 +242,16 @@ app.v_shell = (function () {
       success : function () {
         $$('main-layout').destructor();
 
-        //_logoutNotification(app.m_player.getInfo().email);
+        //_logoutNotification(app.model.getPlayer().email);
 
         stateMap.loggedIn = false;
         stateMap.stomp_client.disconnect();
         stateMap.stomp_client = null;
         $('#main-container').html('');
 
-        app.m_player.reset();
+        app.model.setPlayer(null);
+        app.model.setGameRoom(null);
+        app.model.clearGameRoomList();
 
         app.initModule(stateMap.container);
       }
@@ -254,7 +263,6 @@ app.v_shell = (function () {
     webix.ajax().get('player', {
       error : function (text) {
         console.log('ajax error', text);
-        app.m_player.initModule(null);
         app.model.setPlayer(null);
         stateMap.loggedIn = false;
         if (stateMap.stomp_client) {
@@ -264,7 +272,6 @@ app.v_shell = (function () {
       },
       success : function (text) {
         serverResponse = JSON.parse(text);
-        app.m_player.initModule(serverResponse);
         app.model.setPlayer(serverResponse);
         stateMap.loggedIn = true;
 
@@ -297,14 +304,14 @@ app.v_shell = (function () {
         if (error && error.toLowerCase().indexOf('lost connection') !== -1) {
           $$('main-layout').destructor();
 
-          //_logoutNotification(app.m_player.getInfo().email);
+          //_logoutNotification(app.model.getPlayer().email);
 
           stateMap.loggedIn = false;
           stateMap.stomp_client.disconnect();
           stateMap.stomp_client = null;
           $('#main-container').html('');
 
-          app.m_player.reset();
+          app.model.setPlayer(null);
 
           app.initModule(stateMap.container);
         }
@@ -335,8 +342,8 @@ app.v_shell = (function () {
       operation = responseJson.operation;
     }
 
-    if (player.id === app.m_player.getInfo().id) {
-      app.m_player.initModule(player);
+    if (player.id === app.model.getPlayer().id) {
+      app.model.setPlayer(player);
     }
 
     webix.callEvent(ON_PLAYER_INFO_UPDATED, [operation, player]);
@@ -387,7 +394,7 @@ app.v_shell = (function () {
       success : function (text) {
         var textJson = JSON.parse(text);
         if (textJson) {
-          app.m_player.initModule(textJson);
+          app.model.setPlayer(textJson);
         }
         if (callback && typeof callback === 'function') {
           callback();
@@ -398,13 +405,13 @@ app.v_shell = (function () {
 
   playerGameOverNotification = function (data) {
     var sendUrl, header = {};
-    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/player-game-over-notification';
+    sendUrl = '/app/gameroom/' + app.model.getGameRoom().id + '/player-game-over-notification';
     stateMap.stomp_client.send(sendUrl, header, JSON.stringify(data));
   };
 
   gameEndNotification = function () {
     var sendUrl, header = {}, data = {};
-    sendUrl = '/app/gameroom/' + app.v_game_room.getGameRoomModel().id + '/game-end-notification';
+    sendUrl = '/app/gameroom/' + app.model.getGameRoom().id + '/game-end-notification';
     stateMap.stomp_client.send(sendUrl, header, JSON.stringify(data));
   };
 
