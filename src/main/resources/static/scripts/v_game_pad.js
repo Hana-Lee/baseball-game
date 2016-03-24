@@ -385,8 +385,8 @@ app.v_game_pad = (function () {
         title : '오류',
         ok : '확인',
         text : message
-          + '(입력 오류 : ' + app.m_player.getInfo().wrongCount + '/'
-          + app.v_game_room.getGameRoomModel().setting.limitWrongInputCount + ')'
+        + '(입력 오류 : ' + app.m_player.getInfo().wrongCount + '/'
+        + app.v_game_room.getGameRoomModel().setting.limitWrongInputCount + ')'
       });
       webix.message(message, 'error');
     }
@@ -401,7 +401,7 @@ app.v_game_pad = (function () {
     $$('number-pad').showProgress({
       type : 'top',
       delay : configMap.input_delay,
-      hide : true,
+      hide : false,
       position : 0
     });
 
@@ -412,6 +412,9 @@ app.v_game_pad = (function () {
   };
 
   _hideProgressBar = function (now) {
+    if (now === undefined || now === null) {
+      now = true;
+    }
     $$('number-pad').hideProgress(now);
   };
 
