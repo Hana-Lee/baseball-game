@@ -77,7 +77,7 @@ app.v_chat = (function () {
 
     if (text) {
       webixMap.chat_list.add({
-        player : app.m_player.getInfo(),
+        player : app.model.getPlayer(),
         message : text
       });
     }
@@ -96,7 +96,7 @@ app.v_chat = (function () {
 
     if (obj.nickname === configMap.system_nickname) {
       className = 'system';
-    } else if (obj.player.nickname !== app.m_player.getInfo().nickname) {
+    } else if (obj.player.nickname !== app.model.getPlayer().nickname) {
       className = 'from';
     } else {
       className = 'to';
@@ -176,8 +176,8 @@ app.v_chat = (function () {
     stateMap.proxy = webix.proxy(configMap.proxy_name, configMap.data_url);
     stateMap.proxy.clientId = app.utils.guid();
 
-    if (app.v_game_room && app.v_game_room.getGameRoomModel()) {
-      stateMap.proxy.game_room = app.v_game_room.getGameRoomModel();
+    if (app.v_game_room && app.model.getGameRoom()) {
+      stateMap.proxy.game_room = app.model.getGameRoom();
     }
 
     _createView();

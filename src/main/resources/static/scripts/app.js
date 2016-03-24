@@ -47,7 +47,7 @@ var app = (function () {
           }
 
           if (update.objectOperation && update.objectOperation === 'anotherPlayerInputCount'
-            && app.m_player.getInfo().gameRole === app.const.gameRole.DEFENDER) {
+            && app.model.getPlayer().gameRole === app.const.gameRole.DEFENDER) {
             return;
           }
 
@@ -98,7 +98,7 @@ var app = (function () {
         }
 
         update.clientId = this.clientId;
-        update.data.email = app.m_player.getInfo().email;
+        update.data.email = app.model.getPlayer().email;
         var header = {}, sendUrl = '/app' + this.source;
         app.v_shell.getStompClient().send(sendUrl, header, JSON.stringify(update));
       }

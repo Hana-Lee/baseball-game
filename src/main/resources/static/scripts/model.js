@@ -95,6 +95,9 @@ app.model = (function () {
      * @public
      */
     setGameRoomList = function (gameRoomList_model) {
+      if (gameRoomList_model === null || gameRoomList_model === undefined) {
+        gameRoomList_model = [];
+      }
       gameRoomList = gameRoomList_model;
     },
 
@@ -110,10 +113,36 @@ app.model = (function () {
 
     /**
      * @description 새로운 게임룸을 게임룸 리스트에 추가 한다
+     *
      * @param {GameRoom} newGameRoom
      */
     addGameRoom = function (newGameRoom) {
       gameRoomList.push(newGameRoom);
+    },
+
+    /**
+     * @description 게임룸 목록에서 id 를 이용해 찾아 삭제 한다
+     *
+     * @param {Number} gameRoomId
+     */
+    removeGameRoom = function (gameRoomId) {
+      var gameRoomIdx;
+      gameRoomList.forEach(function (gameRoom, idx) {
+        if (gameRoom.id === gameRoomId) {
+          gameRoomIdx = idx;
+        }
+      });
+
+      if (gameRoomIdx !== undefined) {
+        gameRoomList.splice(gameRoomIdx, 1);
+      }
+    },
+
+    /**
+     * @description 게임룸 목록을 완전히 삭제 한다
+     */
+    clearGameRoomList = function () {
+      gameRoomList = [];
     };
 
   return {
@@ -123,6 +152,8 @@ app.model = (function () {
     getGameRoom : getGameRoom,
     setGameRoomList : setGameRoomList,
     getGameRoomList : getGameRoomList,
-    addGameRoom : addGameRoom
+    addGameRoom : addGameRoom,
+    removeGameRoom : removeGameRoom,
+    clearGameRoomList : clearGameRoomList
   };
 }());
