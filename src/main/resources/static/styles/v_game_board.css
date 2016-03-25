@@ -27,14 +27,29 @@
 	color: #DFDFDF !important;
 }
 
-.board_container .game_progress_board .focus {
+.board_container .game_progress_board .gray {
 	font-weight: bold;
-	color: #DAA520;
+	color: slategray;
 }
 
-.board_container .game_progress_board .alert {
+.board_container .game_progress_board .blue {
+	font-weight: bold;
+	color: #0089FF;
+}
+
+.board_container .game_progress_board .orange {
 	font-weight: bold;
 	color: #FF4500;
+}
+
+.board_container .game_progress_board .purple {
+	font-weight: bold;
+	color: #A600FF;
+}
+
+.board_container .game_progress_board .green {
+	font-weight: bold;
+	color: #22B276;
 }
 
 .board_container .game_progress_board .webix_list_item {

@@ -99,7 +99,7 @@ public class SocketController {
 			type = "normal";
 		} else if (Objects.equals(player.getStatus(), Status.READY_BEFORE)) {
 			message = player.getNickname() + "님 준비 취소!";
-			type = "alert";
+			type = "orange";
 		}
 
 		Map<String, String> messageData = new HashMap<>();
@@ -173,7 +173,7 @@ public class SocketController {
 
 		Map<String, String> messageData = new HashMap<>();
 		messageData.put("message", guessResultMessage);
-		messageData.put("type", "alert");
+		messageData.put("type", "orange");
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(modelMapper.map(updatedPlayer, PlayerDto.Response.class));
 		dto.setObjectOperation("playerGuessNumber");
@@ -192,7 +192,7 @@ public class SocketController {
 
 		Map<String, String> messageData = new HashMap<>();
 		messageData.put("message", player.getNickname() + "님 " + (player.getInputCount() + 1) + "번째 입력중");
-		messageData.put("type", "focus");
+		messageData.put("type", "gray");
 		MessagingDto dto = new MessagingDto();
 		dto.setObjectOperation("anotherPlayerInputCount");
 		dto.setClientId(clientIdPayload.get("clientId"));
@@ -241,7 +241,7 @@ public class SocketController {
 		Map<String, String> messageData = new HashMap<>();
 		messageData.put("message", player.getNickname() + "님이 숫자를 맞췄습니다 (" + player.getInputCount() + "/" + gameRoom
 				.getSetting().getLimitGuessInputCount() + ")");
-		messageData.put("type", "focus");
+		messageData.put("type", "purple");
 		MessagingDto dto = new MessagingDto();
 		dto.setObject(gameRoom);
 		dto.setObjectOperation("playerGameOverUpdate");
@@ -399,7 +399,7 @@ public class SocketController {
 
 		final Map<String, String> messageData = new HashMap<>();
 		messageData.put("message", "게임이 종료 되었습니다");
-		messageData.put("type", "alert");
+		messageData.put("type", "orange");
 
 		final MessagingDto dto = new MessagingDto();
 		dto.setObject(gameRoom);

@@ -23,8 +23,8 @@ app.v_game_board = (function () {
   var
     configMap = {
       welcome_messages : [
-        {message : '환영합니다.', type : 'normal'},
-        {message : '시작하려면 준비를 눌러주세요', type : 'focus'}
+        {message : '@@@@ 환영합니다 @@@@', type : 'gray'},
+        {message : '시작하려면 준비!! 를 눌러주세요', type : 'green'}
       ]
     },
     stateMap = {
@@ -60,7 +60,7 @@ app.v_game_board = (function () {
       if (app.model.getPlayer().status === app.const.status.INPUT) {
         webixMap.game_progress_board.add({
           message : (app.model.getPlayer().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
-          type : 'normal'
+          type : 'gray'
         });
       } else if (app.model.getPlayer().status === app.const.status.GAME_OVER) {
         app.v_shell.playerGameOverNotification({clientId : getProgressBoardProxyClientId()});
@@ -78,11 +78,11 @@ app.v_game_board = (function () {
           app.model.getPlayer().inputCount = 0;
 
           webixMap.game_progress_board.add({
-            message : '게임이 시작 되었습니다', type : 'alert'
+            message : '게임이 시작 되었습니다', type : 'green'
           });
           webixMap.game_progress_board.add({
             message : (app.model.getPlayer().inputCount + 1) + '/' + inputLimitCount + ' 번째 입력을 기다립니다',
-            type : 'normal'
+            type : 'gray'
           });
           webix.callEvent(app.v_game_room.ON_GAME_START, []);
         });
@@ -90,7 +90,7 @@ app.v_game_board = (function () {
     } else if (operation === 'playerGameOverUpdate') {
       if (gameStatus === app.const.status.GAME_END) {
         webixMap.game_progress_board.add({
-          message : '게임이 종료 되었습니다', type : 'alert'
+          message : '게임이 종료 되었습니다', type : 'orange'
         });
         playerRankList = _.sortBy(app.model.getGameRoom().players, function (player) {
           return player.rank.value;
@@ -98,25 +98,25 @@ app.v_game_board = (function () {
 
         if (playerRankList && playerRankList.length > 0) {
           webixMap.game_progress_board.add({
-            message : '*** 게임 순위 입니다 ***', type : 'focus'
+            message : '*** 게임 순위 입니다 ***', type : 'blue'
           });
           playerRankList.forEach(function (p, idx) {
             if (p.gameRole === app.const.gameRole.DEFENDER) {
               webixMap.game_progress_board.add({
-                message : '****************', type : 'focus'
+                message : '****************', type : 'blue'
               });
               webixMap.game_progress_board.add({
-                message :'수비 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
+                message :'수비 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'blue'
               });
             } else {
               webixMap.game_progress_board.add({
-                message : (idx + 1) + '등 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'focus'
+                message : (idx + 1) + '등 : ' + p.nickname + '님 (' + p.score.value + '점)', type : 'blue'
               });
             }
           });
         }
         webixMap.game_progress_board.add({
-          message : '시작하려면 준비를 눌러주세요', type : 'alert'
+          message : '시작하려면 준비를 눌러주세요', type : 'green'
         });
 
         webix.callEvent(app.v_game_room.ON_GAME_END, []);
@@ -178,7 +178,7 @@ app.v_game_board = (function () {
           view : 'list',
           select : false,
           template : function (obj) {
-            var className = obj.type || 'normal';
+            var className = obj.type || 'gray';
             return '<span class="' + className + '">' + obj.message + '</span>';
           },
           data : [],
@@ -286,15 +286,15 @@ app.v_game_board = (function () {
     if (operation === 'anotherPlayerInputResultInfo') {
       webixMap.game_progress_board.add({
         message : anotherPlayerInfo.nickname + '님의 입력 결과 입니다',
-        type : 'normal'
+        type : 'gray'
       });
       webixMap.game_progress_board.add({
         message : anotherPlayerInfo.inputCount + '/' + inputCountLimit + '번째 입력.',
-        type : 'normal'
+        type : 'gray'
       });
       webixMap.game_progress_board.add({
         message : message,
-        type : 'normal'
+        type : 'gray'
       });
     }
   };
