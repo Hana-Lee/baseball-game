@@ -151,11 +151,13 @@ app.v_shell = (function () {
   };
 
   _showGameRoom = function () {
+    location.hash = '#gr_' + app.model.getGameRoom().id;
     app.v_game_room.initModule(webixMap.top);
   };
 
   showMainBoard = function (removeContainer, email) {
     app.model.setGameRoom(null);
+    location.hash = '';
 
     if (removeContainer === 'login-container') {
       $$('login-container').destructor();
@@ -192,9 +194,7 @@ app.v_shell = (function () {
         app.model.getPlayer().gameRoomId = null;
         app.model.getPlayer().wrongCount = 0;
 
-        app.model.setGameRoom(null);
-
-        app.v_main_board.initModule(webixMap.top);
+        showMainBoard();
       }
     });
   };
@@ -220,9 +220,7 @@ app.v_shell = (function () {
         app.model.getPlayer().gameRoomId = null;
         app.model.getPlayer().wrongCount = 0;
 
-        app.model.setGameRoom(null);
-
-        app.v_main_board.initModule(webixMap.top);
+        showMainBoard();
       }
     });
   };
@@ -302,18 +300,7 @@ app.v_shell = (function () {
       function (error) {
         console.log(error);
         if (error && error.toLowerCase().indexOf('lost connection') !== -1) {
-          $$('main-layout').destructor();
-
-          //_logoutNotification(app.model.getPlayer().email);
-
-          stateMap.loggedIn = false;
-          stateMap.stomp_client.disconnect();
-          stateMap.stomp_client = null;
-          $('#main-container').html('');
-
-          app.model.setPlayer(null);
-
-          app.initModule(stateMap.container);
+          logout();
         }
       }
     );
