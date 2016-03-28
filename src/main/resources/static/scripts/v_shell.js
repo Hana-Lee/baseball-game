@@ -156,6 +156,10 @@ app.v_shell = (function () {
   };
 
   showMainBoard = function (removeContainer, email) {
+    app.model.getPlayer().gameRole = null;
+    app.model.getPlayer().status = null;
+    app.model.getPlayer().gameRoomId = null;
+    app.model.getPlayer().wrongCount = 0;
     app.model.setGameRoom(null);
     location.hash = '';
 
@@ -189,11 +193,6 @@ app.v_shell = (function () {
         });
       },
       success : function (/*text*/) {
-        app.model.getPlayer().gameRole = null;
-        app.model.getPlayer().status = null;
-        app.model.getPlayer().gameRoomId = null;
-        app.model.getPlayer().wrongCount = 0;
-
         showMainBoard();
       }
     });
@@ -215,11 +214,6 @@ app.v_shell = (function () {
         });
       },
       success : function (/*text*/) {
-        app.model.getPlayer().gameRole = null;
-        app.model.getPlayer().status = null;
-        app.model.getPlayer().gameRoomId = null;
-        app.model.getPlayer().wrongCount = 0;
-
         showMainBoard();
       }
     });
@@ -239,8 +233,6 @@ app.v_shell = (function () {
       },
       success : function () {
         $$('main-layout').destructor();
-
-        //_logoutNotification(app.model.getPlayer().email);
 
         stateMap.loggedIn = false;
         stateMap.stomp_client.disconnect();
