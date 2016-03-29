@@ -220,6 +220,8 @@ app.v_shell = (function () {
   };
 
   logout = function () {
+    stateMap.loggedIn = false;
+    
     _logoutNotification(app.model.getPlayer().email);
 
     webix.ajax().post('logout', {
@@ -232,11 +234,12 @@ app.v_shell = (function () {
         });
       },
       success : function () {
-        $$('main-layout').destructor();
+        webixMap.main_view.destructor();
 
-        stateMap.loggedIn = false;
-        stateMap.stomp_client.disconnect();
-        stateMap.stomp_client = null;
+        if (stateMap.stomp_client) {
+          stateMap.stomp_client.disconnect();
+          stateMap.stomp_client = null;
+        }
         $('#main-container').html('');
 
         app.model.setPlayer(null);
@@ -291,7 +294,7 @@ app.v_shell = (function () {
       },
       function (error) {
         console.log(error);
-        if (error && error.toLowerCase().indexOf('lost connection') !== -1) {
+        if (error && error.toLowerCase().indexOf('lost connection') !== -1 && stateMap.loggedIn) {
           logout();
         }
       }

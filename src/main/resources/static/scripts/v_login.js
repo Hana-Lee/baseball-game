@@ -89,7 +89,9 @@ app.v_login = (function () {
                               text : textJson.message
                             });
                           },
-                          success : function (/*text, data, XmlHttpRequest */) {
+                          success : function (response/*, data, XmlHttpRequest */) {
+                            var responseJson = JSON.parse(response);
+                            app.model.setPlayer(responseJson);
                             app.v_shell.showMainBoard('login-container', $$('email').getValue());
                           }
                         }
