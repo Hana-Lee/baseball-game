@@ -283,8 +283,6 @@ app.v_shell = (function () {
     stateMap.stomp_client.connect(login, passcode,
       function (frame) {
         // connect 완료 시 error subscribe, global 에러 처리.
-        console.log(frame);
-
         if (callback) {
           callback();
         }

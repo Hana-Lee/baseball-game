@@ -279,7 +279,6 @@ app.v_game_room_menu = (function () {
                       });
                     },
                     success : function (text) {
-                      console.log(text);
                       $$('owner-change-window').close();
                     }
                   });
