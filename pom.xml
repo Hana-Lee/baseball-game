@@ -18,27 +18,35 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>spring-milestones</id>
+			<name>Spring Milestones</name>
+			<url>https://repo.spring.io/libs-milestone</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 
-		<spring.version>4.3.0.BUILD-SNAPSHOT</spring.version>
-		<spring-boot.version>1.4.0.M1</spring-boot.version>
-		<spring-security.version>4.0.4.RELEASE</spring-security.version>
-		<modelmapper.version>0.7.5</modelmapper.version>
+		<spring.version>4.3.0.RC2</spring.version>
+		<spring-boot.version>1.4.0.M3</spring-boot.version>
+		<spring-security.version>4.1.0.RELEASE</spring-security.version>
+		<modelmapper.version>0.7.6</modelmapper.version>
 		<commons-lang3.version>3.4</commons-lang3.version>
 
 		<lombok.version>1.16.8</lombok.version>
 
-		<webjars-webix.version>3.1.0</webjars-webix.version>
+		<webjars-webix.version>3.2.0</webjars-webix.version>
 	</properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.4.0.M1</version>
+		<version>1.4.0.M3</version>
 	</parent>
 
 	<dependencies>
@@ -124,11 +132,11 @@
 		</dependency>
 	</dependencies>
 	<!--<build>-->
-		<!--<plugins>-->
-			<!--<plugin>-->
-				<!--<groupId>org.springframework.boot</groupId>-->
-				<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-			<!--</plugin>-->
-		<!--</plugins>-->
+	<!--<plugins>-->
+	<!--<plugin>-->
+	<!--<groupId>org.springframework.boot</groupId>-->
+	<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+	<!--</plugin>-->
+	<!--</plugins>-->
 	<!--</build>-->
 </project>
