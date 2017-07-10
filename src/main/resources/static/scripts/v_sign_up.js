@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-01-25 01:53
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$ */
-
 app.v_sign_up = (function () {
   'use strict';
 

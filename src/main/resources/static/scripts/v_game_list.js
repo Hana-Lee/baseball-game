@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-01-17 22:33
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$ */
-
 app.v_game_list = (function () {
   'use strict';
 
@@ -168,7 +153,6 @@ app.v_game_list = (function () {
   _getCreatedGameRoomList = function (callback) {
     webix.ajax().get('gameroom/all', {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',

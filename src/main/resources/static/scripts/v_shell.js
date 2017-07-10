@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-01-15 19:35
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$, SockJS, Stomp */
-
 /**
  * @namespace app.v_shell
  *
@@ -95,7 +80,6 @@ app.v_shell = (function () {
       'Content-Type' : 'application/json'
     }).patch(url, dataString, {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',
@@ -132,7 +116,6 @@ app.v_shell = (function () {
       'Content-Type' : 'application/json'
     }).post('gameroom', sendData, {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',
@@ -184,7 +167,6 @@ app.v_shell = (function () {
       'Content-Type' : 'application/json'
     }).patch('gameroom/leave/' + gameRoomModel.id, {}, {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',
@@ -205,7 +187,6 @@ app.v_shell = (function () {
       'Content-Type' : 'application/json'
     }).del('gameroom/leave/' + gameRoomModel.id, {}, {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',
@@ -254,8 +235,7 @@ app.v_shell = (function () {
   _getLoggedInPlayerInfo = function (callback) {
     var serverResponse;
     webix.ajax().get('player', {
-      error : function (text) {
-        console.log('ajax error', text);
+      error : function () {
         app.model.setPlayer(null);
         stateMap.loggedIn = false;
         if (stateMap.stomp_client) {
@@ -281,7 +261,7 @@ app.v_shell = (function () {
     var api_socket = new SockJS('/bbg/sock'), login = '', passcode = '';
     stateMap.stomp_client = Stomp.over(api_socket);
     stateMap.stomp_client.connect(login, passcode,
-      function (frame) {
+      function () {
         // connect 완료 시 error subscribe, global 에러 처리.
         if (callback) {
           callback();
@@ -291,7 +271,6 @@ app.v_shell = (function () {
         stateMap.stomp_client.subscribe('/user/topic/errors', _socketErrorHandler, {});
       },
       function (error) {
-        console.log(error);
         if (error && error.toLowerCase().indexOf('lost connection') !== -1 && stateMap.loggedIn) {
           logout();
         }
@@ -363,7 +342,6 @@ app.v_shell = (function () {
   playerInfoUpdate = function (callback) {
     webix.ajax().get('player', {}, {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',

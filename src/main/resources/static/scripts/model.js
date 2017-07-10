@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-03-21 19:50
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$ */
-
 /**
  * @namespace app.model
  *

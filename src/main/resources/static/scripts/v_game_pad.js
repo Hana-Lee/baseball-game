@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-01-20 21:19
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$ */
-
 app.v_game_pad = (function () {
   'use strict';
 
@@ -56,7 +41,6 @@ app.v_game_pad = (function () {
       'Content-Type' : 'application/json'
     }).patch('gameroom/set-game-number/' + gameRoomId, JSON.stringify(sendData), {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',
@@ -83,7 +67,6 @@ app.v_game_pad = (function () {
       'Content-Type' : 'application/json'
     }).patch('player/ready', JSON.stringify(sendData), {
       error : function (text) {
-        console.log(text);
         var textJson = JSON.parse(text);
         webix.alert({
           title : '오류',

@@ -2,21 +2,6 @@
  * @author Hana Lee
  * @since 2016-02-14 15:42
  */
-/*jslint
- browser  : true,
- continue : true,
- devel    : true,
- indent   : 2,
- maxerr   : 100,
- nomen    : true,
- plusplus : true,
- regexp   : true,
- vars     : false,
- white    : true,
- todo     : true
- */
-/*global $, app, webix, $$, Faye */
-
 app.v_chat = (function () {
   'use strict';
 
