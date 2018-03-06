@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
  * @since 2016-01-14 22-40
  */
 @EnableWebSecurity
-@Profile(value = {"dev"})
+@Profile(value = {"dev", "prod"})
 public class DevWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired

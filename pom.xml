@@ -32,21 +32,19 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 
-		<spring.version>4.3.0.RC2</spring.version>
-		<spring-boot.version>1.4.0.M3</spring-boot.version>
-		<spring-security.version>4.1.0.RELEASE</spring-security.version>
-		<modelmapper.version>0.7.6</modelmapper.version>
-		<commons-lang3.version>3.4</commons-lang3.version>
+		<spring-security.version>5.0.3.RELEASE</spring-security.version>
+		<modelmapper.version>1.1.2</modelmapper.version>
+		<commons-lang3.version>3.7</commons-lang3.version>
 
-		<lombok.version>1.16.8</lombok.version>
+		<lombok.version>1.16.20</lombok.version>
 
-		<webjars-webix.version>3.2.0</webjars-webix.version>
+		<webjars-webix.version>4.4.0</webjars-webix.version>
 	</properties>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.4.0.M3</version>
+		<version>2.0.0.RELEASE</version>
 	</parent>
 
 	<dependencies>
@@ -107,6 +105,10 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.modelmapper</groupId>
@@ -131,12 +133,15 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-	<!--<build>-->
-	<!--<plugins>-->
-	<!--<plugin>-->
-	<!--<groupId>org.springframework.boot</groupId>-->
-	<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-	<!--</plugin>-->
-	<!--</plugins>-->
-	<!--</build>-->
+
+	<build>
+		<plugins>
+			<!-- Package as an executable jar/war -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>

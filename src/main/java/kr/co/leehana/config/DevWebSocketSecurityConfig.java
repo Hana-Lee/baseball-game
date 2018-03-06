@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.socket.AbstractSecurit
  * @since 2016-02-24 20:28
  */
 @Configuration
-@Profile(value = {"dev"})
+@Profile(value = {"dev", "prod"})
 public class DevWebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
 
 	@Override

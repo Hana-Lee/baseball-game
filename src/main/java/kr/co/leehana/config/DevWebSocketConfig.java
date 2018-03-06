@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
  */
 @Configuration
 @EnableWebSocketMessageBroker
-@Profile(value = {"dev", "test"})
+@Profile(value = {"dev", "test", "prod"})
 public class DevWebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override

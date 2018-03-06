@@ -1,7 +1,6 @@
 package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.leehana.App;
 import kr.co.leehana.dto.GameRoomDto;
 import kr.co.leehana.enums.GameRole;
 import kr.co.leehana.model.GameRoom;
@@ -10,13 +9,11 @@ import kr.co.leehana.model.Setting;
 import kr.co.leehana.service.GameRoomService;
 import kr.co.leehana.service.PlayerService;
 import kr.co.leehana.utils.TestPlayerCreator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -50,8 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 2016-02-09 18:27
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {App.class})
-@WebIntegrationTest(randomPort = false)
+@SpringBootTest
 @Transactional
 public class GameRoomControllerTest {
 

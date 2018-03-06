@@ -1,7 +1,6 @@
 package kr.co.leehana.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.leehana.App;
 import kr.co.leehana.dto.PlayerDto;
 import kr.co.leehana.model.Level;
 import kr.co.leehana.model.Lose;
@@ -17,8 +16,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -48,8 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 2016-01-28 20:46
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {App.class})
-@WebIntegrationTest(randomPort = false)
+@SpringBootTest
 @Transactional
 public class PlayerControllerTest {
 

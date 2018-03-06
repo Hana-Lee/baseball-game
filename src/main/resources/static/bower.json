@@ -23,7 +23,7 @@
   ],
   "dependencies": {
     "jquery": "~3.x.x",
-    "webix": "~4.x.x",
+    "webix": "~5.x.x",
     "sockjs-client": "~1.x.x",
     "stomp-websocket": "~2.x.x",
     "underscore": "^1.8.3"
